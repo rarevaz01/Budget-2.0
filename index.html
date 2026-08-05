@@ -7,27 +7,38 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" href="icons/icon-192.png">
 <style>
-:root{--bg:#0A041A;--card:#150B2E;--card-2:#1B1038;--line:#271849;--text:#F4F2F8;--muted:#AAA0C1;--accent:#F79009;--accent-soft:rgba(247,144,9,.14);--accent-soft-line:rgba(247,144,9,.3);--btn-text:#0A041A;--white-seg:#3A2C5C;--track:#241539;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--red:#E2685C;--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
-[data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#EAE5F3;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--red:#D34C40;--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
+:root{--bg:#0A041A;--card:#150B2E;--card-2:#1B1038;--line:#271849;--text:#F4F2F8;--muted:#AAA0C1;--accent:#F79009;--accent-soft:rgba(247,144,9,.14);--accent-soft-line:rgba(247,144,9,.3);--btn-text:#0A041A;--white-seg:#9096A8;--track:#241539;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--other-seg:#8B7FE8;--red:#E2685C;--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
+[data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#9096A8;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--other-seg:#6D5FD1;--red:#D34C40;--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--card);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;-webkit-font-smoothing:antialiased}
 body{padding:28px 14px;display:flex;justify-content:center}
 .card{background:linear-gradient(165deg,var(--card-2) 0%,var(--card) 60%);border:none;border-radius:0;padding:22px 18px;width:100%;max-width:720px;box-shadow:none}
 .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
-.month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 12px;padding:8px;flex-wrap:wrap;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
-.month-select{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 10px;flex:1;min-width:0}
+.month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 12px;padding:8px;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
+.month-nav{display:flex;align-items:center;gap:8px;flex:1;min-width:0;width:100%}
+.month-nav-arrow{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.month-nav-arrow svg{display:block}
+.month-nav-arrow:disabled{opacity:.35;pointer-events:none}
+.month-select{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 10px;flex:1;min-width:0;text-align:center;text-align-last:center}
 .month-menu{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .month-menu svg{display:block}
 #status{font-size:12px;color:var(--muted)}
 #status.err{color:var(--red)}
-.chart-col{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;margin-bottom:12px}
+.chart-col{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;margin-bottom:12px}
 .chart-svg-wrap{flex:0 1 auto}
 .chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform}
 .chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease}
 .chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
 .chart-col.expanded .chart-svg-wrap svg{width:230px;height:230px}
 .chart-col.expanded{row-gap:8px}
+.chart-nav-arrow{display:none;position:absolute;top:115px;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-sm);z-index:2;transition:opacity .15s ease,transform .12s ease}
+.chart-nav-arrow:active{transform:translateY(-50%) scale(.92)}
+.chart-nav-arrow:disabled{opacity:.35;pointer-events:none}
+.chart-nav-arrow svg{display:block}
+.chart-nav-prev{left:0}
+.chart-nav-next{right:0}
+.chart-col.expanded .chart-nav-arrow{display:none}
 .chart-side.expanded{display:none}
 .chart-side.expanded .side-block{flex:0 1 150px;align-items:center}
 .chart-side.expanded .side-income{display:none}
@@ -41,11 +52,11 @@ h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
 .chart-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0;padding:2px 2px;max-height:0;opacity:0;overflow:hidden;transition:max-height .4s ease,opacity .3s ease,margin .4s ease}
 .chart-legend.open{max-height:900px;opacity:1;margin:4px 0 16px}
 .others-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.cat-tile{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px;border-radius:13px;min-width:0}
+.cat-tile{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 10px;border-radius:999px;min-width:0}
 .cat-tile-other{cursor:pointer;border:none;width:100%;text-align:left;font:inherit}
-.cat-tile-name{font-size:12px;font-weight:700;color:var(--tile-text,var(--text));overflow:hidden;white-space:nowrap;flex:1;min-width:0;-webkit-mask-image:linear-gradient(to right,#000 70%,transparent 100%);mask-image:linear-gradient(to right,#000 70%,transparent 100%)}
-.cat-tile-amt{font-size:12px;font-weight:800;color:var(--tile-text,var(--text));font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
-.cat-tile-pct{font-size:12px;font-weight:700;color:var(--tile-text,var(--text));opacity:.86;margin-left:3px}
+.cat-tile-name{font-size:10px;font-weight:700;color:var(--tile-text,var(--text));overflow:hidden;white-space:nowrap;flex:1;min-width:0;-webkit-mask-image:linear-gradient(to right,#000 70%,transparent 100%);mask-image:linear-gradient(to right,#000 70%,transparent 100%)}
+.cat-tile-amt{font-size:10px;font-weight:800;color:var(--tile-text,var(--text));font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.cat-tile-pct{font-size:10px;font-weight:700;color:var(--tile-text,var(--text));opacity:.86;margin-left:3px}
 .chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0}
 .side-block{display:flex;flex-direction:column;gap:5px}
 .side-label{font-size:12px;color:var(--muted);letter-spacing:.02em;font-weight:700}
@@ -222,10 +233,24 @@ svg{overflow:visible}
   </div>
 </div>
 <div class="month-row">
-  <select class="month-select" id="monthSelect"></select>
+  <div class="month-nav">
+    <button type="button" class="month-nav-arrow" id="monthPrevBtn" aria-label="Предыдущий месяц">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <select class="month-select" id="monthSelect"></select>
+    <button type="button" class="month-nav-arrow" id="monthNextBtn" aria-label="Следующий месяц">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
 </div>
 <div class="chart-col" id="chartCol">
+  <button type="button" class="chart-nav-arrow chart-nav-prev" id="chartPrevMonth" aria-label="Предыдущий месяц">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
   <div class="chart-svg-wrap"><svg id="donut" width="180" height="180" viewBox="0 0 300 300"></svg></div>
+  <button type="button" class="chart-nav-arrow chart-nav-next" id="chartNextMonth" aria-label="Следующий месяц">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
   <div class="chart-side">
     <div class="side-block side-budget">
       <span class="side-label">Доходы</span>
@@ -238,7 +263,7 @@ svg{overflow:visible}
     <div class="side-block side-income">
       <form class="income-row" id="incomeForm">
         <input class="income-input" id="incomeAmt" type="text" inputmode="decimal" placeholder="Сумма дохода">
-        <button class="income-btn" type="button" id="incomeBtn" aria-label="Добавить доход">＋ Добавить доход</button>
+        <button class="income-btn" type="button" id="incomeBtn" aria-label="Добавить доход">Добавить доход</button>
       </form>
     </div>
   </div>
@@ -447,12 +472,13 @@ normalizeStore(STORE);
 // active month's data, aliased for convenience
 function cur(){ return STORE.months[STORE.current]; }
 
-const rowsEl=document.getElementById('rows'),svg=document.getElementById('donut'),bi=document.getElementById('bi'),st=document.getElementById('status'),chartCol=document.getElementById('chartCol');
+const rowsEl=document.getElementById('rows'),svg=document.getElementById('donut'),bi=document.getElementById('bi'),ld=document.getElementById('ld'),st=document.getElementById('status'),chartCol=document.getElementById('chartCol');
 const expandedCategories = new Set();
 const limitEditCategories = new Set();
 let submitExpenseFor = function(){};
 let submitIncome = function(){};
 const monthSelect=document.getElementById('monthSelect');
+const monthPrevBtn=document.getElementById('monthPrevBtn'),monthNextBtn=document.getElementById('monthNextBtn');
 const keyboardActionBar=document.getElementById('keyboardActionBar');
 const keyboardActionComment=document.getElementById('keyboardActionComment');
 const keyboardActionSubmit=document.getElementById('keyboardActionSubmit');
@@ -592,10 +618,22 @@ function hexToRgba(hex, alpha){
 function renderMonthSelect(){
   const keys = STORE.order.filter(k=>STORE.months[k]);
   monthSelect.innerHTML = keys.map(k=>`<option value="${k}" ${k===STORE.current?'selected':''}>${monthLabel(k)}</option>`).join('');
+  updateMonthNavArrows();
+}
+
+function updateMonthNavArrows(){
+  const keys = STORE.order.filter(k=>STORE.months[k]);
+  const idx = keys.indexOf(STORE.current);
+  monthPrevBtn.disabled = idx<=0;
+  monthNextBtn.disabled = idx<0 || idx>=keys.length-1;
 }
 
 function switchMonth(key){
-  if(!STORE.months[key]) return;
+  if(!STORE.months[key] || key===STORE.current) return;
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  const fromBudget = cur().B;
+  const fromRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
+  const fromCatAmounts = cur().C.map(c=>parseFloat(c.a)||0);
   STORE.current = key;
   expandedCategories.clear();
   limitEditCategories.clear();
@@ -604,7 +642,23 @@ function switchMonth(key){
   bi.value = fmt(cur().B);
   renderRows();
   renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+  animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts);
+  updateChartNavArrows();
+  updateMonthNavArrows();
+  monthSelect.value = key;
   save();
+}
+
+function orderedMonthKeys(){
+  return STORE.order.filter(k=>STORE.months[k]);
+}
+
+function updateChartNavArrows(){
+  const keys = orderedMonthKeys();
+  const idx = keys.indexOf(STORE.current);
+  document.getElementById('chartPrevMonth').disabled = idx<=0;
+  document.getElementById('chartNextMonth').disabled = idx<0 || idx>=keys.length-1;
 }
 
 function renderRows(){
@@ -619,7 +673,7 @@ function renderRows(){
     const row=document.createElement('div');row.className='row'+(isExpanded?' expanded':'');
     row.innerHTML=`
       <div class="row-top">
-        <div class="sw" style="background:${c.col || P[i%P.length]}"></div>
+        <div class="sw" style="background:${swGradient(c.col || P[i%P.length])}"></div>
         <div class="ninp" title="${(c.n||'').replace(/"/g,'&quot;')}">${(c.n||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
         <div class="amt-display${(c.limit>0 && c.a>c.limit)?' over-limit':''}" id="amt-${i}">${fmt(c.a)}</div>
         <button class="hist-icon-btn" type="button" data-i="${i}" data-histbtn="1" aria-label="История категории" title="История категории">
@@ -666,18 +720,262 @@ let chartExpanded = false;
 let chartPeriod = 'month';
 
 // thin wrappers: inject the live STORE / theme color into the pure logic.js implementations
-function getPeriodCats(period){ return Logic.getPeriodCats(period, STORE, cssVar('--muted')); }
+function getPeriodCats(period){ return Logic.getPeriodCats(period, STORE, cssVar('--other-seg')); }
 function getPeriodBudget(period){ return Logic.getPeriodBudget(period, STORE); }
-function reduceToTopWithRest(items, limit){ return Logic.reduceToTopWithRest(items, limit, cssVar('--muted')); }
+function reduceToTopWithRest(items, limit){ return Logic.reduceToTopWithRest(items, limit, cssVar('--other-seg')); }
 
 let othersData = { items: [], basis: 0 };
+
+function lightenHex(hex, amt){
+  const h = hex.replace('#','');
+  const full = h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n = parseInt(full,16);
+  let r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let hh=0, s=0, l=(max+min)/2;
+  if(max!==min){
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    if(max===r) hh=(g-b)/d+(g<b?6:0);
+    else if(max===g) hh=(b-r)/d+2;
+    else hh=(r-g)/d+4;
+    hh/=6;
+  }
+  l = Math.min(1, l + amt*(1-l));
+  function hue2rgb(p,q,t){ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3-t)*6; return p; }
+  let r2,g2,b2;
+  if(s===0){ r2=g2=b2=l; }
+  else{
+    const q = l<0.5 ? l*(1+s) : l+s-l*s;
+    const p = 2*l-q;
+    r2=hue2rgb(p,q,hh+1/3); g2=hue2rgb(p,q,hh); b2=hue2rgb(p,q,hh-1/3);
+  }
+  const toHex = x => Math.round(x*255).toString(16).padStart(2,'0');
+  return `#${toHex(r2)}${toHex(g2)}${toHex(b2)}`;
+}
+
+function hueOf(hex){
+  const h = (hex||'').replace('#','');
+  const full = h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n = parseInt(full,16);
+  if(isNaN(n)) return 0;
+  const r=((n>>16)&255)/255, g=((n>>8)&255)/255, b=(n&255)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  if(max===min) return 0;
+  const d=max-min;
+  let hh;
+  if(max===r) hh=(g-b)/d+(g<b?6:0);
+  else if(max===g) hh=(b-r)/d+2;
+  else hh=(r-g)/d+4;
+  return hh*60;
+}
+
+// Reorders same-family display slices (e.g. two blues) so they don't land
+// next to each other around the ring — only swaps within the already-
+// decided set/order, doesn't change which categories are shown.
+function avoidAdjacentHues(items){
+  const arr = items.slice();
+  const n = arr.length;
+  if(n<3) return arr;
+  const bucket = it => Math.floor(hueOf(it.col)/40);
+  const conflictAt = () => { for(let i=0;i<n;i++){ if(bucket(arr[i])===bucket(arr[(i+1)%n])) return i; } return -1; };
+  let guard=0, ci;
+  while((ci=conflictAt())!==-1 && guard<20){
+    guard++;
+    const nextIdx=(ci+1)%n;
+    let fixed=false;
+    for(let j=0;j<n;j++){
+      if(j===ci||j===nextIdx) continue;
+      const tmp=arr[nextIdx]; arr[nextIdx]=arr[j]; arr[j]=tmp;
+      if(bucket(arr[ci])!==bucket(arr[nextIdx])){ fixed=true; break; }
+      const tmp2=arr[nextIdx]; arr[nextIdx]=arr[j]; arr[j]=tmp2;
+    }
+    if(!fixed) break;
+  }
+  return arr;
+}
+
+function swGradient(col){
+  return `linear-gradient(135deg,${lightenHex(col,0.32)},${col})`;
+}
+
+// Minimum visual sweep (in degrees) any non-zero ring segment gets, so thin
+// slices stay visible/tappable. Deficit is taken proportionally from
+// segments that have slack (the "left" budget segment first, then other
+// categories), via water-filling so the ring always sums to 360.
+const MIN_SEG_SWEEP = 14.4;
+function applyMinSweep(items, total){
+  total = total==null ? 360 : total;
+  const segs = items.map((it,i)=>({i, sweep:it.sweep, floor:it.floor||0}));
+  const fixed = new Map();
+  let pool = segs.slice();
+  while(true){
+    const below = pool.filter(s=>s.sweep < s.floor);
+    if(below.length===0) break;
+    below.forEach(s=>fixed.set(s.i, s.floor));
+    pool = pool.filter(s=>s.sweep>=s.floor);
+    const usedFixed = [...fixed.values()].reduce((a,b)=>a+b,0);
+    const available = total - usedFixed;
+    const poolRawSum = pool.reduce((a,s)=>a+s.sweep,0);
+    if(poolRawSum<=0) break;
+    const scale = available/poolRawSum;
+    pool.forEach(s=>{ s.sweep = s.sweep*scale; });
+  }
+  pool.forEach(s=>fixed.set(s.i, s.sweep));
+  return segs.map(s=>fixed.get(s.i));
+}
+
+function appendArcGradient(defs, ns, cx, cy, ringR, id, a, sw, colA, colB){
+  const start = pol(cx, cy, ringR, a), end = pol(cx, cy, ringR, a + sw);
+  const grad = document.createElementNS(ns, "linearGradient");
+  grad.setAttribute("id", id);
+  grad.setAttribute("gradientUnits", "userSpaceOnUse");
+  grad.setAttribute("x1", start.x); grad.setAttribute("y1", start.y);
+  grad.setAttribute("x2", end.x); grad.setAttribute("y2", end.y);
+  const s1 = document.createElementNS(ns, "stop"); s1.setAttribute("offset", "0%"); s1.setAttribute("stop-color", colA);
+  const s2 = document.createElementNS(ns, "stop"); s2.setAttribute("offset", "100%"); s2.setAttribute("stop-color", colB);
+  grad.appendChild(s1); grad.appendChild(s2);
+  defs.appendChild(grad);
+}
+
+const CHART_CX=150, CHART_CY=150, CHART_R=130, CHART_RI=100, CHART_THICK=CHART_R-CHART_RI, CHART_RINGR=(CHART_R+CHART_RI)/2, CHART_NS="http://www.w3.org/2000/svg";
+
+// Fixed physical gap between ring segments, independent of segment size.
+// A round stroke-linecap doesn't stop painting at its path's mathematical
+// endpoint — it bulges outward by another stroke-width/2 (in the direction
+// the path was heading), on BOTH sides of the gap. So to get an actual
+// visible gap of RING_GAP_PX between two painted shapes, the angular
+// distance reserved between their skeletons has to be the visual gap PLUS
+// both caps' bulge (thick/2 each) — otherwise adjacent pills/dots visually
+// overlap even though their skeletons don't.
+const RING_GAP_PX = 15;
+function ringGapDeg(ringR, thick){
+  const visualGap = RING_GAP_PX/ringR*180/Math.PI;
+  const capBulge = (thick/2)/ringR*180/Math.PI;
+  return visualGap + 2*capBulge;
+}
+
+// Reserves N fixed-size gaps out of the 360° circle FIRST, then distributes
+// what's left among segments by share (with a MIN_SEG_SWEEP floor for the
+// ones marked `floor`). Because the gap is baked into the layout up front —
+// rather than carved out of an already-final slot at render time — every
+// segment's [a, a+sw) is already its true visible arc, segments never touch,
+// and the ring always closes exactly on 360° with no special-case seam fix.
+function layoutRingSweeps(shareItems, ringR, thick){
+  const gapDeg = ringGapDeg(ringR, thick);
+  const availableDeg = Math.max(0, 360 - shareItems.length*gapDeg);
+  const sweepItems = shareItems.map(it=>({sweep: it.share*availableDeg, floor: it.floor||0}));
+  return { adjSweeps: applyMinSweep(sweepItems, availableDeg), gapDeg };
+}
+
+// A segment whose real share is tiny (e.g. ~1%) is drawn as a dot instead of
+// a stretched pill: a zero-length path at the slot's mid-angle, which a
+// round stroke-linecap renders as a perfect circle of diameter = thick.
+function dotPath(cx, cy, ringR, angle){
+  const p = pol(cx, cy, ringR, angle);
+  return `M ${p.x} ${p.y} L ${p.x} ${p.y}`;
+}
+
+// Each ring segment is ONE path with a native round stroke-linecap on both
+// ends. [a, a+sw) is already the exact visible arc (gaps are reserved by
+// layoutRingSweeps beforehand), so segments simply never touch — no paint
+// ordering or seam patching needed.
+function buildRingSegment(ns, cx, cy, ringR, thick, a, sw, paintRef, key, isDot){
+  const el=document.createElementNS(ns,"path");
+  if(isDot){
+    el.setAttribute("d",dotPath(cx,cy,ringR,a+sw/2));
+    el.setAttribute("data-s",a+sw/2);el.setAttribute("data-e",a+sw/2);
+  } else {
+    el.setAttribute("d",arc(cx,cy,ringR,a,a+sw));
+    el.setAttribute("data-s",a);el.setAttribute("data-e",a+sw);
+  }
+  el.setAttribute("stroke",paintRef);el.setAttribute("stroke-width",thick);el.setAttribute("stroke-linecap","round");el.setAttribute("fill","none");
+  el.setAttribute("data-seg",key);
+  return el;
+}
+
+function appendClosedRing(svg, ns, cx, cy, ringR, thick, segDescs){
+  segDescs.forEach(d=>svg.appendChild(buildRingSegment(ns, cx, cy, ringR, thick, d.a, d.sw, d.paint, d.key, d.isDot)));
+}
+let lastCatRanges = [];
+let lastLeftRange = null;
+let lastPeriodTotal = 0;
+
+function animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const toBudget = cur().B;
+  const toRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
+  const rowEls = Array.from(document.querySelectorAll('.amt-display'));
+  const toCatAmounts = cur().C.map(c=>parseFloat(c.a)||0);
+  if(reduceMotion){
+    bi.value = fmt(toBudget);
+    ld.textContent = fmt(toRemaining);
+    rowEls.forEach((el,i)=>{ el.textContent = fmt(toCatAmounts[i]||0); });
+    return;
+  }
+  const dur=300, t0=performance.now();
+  const ease = t => 1-Math.pow(1-t,3);
+  function frame(now){
+    const t=Math.min(1,(now-t0)/dur), k=ease(t);
+    bi.value = fmt(Math.round(fromBudget+(toBudget-fromBudget)*k));
+    ld.textContent = fmt(Math.round(fromRemaining+(toRemaining-fromRemaining)*k));
+    rowEls.forEach((el,i)=>{
+      const fv = fromCatAmounts[i]!=null ? fromCatAmounts[i] : (toCatAmounts[i]||0);
+      const tv = toCatAmounts[i]||0;
+      el.textContent = fmt(Math.round(fv+(tv-fv)*k));
+    });
+    if(t<1) requestAnimationFrame(frame);
+    else {
+      bi.value = fmt(toBudget);
+      ld.textContent = fmt(toRemaining);
+      rowEls.forEach((el,i)=>{ el.textContent = fmt(toCatAmounts[i]||0); });
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function animateChartTransition(fromRanges, fromLeft, fromTotal){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion) return;
+  const paths = Array.from(svg.querySelectorAll('path[data-seg]'));
+  if(!paths.length) return;
+  const jobs = paths.map(el=>{
+    const key = el.getAttribute('data-seg');
+    const toS = parseFloat(el.getAttribute('data-s')), toE = parseFloat(el.getAttribute('data-e'));
+    const fromRange = key==='__left__' ? fromLeft : fromRanges.find(r=>r.name===key);
+    let fromS, fromE;
+    if(fromRange){ fromS=fromRange.s; fromE=fromRange.e; }
+    else { const mid=(toS+toE)/2; fromS=mid; fromE=mid; }
+    return {el, fromS, fromE, toS, toE};
+  });
+  const totalEl = svg.querySelector('[data-role="chart-total"]');
+  const toTotal = totalEl ? parseFloat(totalEl.getAttribute('data-raw')) : null;
+  const animateTotal = totalEl && typeof fromTotal==='number' && !isNaN(toTotal) && fromTotal!==toTotal;
+  const dur=300, t0=performance.now();
+  const ease = t => 1-Math.pow(1-t,3);
+  function frame(now){
+    const t=Math.min(1,(now-t0)/dur), k=ease(t);
+    jobs.forEach(j=>{
+      const s=j.fromS+(j.toS-j.fromS)*k;
+      const e=j.fromE+(j.toE-j.fromE)*k;
+      if(Math.abs(e-s)<0.01){
+        j.el.setAttribute('d', dotPath(CHART_CX,CHART_CY,CHART_RINGR,(s+e)/2));
+      } else {
+        j.el.setAttribute('d', arc(CHART_CX,CHART_CY,CHART_RINGR, s, e));
+      }
+    });
+    if(animateTotal) totalEl.textContent = fmt(Math.round(fromTotal+(toTotal-fromTotal)*k));
+    if(t<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
 
 function renderChart(){
   const m = cur();
   const total=m.C.reduce((s,c)=>s+(parseFloat(c.a)||0),0);
-  const ld=document.getElementById('ld');
   svg.innerHTML='';
-  const cx=150,cy=150,r=130,ri=94,ns="http://www.w3.org/2000/svg",thick=r-ri,ringR=(r+ri)/2;
+  const cx=CHART_CX,cy=CHART_CY,r=CHART_R,ri=CHART_RI,ns=CHART_NS,thick=CHART_THICK,ringR=CHART_RINGR;
   const legend = document.getElementById('chartLegend');
   const periodTabs = document.getElementById('periodTabs');
 
@@ -685,12 +983,14 @@ function renderChart(){
   const isMonth = period==='month';
   const catRanges=[];
   let periodTotal = total;
+  let lastLeftRangeNext = null;
 
   const periodBudget = getPeriodBudget(period);
   const periodSpentSoFar = isMonth ? total : getPeriodCats(period).reduce((s,c)=>s+c.amount,0);
   const periodLeft = periodBudget - periodSpentSoFar;
   bi.value = fmt(periodBudget);
   ld.textContent = fmt(periodLeft);
+  ld.setAttribute('data-raw', periodLeft);
   ld.classList.toggle('neg', periodLeft<0);
 
   if(isMonth){
@@ -703,26 +1003,31 @@ function renderChart(){
       svg.appendChild(c);
     } else {
       const rawCats = getPeriodCats('month');
-      const displayCats = reduceToTopWithRest(rawCats, 5);
+      const displayCats = avoidAdjacentHues(reduceToTopWithRest(rawCats, 5));
       const otherTile = displayCats.find(c=>c.isOther);
       othersData = { items: otherTile ? otherTile.restItems : [], basis: ct };
+      const defs=document.createElementNS(ns,"defs"); svg.appendChild(defs);
+      const shareItems = displayCats.map(c=>({share:c.amount/ct, floor:MIN_SEG_SWEEP}));
+      if(left>0) shareItems.push({share:left/ct, floor:0});
+      const {adjSweeps, gapDeg} = layoutRingSweeps(shareItems, ringR, thick);
+      const segDescs=[];
       let a=-90;
-      displayCats.forEach(c=>{
-        const sw=(c.amount/ct)*360, col=c.col||cssVar('--muted');
-        const p=arc(cx,cy,ringR,a,a+sw);
-        const el=document.createElementNS(ns,"path");
-        el.setAttribute("d",p);el.setAttribute("stroke",col);el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
-        svg.appendChild(el);
+      displayCats.forEach((c,idx)=>{
+        const sw=adjSweeps[idx], col=c.col||cssVar('--muted');
+        const gradId=`donutGrad${idx}`;
+        appendArcGradient(defs, ns, cx, cy, ringR, gradId, a, sw, lightenHex(col,0.32), col);
+        const isDot = (c.amount/ct)*100 < 1.5;
+        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name, isDot});
         catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/ct)*100), isOther:c.isOther});
-        a+=sw;
+        a+=sw+gapDeg;
       });
       if(left>0){
-        const sw=(left/ct)*360;
-        const p=arc(cx,cy,ringR,a,a+sw);
-        const el=document.createElementNS(ns,"path");
-        el.setAttribute("d",p);el.setAttribute("stroke",cssVar('--white-seg'));el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
-        svg.appendChild(el);
+        const sw=adjSweeps[displayCats.length];
+        const isDot = (left/ct)*100 < 1.5;
+        segDescs.push({a, sw, paint:cssVar('--white-seg'), key:'__left__', isDot});
+        lastLeftRangeNext = {s:a, e:a+sw};
       }
+      appendClosedRing(svg, ns, cx, cy, ringR, thick, segDescs);
     }
     periodTotal = total;
   } else {
@@ -734,29 +1039,35 @@ function renderChart(){
       c.setAttribute("fill","none");c.setAttribute("stroke",cssVar('--track'));c.setAttribute("stroke-width",thick);
       svg.appendChild(c);
     } else {
-      const displayCats = reduceToTopWithRest(rawCats, 5);
+      const displayCats = avoidAdjacentHues(reduceToTopWithRest(rawCats, 5));
       const otherTile = displayCats.find(c=>c.isOther);
       othersData = { items: otherTile ? otherTile.restItems : [], basis: periodTotal };
+      const defs=document.createElementNS(ns,"defs"); svg.appendChild(defs);
+      const shareItems = displayCats.map(c=>({share:c.amount/periodTotal, floor:MIN_SEG_SWEEP}));
+      const {adjSweeps, gapDeg} = layoutRingSweeps(shareItems, ringR, thick);
+      const segDescs=[];
       let a=-90;
-      displayCats.forEach(c=>{
-        const sw=(c.amount/periodTotal)*360, col=c.col||cssVar('--muted');
-        const p=arc(cx,cy,ringR,a,a+sw);
-        const el=document.createElementNS(ns,"path");
-        el.setAttribute("d",p);el.setAttribute("stroke",col);el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
-        svg.appendChild(el);
+      displayCats.forEach((c,idx)=>{
+        const sw=adjSweeps[idx], col=c.col||cssVar('--muted');
+        const gradId=`donutGrad${idx}`;
+        appendArcGradient(defs, ns, cx, cy, ringR, gradId, a, sw, lightenHex(col,0.32), col);
+        const isDot = (c.amount/periodTotal)*100 < 1.5;
+        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name, isDot});
         catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/periodTotal)*100), isOther:c.isOther});
-        a+=sw;
+        a+=sw+gapDeg;
       });
+      appendClosedRing(svg, ns, cx, cy, ringR, thick, segDescs);
     }
   }
 
   const centerLabel = period==='week' ? 'За неделю' : period==='year' ? 'За год' : 'За месяц';
-  const t1=document.createElementNS(ns,"text");t1.setAttribute("x",cx);t1.setAttribute("y",cy+2);t1.setAttribute("text-anchor","middle");t1.setAttribute("fill",cssVar('--text'));t1.setAttribute("font-weight","800");t1.setAttribute("letter-spacing","-0.02em");t1.setAttribute("font-size",periodTotal>=1000000?25:31);t1.textContent=fmt(periodTotal);svg.appendChild(t1);
+  const t1=document.createElementNS(ns,"text");t1.setAttribute("x",cx);t1.setAttribute("y",cy+2);t1.setAttribute("text-anchor","middle");t1.setAttribute("fill",cssVar('--text'));t1.setAttribute("font-weight","800");t1.setAttribute("letter-spacing","-0.02em");t1.setAttribute("font-size",periodTotal>=1000000?25:31);t1.setAttribute("data-role","chart-total");t1.setAttribute("data-raw",periodTotal);t1.textContent=fmt(periodTotal);svg.appendChild(t1);
   const t2=document.createElementNS(ns,"text");t2.setAttribute("x",cx);t2.setAttribute("y",cy+25);t2.setAttribute("text-anchor","middle");t2.setAttribute("fill",cssVar('--muted'));t2.setAttribute("font-size","12");t2.setAttribute("letter-spacing","1.1px");t2.setAttribute("font-weight","700");t2.textContent=centerLabel;svg.appendChild(t2);
 
   // plain percentage labels around the ring + tile grid below, shown after tapping the chart
   if(chartExpanded){
     catRanges.forEach(range=>{
+      if(range.pct<=0) return;
       const mid=(range.s+range.e)/2;
       const pos=pol(cx,cy,r+24,mid);
       const txt=document.createElementNS(ns,"text");
@@ -768,9 +1079,9 @@ function renderChart(){
     if(catRanges.length>0){
       const sorted = catRanges.slice().sort((a,b)=>(a.isOther?1:0)-(b.isOther?1:0) || b.amount-a.amount);
       legend.innerHTML = sorted.map(range=>`
-        <div class="cat-tile${range.isOther?' cat-tile-other':''}" ${range.isOther?'data-other="1"':''} style="background:${range.col};--tile-text:${contrastTextColor(range.col)}">
+        <div class="cat-tile${range.isOther?' cat-tile-other':''}" ${range.isOther?'data-other="1"':''} style="background:${swGradient(range.col)};--tile-text:${contrastTextColor(range.col)}">
           <span class="cat-tile-name">${(range.name||'').replace(/</g,'&lt;')}</span>
-          <span class="cat-tile-amt">${fmt(range.amount)}<span class="cat-tile-pct">· ${range.pct}%</span></span>
+          <span class="cat-tile-amt">${fmt(range.amount)}${range.pct>0?`<span class="cat-tile-pct">· ${range.pct}%</span>`:''}</span>
         </div>
       `).join('');
       legend.classList.add('open');
@@ -788,6 +1099,9 @@ function renderChart(){
     btn.classList.toggle('active', btn.dataset.period===chartPeriod);
   });
   chartCol.classList.toggle('expanded', chartExpanded);
+  lastCatRanges = catRanges.map(r=>({name:r.name, s:r.s, e:r.e}));
+  lastLeftRange = lastLeftRangeNext;
+  lastPeriodTotal = periodTotal;
 }
 
 function addExpense(i, amount, comment){
@@ -1578,7 +1892,7 @@ function renderCatEditor(){
   m.C.forEach((c,i)=>{
     html += `
       <div class="cat-edit-item">
-        <div class="cat-edit-sw" style="background:${c.col}"></div>
+        <div class="cat-edit-sw" style="background:${swGradient(c.col)}"></div>
         <div class="cat-edit-name">${c.n.replace(/</g,'&lt;')}</div>
         <button class="cat-edit-toggle on" type="button" data-cathide="${i}" aria-label="Отключить категорию"></button>
       </div>`;
@@ -1589,7 +1903,7 @@ function renderCatEditor(){
         <button class="cat-swipe-delete" data-catdelhidden="${i}">Удалить</button>
         <div class="cat-swipe-content" data-swipeitem="1">
           <div class="cat-edit-item" style="border-bottom:none">
-            <div class="cat-edit-sw" style="background:${c.col}"></div>
+            <div class="cat-edit-sw" style="background:${swGradient(c.col)}"></div>
             <div class="cat-edit-name dim">${c.n.replace(/</g,'&lt;')}</div>
             <button class="cat-edit-toggle" type="button" data-catshow="${i}" aria-label="Включить категорию"></button>
           </div>
@@ -1737,7 +2051,7 @@ function cancelIncomeEntry(){
   incomeAmt.value='';
   incomeAmt.classList.remove('show');
   incomeBtn.classList.remove('confirm');
-  incomeBtn.textContent='＋ Добавить доход';
+  incomeBtn.textContent='Добавить доход';
   incomeBtn.setAttribute('aria-label','Добавить доход');
   if(keyboardActionMode==='income') keyboardActionComment.value='';
 }
@@ -1768,6 +2082,27 @@ incomeAmt.addEventListener('keydown',e=>{
 });
 
 monthSelect.addEventListener('change',e=>{ switchMonth(e.target.value); });
+monthPrevBtn.addEventListener('click',()=>{
+  const keys = orderedMonthKeys();
+  const idx = keys.indexOf(STORE.current);
+  if(idx>0) switchMonth(keys[idx-1]);
+});
+monthNextBtn.addEventListener('click',()=>{
+  const keys = orderedMonthKeys();
+  const idx = keys.indexOf(STORE.current);
+  if(idx>=0 && idx<keys.length-1) switchMonth(keys[idx+1]);
+});
+
+document.getElementById('chartPrevMonth').addEventListener('click',()=>{
+  const keys = orderedMonthKeys();
+  const idx = keys.indexOf(STORE.current);
+  if(idx>0) switchMonth(keys[idx-1]);
+});
+document.getElementById('chartNextMonth').addEventListener('click',()=>{
+  const keys = orderedMonthKeys();
+  const idx = keys.indexOf(STORE.current);
+  if(idx>=0 && idx<keys.length-1) switchMonth(keys[idx+1]);
+});
 
 document.getElementById('newMonthBtn').addEventListener('click',()=>{
   const calendarKeys = Object.keys(STORE.months).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
@@ -2368,7 +2703,8 @@ function toggleChartExpanded(){
   chartExpanded = next;
   if(!next) chartPeriod = 'month';
   chartSideEl.classList.toggle('expanded', next);
-  renderChart();
+  chartCol.classList.toggle('expanded', next);
+  if(next) updateChartNavArrows();
 
   const endRect = ringEl.getBoundingClientRect();
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2398,6 +2734,8 @@ function toggleChartExpanded(){
       fill:'both'
     });
   }
+
+  requestAnimationFrame(renderChart);
 }
 svg.addEventListener('click', toggleChartExpanded);
 
@@ -2420,8 +2758,10 @@ document.addEventListener('click',e=>{
 document.querySelectorAll('#periodTabs button').forEach(btn=>{
   btn.addEventListener('click',()=>{
     if(chartPeriod===btn.dataset.period) return;
+    const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
     chartPeriod = btn.dataset.period;
     renderChart();
+    animateChartTransition(fromRanges, fromLeft, fromTotal);
   });
 });
 
