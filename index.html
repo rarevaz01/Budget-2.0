@@ -1,0 +1,2286 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<style>
+:root{--bg:#0A041A;--card:#150B2E;--card-2:#1B1038;--line:#271849;--text:#F4F2F8;--muted:#AAA0C1;--accent:#F79009;--accent-soft:rgba(247,144,9,.14);--accent-soft-line:rgba(247,144,9,.3);--btn-text:#0A041A;--white-seg:#3A2C5C;--track:#241539;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--red:#E2685C;--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
+[data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#EAE5F3;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--red:#D34C40;--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--card);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;-webkit-font-smoothing:antialiased}
+body{padding:28px 14px;display:flex;justify-content:center}
+.card{background:linear-gradient(165deg,var(--card-2) 0%,var(--card) 60%);border:none;border-radius:0;padding:22px 18px;width:100%;max-width:720px;box-shadow:none}
+.head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
+.month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 12px;padding:8px;flex-wrap:wrap;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
+.month-select{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 10px;flex:1;min-width:0}
+.month-menu{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.month-menu svg{display:block}
+#status{font-size:12px;color:var(--muted)}
+#status.err{color:var(--red)}
+.chart-col{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;margin-bottom:12px}
+.chart-svg-wrap{flex:0 1 auto}
+.chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform}
+.chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease}
+.chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
+.chart-col.expanded .chart-svg-wrap svg{width:230px;height:230px}
+.chart-col.expanded{row-gap:8px}
+.chart-side.expanded{display:none}
+.chart-side.expanded .side-block{flex:0 1 150px;align-items:center}
+.chart-side.expanded .side-income{display:none}
+.chart-side.expanded .binp{text-align:center}
+.chart-side{transition:opacity .2s ease,transform .2s ease}
+.period-tabs{display:none;justify-content:center;width:100%;margin:24px 0 14px;padding:0 2px}
+.period-tabs.show{display:flex}
+.period-tabs-track{display:flex;gap:2px;width:100%;background:var(--track);border-radius:12px;padding:3px}
+.period-tabs button{flex:1;min-width:0;background:none;border:none;color:var(--muted);font-size:13px;font-weight:700;padding:7px 12px;border-radius:9px;transition:background .2s ease,color .2s ease}
+.period-tabs button.active{color:var(--text);background:var(--card);box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.chart-legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0;padding:2px 2px;max-height:0;opacity:0;overflow:hidden;transition:max-height .4s ease,opacity .3s ease,margin .4s ease}
+.chart-legend.open{max-height:900px;opacity:1;margin:4px 0 16px}
+.others-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-tile{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 10px;border-radius:13px;min-width:0}
+.cat-tile-other{cursor:pointer;border:none;width:100%;text-align:left;font:inherit}
+.cat-tile-name{font-size:12px;font-weight:700;color:var(--tile-text,var(--text));overflow:hidden;white-space:nowrap;flex:1;min-width:0;-webkit-mask-image:linear-gradient(to right,#000 70%,transparent 100%);mask-image:linear-gradient(to right,#000 70%,transparent 100%)}
+.cat-tile-amt{font-size:12px;font-weight:800;color:var(--tile-text,var(--text));font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.cat-tile-pct{font-size:12px;font-weight:700;color:var(--tile-text,var(--text));opacity:.86;margin-left:3px}
+.chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0}
+.side-block{display:flex;flex-direction:column;gap:5px}
+.side-label{font-size:12px;color:var(--muted);letter-spacing:.02em;font-weight:700}
+.side-value{font-size:21px;line-height:1;font-weight:800;color:var(--text);padding:4px 0;letter-spacing:-.01em;font-variant-numeric:tabular-nums;display:inline-block}
+.income-row{display:flex;gap:6px}
+.income-input{background:var(--green-soft);border:1px solid var(--green-soft-line);border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;padding:0 10px;width:0;min-width:0;height:44px;flex:1;display:none;text-align:center}
+.income-input.show{display:block}
+.income-input::placeholder{color:var(--green)}
+.income-btn{display:flex;align-items:center;justify-content:center;background:var(--green-soft);border:1px solid transparent;color:var(--green);font-family:inherit;font-weight:700;font-size:14px;padding:0 14px;border-radius:12px;flex-shrink:0;white-space:nowrap;width:100%;height:44px;transition:background .18s ease,transform .12s ease,width .18s ease}
+.income-btn:active{transform:scale(.99)}
+.income-input.show ~ .income-btn,.income-btn.confirm{width:44px;padding:0;font-size:18px;border-color:var(--green-soft-line)}
+.side-value.neg{color:var(--red)}
+svg{overflow:visible}
+.binp{background:none;border:none;color:var(--text);font-weight:800;font-size:21px;line-height:1;padding:4px 0;width:100%;max-width:150px;cursor:default;letter-spacing:-.01em;font-family:inherit;font-variant-numeric:tabular-nums}
+.binp:focus{outline:none}
+.row{padding:13px 0;border-bottom:1px solid var(--line)}
+.row-top{display:grid;grid-template-columns:12px minmax(0,1fr) 88px 44px 44px;align-items:center;gap:8px;touch-action:pan-y}
+@media(max-width:430px){.row-top{grid-template-columns:12px minmax(0,1fr) 72px 44px 44px;gap:6px}}
+.row-dragging{opacity:.95;box-shadow:0 10px 24px rgba(0,0,0,.3);border-radius:14px;background:var(--card);pointer-events:none}
+.row-spacer{border:2px dashed var(--line);border-radius:12px;margin:2px 0;box-sizing:border-box}
+.sw{width:10px;height:10px;border-radius:3px}
+.ninp{color:var(--text);font-weight:700;font-size:13px;line-height:1.2;letter-spacing:0;width:100%;min-width:0;padding:3px 2px;overflow:hidden;white-space:nowrap}
+.ninp.is-overflowing{-webkit-mask-image:linear-gradient(to right,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 72%,transparent 100%)}
+.amt-display{font-weight:700;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.pct-input{font-size:12px;color:var(--text);text-align:right;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;width:44px;padding:2px 3px}
+.row-expand-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--green-soft-line);background:var(--green-soft);color:var(--green);font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0}
+.row-expand-btn span{display:block;line-height:1;transition:transform .22s cubic-bezier(.22,1,.36,1)}
+.row-expand-btn.open span{transform:rotate(45deg)}
+.row-bottom{display:none;flex-direction:column;gap:4px;margin-top:10px}
+.row.expanded .row-bottom{display:flex;animation:rowReveal .24s cubic-bezier(.22,1,.36,1)}
+@keyframes rowReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.plus-input{background:var(--green-soft);border:1px solid var(--green-soft-line);border-radius:10px;color:var(--text);font-size:14px;padding:9px 10px;width:0;min-width:0;height:40px;text-align:center;display:none;flex:1}
+.plus-input.show{display:block}
+.plus-input::placeholder{color:var(--green)}
+.limit-input{display:none;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:12px;padding:9px 8px;width:92px;height:40px;text-align:center;flex-shrink:0}
+.limit-input.show{display:block}
+.limit-input.limit-edit{display:block;flex:1;width:0;font-size:14px}
+.limit-input::placeholder{color:var(--muted);font-weight:700}
+.plus-row{display:flex;align-items:center;gap:6px;width:100%}
+.pct-toggle-btn{display:none;background:none;border:1px solid var(--line);color:var(--muted);width:44px;height:44px;border-radius:10px;font-size:14px;font-weight:700;flex-shrink:0}
+.pct-toggle-btn.show{display:block}
+.pct-toggle-btn.active{background:var(--accent-soft);border-color:var(--accent-soft-line);color:var(--accent)}
+.pct-preview{font-size:12px;color:var(--text);font-weight:700;padding:2px 0 0 2px;min-height:16px}
+.pct-preview:empty{min-height:0;padding:0}
+.hist-toggle-row{display:flex;justify-content:flex-start}
+.hist-icon-btn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.limit-action-btn{width:64px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:700}
+.limit-action-btn.limit-confirm{width:44px;padding:0}
+.hist-icon-btn.limit-confirm{border-color:var(--green-soft-line);background:var(--green-soft);color:var(--green)}
+.row-top .hist-icon-btn{width:44px;height:44px}
+.amt-display.over-limit{color:var(--red)}
+.limit-bar-wrap{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:4px 0 0}
+.limit-bar{height:100%;background:var(--green);border-radius:3px;transition:width .2s}
+.limit-bar.over{background:var(--red)}
+.limit-text{font-size:12px;color:var(--muted);margin:4px 0 0}
+.limit-text.over{color:var(--red);font-weight:700}
+.hist-toggle{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:2px 4px;flex-shrink:0}
+.hist{margin-top:6px;padding-left:18px;display:none}
+.hist.open{display:block}
+.hist-item{display:flex;flex-direction:column;gap:1px;font-size:13px;color:var(--muted);padding:6px 0}
+.hist-item .hist-top{display:flex;gap:10px;align-items:center}
+.hist-item b{color:var(--text);font-weight:600;font-size:14px}
+.hist-item .hist-comment{color:var(--muted);font-size:13px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;cursor:pointer}
+.hist-item .hist-comment.expanded{white-space:normal;overflow:visible;text-overflow:clip}
+.hist-del{background:none;border:none;color:var(--muted);font-size:13px;width:20px;height:20px;border-radius:5px;margin-left:auto;flex-shrink:0}
+.add{margin-top:14px;background:var(--accent-soft);border:1px solid var(--accent-soft-line);color:var(--accent);font-weight:700;font-size:13px;padding:12px 12px;border-radius:12px;width:100%;text-align:center}
+.bottom-row{display:flex;gap:8px;margin-top:10px}
+.head-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center;z-index:100}
+.overlay.open{display:flex}
+.sheet{background:linear-gradient(180deg,var(--card-2) 0%,var(--card) 40%);width:100%;max-width:720px;max-height:85vh;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:var(--shadow)}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sheet-head h2{font-size:18px;font-weight:800;margin:0;letter-spacing:-.01em}
+.backup-option{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line);text-align:left;background:none;border-top:none;border-left:none;border-right:none;width:100%}
+.backup-option:last-child{border-bottom:none}
+.backup-option-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text)}
+.backup-option-text{flex:1;min-width:0}
+.backup-option-title{font-size:14px;font-weight:700;color:var(--text)}
+.backup-option-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.backup-option.danger .backup-option-icon{color:var(--red)}
+.period-rename-form{display:none;align-items:center;gap:8px;padding:10px 4px 14px;border-bottom:1px solid var(--line)}
+.period-rename-form.open{display:flex}
+.period-rename-input{min-width:0;flex:1;height:44px;padding:0 12px;border:1px solid var(--accent-soft-line);border-radius:11px;outline:0;background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;font-size:14px}
+.period-rename-input:focus{border-color:var(--accent)}
+.period-rename-save{height:44px;padding:0 15px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800}
+.gh-search{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:13px;padding:9px 10px;margin-bottom:12px}
+.gh-search::placeholder{color:var(--muted)}
+.gh-month-tag{font-size:12px;color:var(--muted);font-weight:700}
+.gh-tags{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.gh-tag{background:none;border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:600;padding:7px 12px;border-radius:20px}
+.gh-tag.active{background:var(--accent);color:var(--btn-text);border-color:var(--accent)}
+.gh-date-toggle{display:flex;align-items:center;justify-content:center;width:34px;height:32px;margin-left:2px;padding:0;border:1px solid var(--line);border-radius:16px;background:none;color:var(--muted)}
+.gh-date-toggle.open,.gh-date-toggle.filtered{border-color:var(--accent-soft-line);background:var(--accent-soft);color:var(--accent)}
+.gh-date-filters{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:8px;margin:-4px 0 14px}
+.gh-date-filters.open{display:grid}
+.gh-date-box{min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035)}
+.gh-date-label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;font-weight:700}
+.gh-date-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:5px}
+.gh-date-input{min-width:0;width:100%;height:32px;margin:0;border:0;border-radius:7px;outline:0;background:var(--card);color:var(--text);font-family:inherit;font-size:12px;padding:4px 6px;color-scheme:dark}
+[data-theme="light"] .gh-date-input{color-scheme:light}
+.gh-date-dash{color:var(--muted);font-size:12px}
+.gh-date-clear{grid-column:1/-1;justify-self:end;margin-top:-2px;border:0;background:none;color:var(--muted);font-family:inherit;font-size:12px;text-decoration:underline;padding:2px 0}
+@media(max-width:430px){.gh-date-filters{grid-template-columns:1fr}.gh-date-clear{grid-column:1}}
+.gh-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035)}
+.gh-summary-count{color:var(--text);font-size:13px;font-weight:700}
+.gh-summary-totals{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.gh-summary-totals b{color:var(--text);font-weight:700}
+.gh-day-title{margin:18px 0 2px;padding-bottom:7px;border-bottom:1px solid var(--line);color:var(--text);font-size:13px;font-weight:800}
+.gh-summary + .gh-day-title{margin-top:0}
+.sheet-close{background:none;border:none;color:var(--muted);font-size:20px;width:32px;height:32px}
+.sheet-export{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.gh-empty{color:var(--muted);font-size:13px;text-align:center;padding:30px 0}
+.gh-item{border-bottom:1px solid var(--line);padding:10px 0}
+.gh-row{display:flex;align-items:center;gap:8px}
+.gh-sw{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.gh-cat{font-size:12px;color:var(--muted);flex-shrink:0}
+.gh-date{font-size:12px;color:var(--muted)}
+.gh-editrow{display:flex;align-items:center;gap:6px;margin-top:6px}
+.gh-amt-input{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;color:var(--text);font-weight:700;font-size:13px;padding:6px 8px;width:90px;text-align:center}
+.gh-comment-input{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:8px;color:var(--text);font-size:12px;padding:6px 8px;flex:1;min-width:0}
+.gh-save{background:var(--green-soft);border:1px solid var(--green-soft-line);color:var(--green);font-weight:700;font-size:12px;padding:7px 10px;border-radius:8px;flex-shrink:0}
+.gh-del{background:none;border:none;color:var(--muted);font-size:14px;width:26px;height:26px;border-radius:6px;flex-shrink:0}
+.gh-edit-icon{font-size:20px;font-weight:700;width:32px;height:32px}
+.gh-restore{background:none;border:1px solid var(--green-soft-line);color:var(--green);font-weight:700;font-size:12px;padding:7px 12px;border-radius:8px}
+.cat-edit-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cat-swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.cat-swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
+.cat-swipe-delete{position:absolute;top:0;right:0;bottom:0;width:80px;background:var(--red);color:#fff;font-weight:700;font-size:12px;border:none}
+.cat-edit-sw{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+.cat-edit-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
+.cat-edit-name.dim{color:var(--muted);font-weight:500}
+.cat-edit-toggle{width:44px;height:26px;border-radius:13px;border:none;background:var(--line);position:relative;flex-shrink:0;transition:background .15s}
+.cat-edit-toggle.on{background:var(--green)}
+.cat-edit-toggle::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.cat-edit-toggle.on::after{left:20px}
+.cat-add-row{display:flex;gap:8px;margin-top:14px}
+.cat-add-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:13px;padding:10px}
+.cat-add-btn{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-soft-line);border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px;white-space:nowrap}
+.cat-restore-btn{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:12px 0 0;width:100%;text-align:center}
+.cat-restore-btn:disabled{opacity:.4;text-decoration:none}
+.keyboard-action-bar{position:fixed;left:0;right:0;bottom:0;z-index:400;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:44px;align-items:stretch;gap:8px;width:min(100%,720px);margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--card);box-shadow:0 -12px 30px rgba(23,11,51,.12);transform:translateY(120%);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .16s ease}
+.keyboard-action-bar.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.keyboard-action-comment-wrap{box-sizing:border-box;display:flex;align-items:center;width:100%;height:44px;min-height:44px;max-height:44px;margin:0;overflow:hidden;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.keyboard-action-comment{box-sizing:border-box;display:block;min-width:0;width:100%;height:42px;min-height:42px;max-height:42px;margin:0;border:0;border-radius:0;outline:0;background:transparent;color:var(--text);font-family:inherit;font-size:14px;font-weight:700;line-height:42px;padding:0 12px;text-align:center;-webkit-appearance:none;appearance:none}
+.keyboard-action-comment::placeholder{color:var(--muted);font-weight:700}
+.keyboard-action-submit{box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:100%;height:100%;min-height:0;max-height:44px;margin:0;border:1px solid var(--green-soft-line);border-radius:12px;background:var(--green-soft);color:var(--green);font-family:inherit;font-size:14px;font-weight:700;line-height:1;padding:0 12px;text-align:center;white-space:nowrap;-webkit-appearance:none;appearance:none}
+.keyboard-action-submit:active{transform:scale(.99)}
+@media(max-width:390px){.keyboard-action-bar{padding-left:10px;padding-right:10px}.keyboard-action-submit{padding:0 12px}}
+.undo-toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:500;display:flex;align-items:center;justify-content:space-between;gap:12px;width:calc(100% - 28px);max-width:680px;min-height:48px;padding:10px 12px 10px 15px;border:1px solid var(--line);border-radius:13px;background:var(--text);color:var(--card);box-shadow:0 12px 30px rgba(23,11,51,.28);opacity:0;pointer-events:none;transform:translate(-50%,18px);transition:opacity .18s ease,transform .22s cubic-bezier(.22,1,.36,1)}
+.undo-toast.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.undo-toast-message{font-size:13px;font-weight:700;line-height:1.3}
+.undo-toast-btn{flex-shrink:0;border:0;border-radius:8px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800;padding:8px 10px}
+</style></head><body><div class="card">
+<div class="head">
+  <h1>Финансы</h1>
+  <div class="head-icons">
+    <span id="status"></span>
+    <button class="icon-btn" id="openGlobalHist" title="История" aria-label="История">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+    </button>
+    <button class="month-menu" id="monthMenuBtn" title="Меню периода" aria-label="Меню периода">
+      <svg width="18" height="6" viewBox="0 0 18 6" aria-hidden="true"><circle cx="3" cy="3" r="1.6" fill="currentColor"/><circle cx="9" cy="3" r="1.6" fill="currentColor"/><circle cx="15" cy="3" r="1.6" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+<div class="month-row">
+  <select class="month-select" id="monthSelect"></select>
+</div>
+<div class="chart-col" id="chartCol">
+  <div class="chart-svg-wrap"><svg id="donut" width="180" height="180" viewBox="0 0 300 300"></svg></div>
+  <div class="chart-side">
+    <div class="side-block side-budget">
+      <span class="side-label">Доходы</span>
+      <input class="binp" id="bi" type="text" inputmode="decimal" value="0" readonly>
+    </div>
+    <div class="side-block side-left">
+      <span class="side-label">Остаток</span>
+      <span class="side-value" id="ld">-</span>
+    </div>
+    <div class="side-block side-income">
+      <form class="income-row" id="incomeForm">
+        <input class="income-input" id="incomeAmt" type="text" inputmode="decimal" placeholder="Сумма дохода">
+        <button class="income-btn" type="button" id="incomeBtn" aria-label="Добавить доход">＋ Добавить доход</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="period-tabs" id="periodTabs">
+  <div class="period-tabs-track">
+    <button type="button" data-period="week">Неделя</button>
+    <button type="button" data-period="month" class="active">Месяц</button>
+    <button type="button" data-period="year">Год</button>
+  </div>
+</div>
+<div class="chart-legend" id="chartLegend"></div>
+<div id="rows"></div>
+<button class="add" id="openCatEditor">Изменить категории</button>
+</div>
+<div class="keyboard-action-bar" id="keyboardActionBar" aria-hidden="true" inert>
+  <div class="keyboard-action-comment-wrap">
+    <input class="keyboard-action-comment" id="keyboardActionComment" type="text" placeholder="Комментарий" autocomplete="off">
+  </div>
+  <button class="keyboard-action-submit" id="keyboardActionSubmit" type="button">Добавить расход</button>
+</div>
+<div class="undo-toast" id="undoToast" role="status" aria-live="polite" aria-hidden="true" inert>
+  <span class="undo-toast-message" id="undoToastMessage"></span>
+  <button class="undo-toast-btn" id="undoToastBtn" type="button">Отменить</button>
+</div>
+<div class="overlay" id="ghOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>История</h2>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="sheet-export" id="ghExport" title="Выгрузить в Excel" aria-label="Выгрузить в Excel">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        </button>
+        <button class="sheet-close" id="ghClose">×</button>
+      </div>
+    </div>
+    <input class="gh-search" id="ghSearch" type="text" placeholder="Поиск по категории, комментарию, сумме...">
+    <div class="gh-tags">
+      <button class="gh-tag active" data-ghtag="all">Все</button>
+      <button class="gh-tag" data-ghtag="expense">Траты</button>
+      <button class="gh-tag" data-ghtag="income">Доходы</button>
+      <button class="gh-tag" data-ghtag="other">Другое</button>
+      <button class="gh-date-toggle" id="ghDateToggle" type="button" aria-label="Фильтр по дате" aria-expanded="false" title="Фильтр по дате">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+      </button>
+    </div>
+    <div class="gh-date-filters" id="ghDateFilters">
+      <label class="gh-date-box">
+        <span class="gh-date-label">Выбрать дату</span>
+        <input class="gh-date-input" id="ghExactDate" type="date" aria-label="Дата истории">
+      </label>
+      <div class="gh-date-box">
+        <span class="gh-date-label">Период по датам</span>
+        <div class="gh-date-range">
+          <input class="gh-date-input" id="ghDateFrom" type="date" aria-label="Начало периода">
+          <span class="gh-date-dash">—</span>
+          <input class="gh-date-input" id="ghDateTo" type="date" aria-label="Конец периода">
+        </div>
+      </div>
+      <button class="gh-date-clear" id="ghDateClear" type="button">Сбросить даты</button>
+    </div>
+    <div id="ghList"></div>
+  </div>
+</div>
+<div class="overlay" id="catEditorOverlay">
+  <div class="sheet">
+    <div class="sheet-head"><h2>Категории</h2><button class="sheet-close" id="catEditorClose">×</button></div>
+    <div id="catEditorList"></div>
+    <div class="cat-add-row">
+      <input class="cat-add-input" id="catAddInput" type="text" placeholder="своя категория">
+      <button class="cat-add-btn" id="catAddBtn">Добавить</button>
+    </div>
+    <button class="cat-restore-btn" id="catRestorePresetsBtn">Восстановить убранные категории</button>
+  </div>
+</div>
+<div class="overlay" id="othersOverlay">
+  <div class="sheet">
+    <div class="sheet-head"><h2>Остальные категории</h2><button class="sheet-close" id="othersClose">×</button></div>
+    <div class="others-grid" id="othersList"></div>
+  </div>
+</div>
+<div class="overlay" id="backupOverlay">
+  <div class="sheet">
+    <div class="sheet-head"><h2>Период и данные</h2><button class="sheet-close" id="backupOverlayClose">×</button></div>
+    <button class="backup-option" type="button" id="newMonthBtn">
+      <div class="backup-option-icon">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M12 14v4M10 16h4"/></svg>
+      </div>
+      <div class="backup-option-text"><div class="backup-option-title">Создать следующий месяц</div><div class="backup-option-desc">Перенесёт категории и лимиты, но без расходов</div></div>
+    </button>
+    <button class="backup-option" type="button" id="editMonthNameBtn">
+      <div class="backup-option-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+      </div>
+      <div class="backup-option-text"><div class="backup-option-title">Переименовать период</div><div class="backup-option-desc">Изменить название выбранного месяца</div></div>
+    </button>
+    <form class="period-rename-form" id="periodRenameForm">
+      <input class="period-rename-input" id="periodRenameInput" type="text" maxlength="40" autocomplete="off" placeholder="Название периода" aria-label="Название периода">
+      <button class="period-rename-save" type="submit">Сохранить</button>
+    </form>
+    <button class="backup-option danger" type="button" id="delMonthBtn">
+      <div class="backup-option-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
+      </div>
+      <div class="backup-option-text"><div class="backup-option-title">Удалить выбранный месяц</div><div class="backup-option-desc">Месяц можно будет восстановить из истории</div></div>
+    </button>
+    <button class="backup-option" type="button" id="backupExportBtn">
+      <div class="backup-option-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      </div>
+      <div class="backup-option-text">
+        <div class="backup-option-title">Резервная копия</div>
+        <div class="backup-option-desc">Сохранит все месяцы, категории и расходы<br>в файл на устройство</div>
+      </div>
+    </button>
+    <button class="backup-option danger" type="button" id="backupImportBtn">
+      <div class="backup-option-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      </div>
+      <div class="backup-option-text">
+        <div class="backup-option-title">Восстановить из копии</div>
+        <div class="backup-option-desc">Заменит все текущие данные файлом.<br><strong>Действие необратимо!</strong></div>
+      </div>
+    </button>
+    <button class="backup-option" type="button" id="themeToggle">
+      <div class="backup-option-icon">
+        <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      </div>
+      <div class="backup-option-text"><div class="backup-option-title" id="themeMenuTitle">Тёмная тема</div><div class="backup-option-desc">Переключить оформление приложения</div></div>
+    </button>
+    <input type="file" id="backupFileInput" accept="application/json" style="display:none">
+  </div>
+</div>
+<script>
+const P=["#3382F9","#F79009","#5FC787","#6699F5","#F7A83D","#8ED2A0","#1E5FC7","#C06F00","#3F8F56","#B8D0FB","#FBCE94","#C3E8CD"];
+function nextColor(existingCategories){
+  const used = (existingCategories||[]).map(c=>c.col).filter(Boolean);
+  for(const c of P){ if(!used.includes(c)) return c; }
+  return P[(existingCategories||[]).length % P.length];
+}
+const K="icity-budget-v2";
+const MONTH_NAMES=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const PRESET_CATEGORIES=["Спорт","Красота и уход","Образование","Подарки","Ребёнок","Животные","Другое"];
+
+function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function monthLabel(key){
+  const month = STORE.months[key];
+  if(month && month.customName) return month.customName;
+  const parts = key.split('-');
+  if(parts.length===2 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])){
+    const y = +parts[0], m = +parts[1];
+    return MONTH_NAMES[m-1]+' '+y;
+  }
+  return key;
+}
+function defaultMonthData(){
+  return {
+    B:0,
+    C:[
+      {n:"Дом",a:0,h:[],col:P[0]},
+      {n:"Продукты и хозтовары",a:0,h:[],col:P[1]},
+      {n:"Транспорт",a:0,h:[],col:P[2]},
+      {n:"Связь и подписки",a:0,h:[],col:P[3]},
+      {n:"Одежда",a:0,h:[],col:P[4]},
+      {n:"Развлечения",a:0,h:[],col:P[5]},
+      {n:"Еда вне дома",a:0,h:[],col:P[6]},
+      {n:"Путешествия",a:0,h:[],col:P[7]},
+      {n:"Здоровье",a:0,h:[],col:P[8]},
+      {n:"Кредиты",a:0,h:[],col:P[9]}
+    ],
+    hiddenC:[],
+    EV:[],
+    IN:[]
+  };
+}
+
+let STORE = { months:{}, current:null, deletedMonths:[], order:[], dismissedPresets:[] };
+try{
+  const r=localStorage.getItem(K);
+  if(r){
+    const p=JSON.parse(r);
+    if(p && typeof p.months==='object') STORE.months=p.months;
+    if(p && p.current) STORE.current=p.current;
+    if(p && Array.isArray(p.deletedMonths)) STORE.deletedMonths=p.deletedMonths;
+    if(p && Array.isArray(p.order)) STORE.order=p.order;
+    if(p && Array.isArray(p.dismissedPresets)) STORE.dismissedPresets=p.dismissedPresets;
+  }
+}catch(e){}
+
+const nowKey = monthKey(new Date());
+if(Object.keys(STORE.months).length===0){
+  STORE.months[nowKey] = defaultMonthData();
+  STORE.current = nowKey;
+}
+if(!STORE.current || !STORE.months[STORE.current]){
+  const keys = Object.keys(STORE.months).sort();
+  STORE.current = keys[keys.length-1];
+}
+
+// migrate: build/repair order array so it contains exactly the existing month keys
+{
+  const existing = Object.keys(STORE.months);
+  const known = new Set(STORE.order);
+  const missing = existing.filter(k=>!known.has(k)).sort();
+  STORE.order = STORE.order.filter(k=>STORE.months[k]).concat(missing);
+}
+
+// migrate old data without fixed category colors
+Object.values(STORE.months).forEach(month=>{
+  (month.C||[]).forEach((c,i)=>{
+    if(!c.col) c.col = nextColor(month.C.slice(0,i));
+  });
+  if(!Array.isArray(month.IN)) month.IN = [];
+  if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
+});
+
+// active month's data, aliased for convenience
+function cur(){ return STORE.months[STORE.current]; }
+
+const rowsEl=document.getElementById('rows'),svg=document.getElementById('donut'),bi=document.getElementById('bi'),st=document.getElementById('status'),chartCol=document.getElementById('chartCol');
+const expandedCategories = new Set();
+const limitEditCategories = new Set();
+let submitExpenseFor = function(){};
+let submitIncome = function(){};
+const monthSelect=document.getElementById('monthSelect');
+const keyboardActionBar=document.getElementById('keyboardActionBar');
+const keyboardActionComment=document.getElementById('keyboardActionComment');
+const keyboardActionSubmit=document.getElementById('keyboardActionSubmit');
+const undoToast=document.getElementById('undoToast');
+const undoToastMessage=document.getElementById('undoToastMessage');
+const undoToastBtn=document.getElementById('undoToastBtn');
+let activeExpenseIndex=null;
+let keyboardActionMode=null;
+let lastUndoAction=null;
+let undoToastTimer=null;
+
+function hideUndoToast(){
+  if(undoToastTimer) clearTimeout(undoToastTimer);
+  undoToastTimer=null;
+  lastUndoAction=null;
+  undoToast.classList.remove('show');
+  undoToast.setAttribute('aria-hidden','true');
+  undoToast.inert=true;
+}
+function showUndoToast(message,undoAction){
+  if(undoToastTimer) clearTimeout(undoToastTimer);
+  lastUndoAction=undoAction;
+  undoToastMessage.textContent=message;
+  undoToast.classList.add('show');
+  undoToast.setAttribute('aria-hidden','false');
+  undoToast.inert=false;
+  undoToastTimer=setTimeout(hideUndoToast,6000);
+}
+function refreshAfterUndo(){
+  bi.value=fmt(cur().B);
+  renderRows();
+  renderChart();
+  if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+  if(document.getElementById('catEditorOverlay').classList.contains('open')) renderCatEditor();
+  save();
+}
+undoToastBtn.addEventListener('click',()=>{
+  const undoAction=lastUndoAction;
+  hideUndoToast();
+  if(typeof undoAction==='function') undoAction();
+});
+
+function updateKeyboardActionBarPosition(){
+  if(!keyboardActionBar) return;
+  const viewport=window.visualViewport;
+  const keyboardInset=viewport ? Math.max(0,window.innerHeight-viewport.height-viewport.offsetTop) : 0;
+  keyboardActionBar.style.bottom=keyboardInset+'px';
+}
+function showKeyboardActionBar(mode,i){
+  const nextMode = mode || 'expense';
+  if(keyboardActionMode!==nextMode || activeExpenseIndex!==i) keyboardActionComment.value='';
+  keyboardActionMode=nextMode;
+  activeExpenseIndex=nextMode==='expense'?i:null;
+  keyboardActionSubmit.textContent=nextMode==='income'?'Добавить':'Добавить расход';
+  keyboardActionBar.classList.add('show');
+  keyboardActionBar.setAttribute('aria-hidden','false');
+  keyboardActionBar.inert=false;
+  updateKeyboardActionBarPosition();
+}
+function hideKeyboardActionBar(){
+  activeExpenseIndex=null;
+  keyboardActionMode=null;
+  keyboardActionBar.classList.remove('show');
+  keyboardActionBar.setAttribute('aria-hidden','true');
+  keyboardActionBar.inert=true;
+  keyboardActionBar.style.bottom='0px';
+}
+keyboardActionSubmit.addEventListener('pointerdown',e=>e.preventDefault());
+keyboardActionSubmit.addEventListener('click',()=>{
+  if(keyboardActionMode==='income') submitIncome();
+  if(keyboardActionMode==='expense' && activeExpenseIndex!==null) submitExpenseFor(activeExpenseIndex);
+});
+keyboardActionComment.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key==='Go'||e.key==='Done'){
+    e.preventDefault();
+    if(keyboardActionMode==='income') submitIncome();
+    if(keyboardActionMode==='expense' && activeExpenseIndex!==null) submitExpenseFor(activeExpenseIndex);
+  }
+});
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',updateKeyboardActionBarPosition);
+  window.visualViewport.addEventListener('scroll',updateKeyboardActionBarPosition);
+}
+window.addEventListener('resize',updateKeyboardActionBarPosition);
+
+function fmt(n){return new Intl.NumberFormat('ru-RU').format(Math.round(n||0))}
+function strip(v){return v.replace(/[^0-9.]/g,'').replace(/^0+(?=\d)/,'')}
+function formatLiveInput(inp){
+  const raw = strip(inp.value);
+  const parts = raw.split('.');
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
+  const formatted = parts.length>1 ? intPart+'.'+parts[1] : intPart;
+  inp.value = formatted;
+}
+function numVal(v){ return parseFloat(String(v).replace(/[\u00A0\s%]/g,''))||0; }
+function fmtDate(iso){
+  const d=new Date(iso);
+  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+}
+function save(){
+  try{
+    localStorage.setItem(K,JSON.stringify(STORE));
+    st.textContent="Сохранено ✓";
+    st.classList.remove('err');
+    setTimeout(()=>st.textContent='',1200);
+  }catch(e){
+    st.textContent="Ошибка сохранения";
+    st.classList.add('err');
+  }
+}
+let t=null;function sched(){if(t)clearTimeout(t);t=setTimeout(save,800)}
+function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
+function hexToRgba(hex, alpha){
+  const h = (hex||'#8884aa').replace('#','');
+  const full = h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n = parseInt(full,16);
+  if(isNaN(n)) return `rgba(136,132,170,${alpha})`;
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+function contrastTextColor(color){
+  let r=0,g=0,b=0;
+  const value=(color||'').trim();
+  if(value.startsWith('#')){
+    const h=value.slice(1);
+    const full=h.length===3?h.split('').map(c=>c+c).join(''):h;
+    const n=parseInt(full,16);
+    if(!isNaN(n)){ r=(n>>16)&255; g=(n>>8)&255; b=n&255; }
+  } else {
+    const parts=value.match(/[\d.]+/g);
+    if(parts && parts.length>=3){ r=+parts[0]; g=+parts[1]; b=+parts[2]; }
+  }
+  return (r*299+g*587+b*114)/1000>155 ? '#170B33' : '#FFFFFF';
+}
+function pol(cx,cy,r,a){const x=a*Math.PI/180;return{x:cx+r*Math.cos(x),y:cy+r*Math.sin(x)}}
+function arc(cx,cy,r,s,e){
+  if(e-s>=359.999) e=s+359.999;
+  const S=pol(cx,cy,r,s),E=pol(cx,cy,r,e),L=e-s<=180?0:1;
+  return`M ${S.x} ${S.y} A ${r} ${r} 0 ${L} 1 ${E.x} ${E.y}`;
+}
+
+function renderMonthSelect(){
+  const keys = STORE.order.filter(k=>STORE.months[k]);
+  monthSelect.innerHTML = keys.map(k=>`<option value="${k}" ${k===STORE.current?'selected':''}>${monthLabel(k)}</option>`).join('');
+}
+
+function switchMonth(key){
+  if(!STORE.months[key]) return;
+  STORE.current = key;
+  expandedCategories.clear();
+  limitEditCategories.clear();
+  cancelIncomeEntry();
+  hideKeyboardActionBar();
+  bi.value = fmt(cur().B);
+  renderRows();
+  renderChart();
+  save();
+}
+
+function renderRows(){
+  const m = cur();
+  const C = m.C;
+  const openHist = new Set();
+  document.querySelectorAll('.hist.open').forEach(el=>openHist.add(el.id));
+  rowsEl.innerHTML='';
+  C.forEach((c,i)=>{
+    const isExpanded=expandedCategories.has(c);
+    const isLimitEditing=limitEditCategories.has(c);
+    const row=document.createElement('div');row.className='row'+(isExpanded?' expanded':'');
+    row.innerHTML=`
+      <div class="row-top">
+        <div class="sw" style="background:${c.col || P[i%P.length]}"></div>
+        <div class="ninp" title="${(c.n||'').replace(/"/g,'&quot;')}">${(c.n||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+        <div class="amt-display${(c.limit>0 && c.a>c.limit)?' over-limit':''}" id="amt-${i}">${fmt(c.a)}</div>
+        <button class="hist-icon-btn" type="button" data-i="${i}" data-histbtn="1" aria-label="История категории" title="История категории">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+        </button>
+        <button class="row-expand-btn${isExpanded?' open':''}" type="button" data-rowtoggle="${i}" aria-label="${isExpanded?'Свернуть категорию':'Добавить расход'}" aria-expanded="${isExpanded?'true':'false'}"><span>+</span></button>
+      </div>
+      ${c.limit>0 ? `
+      <div class="limit-bar-wrap">
+        <div class="limit-bar${c.a>c.limit?' over':''}" style="width:${Math.min(100,(c.a/c.limit*100))}%"></div>
+      </div>
+      <div class="limit-text${c.a>c.limit?' over':''}">Лимит ${fmt(c.limit)}${c.a>c.limit?` · превышение на ${fmt(c.a-c.limit)}`:` · осталось ${fmt(Math.max(0,c.limit-c.a))}`}</div>
+      ` : ''}
+      <div class="row-bottom">
+        <form class="plus-row" data-plusform="${i}">
+          <input class="plus-input${isLimitEditing?'':' show'}" type="text" inputmode="decimal" placeholder="Сумма" data-i="${i}" data-plus="1">
+          <button class="pct-toggle-btn${isLimitEditing?'':' show'}" type="button" data-i="${i}" data-pcttoggle="1">%</button>
+          <input class="limit-input${isLimitEditing?' show limit-edit':''}" type="text" inputmode="decimal" placeholder="Добавить лимит" value="${c.limit>0?fmt(c.limit):''}" data-limitinput="${i}">
+          <button class="hist-icon-btn limit-action-btn${isLimitEditing?' limit-confirm':''}" type="button" data-i="${i}" data-limitbtn="1" aria-label="${isLimitEditing?'Сохранить лимит':'Добавить лимит'}" title="${isLimitEditing?'Сохранить лимит':'Добавить лимит'}">
+            ${isLimitEditing?'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>':'Лимит'}
+          </button>
+        </form>
+        <div class="pct-preview" id="pctPreview-${i}"></div>
+      </div>
+      <div class="hist${openHist.has('hist-'+i)?' open':''}" id="hist-${i}">
+        ${(c.h||[]).map((item,hi)=>({item,hi})).reverse().map(({item,hi})=>`<div class="hist-item"><div class="hist-top"><span>${fmtDate(item.d)}</span><b>${fmt(item.a)}</b>${item.c?`<span class="hist-comment" data-commenttoggle="1">${item.c.replace(/</g,'&lt;')}</span>`:''}<button class="hist-del" data-i="${i}" data-hi="${hi}">×</button></div></div>`).join('')}
+      </div>
+    `;
+    row._cat = c;
+    rowsEl.appendChild(row);
+  });
+  updateCategoryNameFades();
+  attach();
+}
+
+function updateCategoryNameFades(){
+  document.querySelectorAll('.ninp').forEach(name=>{
+    name.classList.toggle('is-overflowing',name.scrollWidth>name.clientWidth+1);
+  });
+}
+window.addEventListener('resize',updateCategoryNameFades);
+
+let chartExpanded = false;
+let chartPeriod = 'month';
+
+function getWeekBounds(){
+  const now=new Date();
+  const from=new Date(now.getTime()-6*24*60*60*1000);
+  from.setHours(0,0,0,0);
+  return {from, now};
+}
+
+function getPeriodCats(period){
+  if(period==='week'){
+    const {from, now} = getWeekBounds();
+    const map={};
+    Object.values(STORE.months).forEach(mo=>{
+      (mo.C||[]).forEach(c=>{
+        (c.h||[]).forEach(item=>{
+          const d=new Date(item.d);
+          if(d>=from && d<=now){
+            if(!map[c.n]) map[c.n]={name:c.n, col:c.col, amount:0};
+            map[c.n].amount += parseFloat(item.a)||0;
+          }
+        });
+      });
+    });
+    return Object.values(map).filter(x=>x.amount>0);
+  }
+  if(period==='year'){
+    const year=(STORE.current||'').split('-')[0];
+    const map={};
+    Object.keys(STORE.months).forEach(mk=>{
+      if(!mk.startsWith(year+'-')) return;
+      (STORE.months[mk].C||[]).forEach(c=>{
+        const amt=parseFloat(c.a)||0; if(amt<=0) return;
+        if(!map[c.n]) map[c.n]={name:c.n, col:c.col, amount:0};
+        map[c.n].amount += amt;
+      });
+    });
+    return Object.values(map).filter(x=>x.amount>0);
+  }
+  return cur().C.map(c=>({name:c.n, col:c.col, amount:parseFloat(c.a)||0})).filter(x=>x.amount>0);
+}
+
+// Income is prorated/aggregated to match the selected period, so "Доходы"/"Остаток"
+// always show real numbers instead of disappearing on Week/Year.
+function getPeriodBudget(period){
+  if(period==='year'){
+    const year=(STORE.current||'').split('-')[0];
+    let budget=0;
+    Object.keys(STORE.months).forEach(mk=>{
+      if(mk.startsWith(year+'-')) budget += parseFloat(STORE.months[mk].B)||0;
+    });
+    return budget;
+  }
+  if(period==='week'){
+    const {from, now} = getWeekBounds();
+    let budget=0;
+    for(let d=new Date(from); d<=now; d.setDate(d.getDate()+1)){
+      const mo = STORE.months[monthKey(d)];
+      if(mo){
+        const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+        budget += (parseFloat(mo.B)||0)/daysInMonth;
+      }
+    }
+    return budget;
+  }
+  return parseFloat(cur().B)||0;
+}
+
+// keeps the ring/tiles to at most 6 slices: top 5 by amount + everything else
+// lumped into a single "Остальные" slice, so the tile grid always fits 2×3
+function reduceToTopWithRest(items, limit){
+  if(items.length<=limit+1) return items.slice();
+  const sorted = items.slice().sort((a,b)=>b.amount-a.amount);
+  const top = sorted.slice(0,limit);
+  const rest = sorted.slice(limit);
+  const restSum = rest.reduce((s,c)=>s+c.amount,0);
+  if(restSum>0) top.push({name:'Остальные', col: cssVar('--muted'), amount: restSum, isOther:true, restItems: rest});
+  return top;
+}
+
+let othersData = { items: [], basis: 0 };
+
+function renderChart(){
+  const m = cur();
+  const total=m.C.reduce((s,c)=>s+(parseFloat(c.a)||0),0);
+  const ld=document.getElementById('ld');
+  svg.innerHTML='';
+  const cx=150,cy=150,r=130,ri=94,ns="http://www.w3.org/2000/svg",thick=r-ri,ringR=(r+ri)/2;
+  const legend = document.getElementById('chartLegend');
+  const periodTabs = document.getElementById('periodTabs');
+
+  const period = chartExpanded ? chartPeriod : 'month';
+  const isMonth = period==='month';
+  const catRanges=[];
+  let periodTotal = total;
+
+  const periodBudget = getPeriodBudget(period);
+  const periodSpentSoFar = isMonth ? total : getPeriodCats(period).reduce((s,c)=>s+c.amount,0);
+  const periodLeft = periodBudget - periodSpentSoFar;
+  bi.value = fmt(periodBudget);
+  ld.textContent = fmt(periodLeft);
+  ld.classList.toggle('neg', periodLeft<0);
+
+  if(isMonth){
+    const left = periodLeft;
+    const ct = Math.max(m.B,total);
+    if(ct<=0){
+      const c=document.createElementNS(ns,"circle");
+      c.setAttribute("cx",cx);c.setAttribute("cy",cy);c.setAttribute("r",ringR);
+      c.setAttribute("fill","none");c.setAttribute("stroke",cssVar('--track'));c.setAttribute("stroke-width",thick);
+      svg.appendChild(c);
+    } else {
+      const rawCats = getPeriodCats('month');
+      const displayCats = reduceToTopWithRest(rawCats, 5);
+      const otherTile = displayCats.find(c=>c.isOther);
+      othersData = { items: otherTile ? otherTile.restItems : [], basis: ct };
+      let a=-90;
+      displayCats.forEach(c=>{
+        const sw=(c.amount/ct)*360, col=c.col||cssVar('--muted');
+        const p=arc(cx,cy,ringR,a,a+sw);
+        const el=document.createElementNS(ns,"path");
+        el.setAttribute("d",p);el.setAttribute("stroke",col);el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
+        svg.appendChild(el);
+        catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/ct)*100), isOther:c.isOther});
+        a+=sw;
+      });
+      if(left>0){
+        const sw=(left/ct)*360;
+        const p=arc(cx,cy,ringR,a,a+sw);
+        const el=document.createElementNS(ns,"path");
+        el.setAttribute("d",p);el.setAttribute("stroke",cssVar('--white-seg'));el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
+        svg.appendChild(el);
+      }
+    }
+    periodTotal = total;
+  } else {
+    const rawCats = getPeriodCats(period);
+    periodTotal = rawCats.reduce((s,c)=>s+c.amount,0);
+    if(periodTotal<=0){
+      const c=document.createElementNS(ns,"circle");
+      c.setAttribute("cx",cx);c.setAttribute("cy",cy);c.setAttribute("r",ringR);
+      c.setAttribute("fill","none");c.setAttribute("stroke",cssVar('--track'));c.setAttribute("stroke-width",thick);
+      svg.appendChild(c);
+    } else {
+      const displayCats = reduceToTopWithRest(rawCats, 5);
+      const otherTile = displayCats.find(c=>c.isOther);
+      othersData = { items: otherTile ? otherTile.restItems : [], basis: periodTotal };
+      let a=-90;
+      displayCats.forEach(c=>{
+        const sw=(c.amount/periodTotal)*360, col=c.col||cssVar('--muted');
+        const p=arc(cx,cy,ringR,a,a+sw);
+        const el=document.createElementNS(ns,"path");
+        el.setAttribute("d",p);el.setAttribute("stroke",col);el.setAttribute("stroke-width",thick);el.setAttribute("fill","none");
+        svg.appendChild(el);
+        catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/periodTotal)*100), isOther:c.isOther});
+        a+=sw;
+      });
+    }
+  }
+
+  const centerLabel = period==='week' ? 'За неделю' : period==='year' ? 'За год' : 'За месяц';
+  const t1=document.createElementNS(ns,"text");t1.setAttribute("x",cx);t1.setAttribute("y",cy+2);t1.setAttribute("text-anchor","middle");t1.setAttribute("fill",cssVar('--text'));t1.setAttribute("font-weight","800");t1.setAttribute("letter-spacing","-0.02em");t1.setAttribute("font-size",periodTotal>=1000000?25:31);t1.textContent=fmt(periodTotal);svg.appendChild(t1);
+  const t2=document.createElementNS(ns,"text");t2.setAttribute("x",cx);t2.setAttribute("y",cy+25);t2.setAttribute("text-anchor","middle");t2.setAttribute("fill",cssVar('--muted'));t2.setAttribute("font-size","12");t2.setAttribute("letter-spacing","1.1px");t2.setAttribute("font-weight","700");t2.textContent=centerLabel;svg.appendChild(t2);
+
+  // plain percentage labels around the ring + tile grid below, shown after tapping the chart
+  if(chartExpanded){
+    catRanges.forEach(range=>{
+      const mid=(range.s+range.e)/2;
+      const pos=pol(cx,cy,r+24,mid);
+      const txt=document.createElementNS(ns,"text");
+      txt.setAttribute("x",pos.x);txt.setAttribute("y",pos.y+5);txt.setAttribute("text-anchor","middle");
+      txt.setAttribute("fill",range.col);txt.setAttribute("font-size","13");txt.setAttribute("font-weight","700");
+      txt.textContent=range.pct+'%';
+      svg.appendChild(txt);
+    });
+    if(catRanges.length>0){
+      const sorted = catRanges.slice().sort((a,b)=>(a.isOther?1:0)-(b.isOther?1:0) || b.amount-a.amount);
+      legend.innerHTML = sorted.map(range=>`
+        <div class="cat-tile${range.isOther?' cat-tile-other':''}" ${range.isOther?'data-other="1"':''} style="background:${range.col};--tile-text:${contrastTextColor(range.col)}">
+          <span class="cat-tile-name">${(range.name||'').replace(/</g,'&lt;')}</span>
+          <span class="cat-tile-amt">${fmt(range.amount)}<span class="cat-tile-pct">· ${range.pct}%</span></span>
+        </div>
+      `).join('');
+      legend.classList.add('open');
+    } else {
+      legend.innerHTML = '<div class="gh-empty" style="grid-column:1/-1">Нет трат за этот период</div>';
+      legend.classList.add('open');
+    }
+    periodTabs.classList.add('show');
+  } else {
+    legend.classList.remove('open');
+    legend.innerHTML = '';
+    periodTabs.classList.remove('show');
+  }
+  periodTabs.querySelectorAll('button').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.period===chartPeriod);
+  });
+  chartCol.classList.toggle('expanded', chartExpanded);
+}
+
+function addExpense(i, amount, comment){
+  const C = cur().C;
+  if(!amount || amount<=0) return;
+  const category=C[i];
+  if(!category) return;
+  category.a = (parseFloat(category.a)||0) + amount;
+  if(!category.h) category.h=[];
+  const entry = {a:amount, d:new Date().toISOString()};
+  if(comment && comment.trim()) entry.c = comment.trim();
+  category.h.push(entry);
+  renderRows();
+  renderChart();
+  if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+  save();
+  showUndoToast(`Расход ${fmt(amount)} добавлен`,()=>{
+    const entryIndex=category.h.indexOf(entry);
+    if(entryIndex<0) return;
+    category.h.splice(entryIndex,1);
+    category.a=Math.max(0,(parseFloat(category.a)||0)-(parseFloat(entry.a)||0));
+    refreshAfterUndo();
+  });
+}
+
+function addIncome(amount, comment){
+  const m = cur();
+  if(!amount || amount<=0) return;
+  m.B = (parseFloat(m.B)||0) + amount;
+  if(!m.IN) m.IN=[];
+  const entry = {a:amount, d:new Date().toISOString()};
+  if(comment && comment.trim()) entry.c = comment.trim();
+  m.IN.push(entry);
+  bi.value = fmt(m.B);
+  renderRows();
+  renderChart();
+  if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+  save();
+  showUndoToast(`Доход ${fmt(amount)} добавлен`,()=>{
+    const entryIndex=(m.IN||[]).indexOf(entry);
+    if(entryIndex<0) return;
+    m.IN.splice(entryIndex,1);
+    m.B=Math.max(0,(parseFloat(m.B)||0)-(parseFloat(entry.a)||0));
+    refreshAfterUndo();
+  });
+}
+
+function deleteIncome(mk, ii){
+  const m = STORE.months[mk];
+  if(!m) return;
+  const entry = (m.IN||[])[ii];
+  if(!entry) return;
+  const label = entry.c ? `${fmt(entry.a)} (${entry.c})` : fmt(entry.a);
+  if(!confirm(`Удалить доход ${label}? Доходы уменьшатся.`)) return;
+  m.B = (parseFloat(m.B)||0) - (parseFloat(entry.a)||0);
+  m.IN.splice(ii,1);
+  if(mk===STORE.current) bi.value = fmt(cur().B);
+  renderRows();
+  renderChart();
+  renderGlobalHist();
+  save();
+}
+
+function editIncome(mk, ii, newAmount, newComment){
+  const m = STORE.months[mk];
+  if(!m) return;
+  const entry = (m.IN||[])[ii];
+  if(!entry) return;
+  const oldAmount = parseFloat(entry.a)||0;
+  const diff = (newAmount||0) - oldAmount;
+  m.B = (parseFloat(m.B)||0) + diff;
+  entry.a = newAmount||0;
+  entry.c = newComment && newComment.trim() ? newComment.trim() : undefined;
+  if(!entry.c) delete entry.c;
+  if(mk===STORE.current) bi.value = fmt(cur().B);
+  renderRows();
+  renderChart();
+  renderGlobalHist();
+  save();
+}
+
+function deleteExpense(mk, i, hi){
+  const m = STORE.months[mk];
+  if(!m) return;
+  const C = m.C;
+  const entry = C[i] && C[i].h[hi];
+  if(!entry) return;
+  const label = entry.c ? `${fmt(entry.a)} (${entry.c})` : fmt(entry.a);
+  if(!confirm(`Удалить трату ${label}? Сумма категории уменьшится.`)) return;
+  const category=C[i];
+  const amount=parseFloat(entry.a)||0;
+  category.a = (parseFloat(category.a)||0) - amount;
+  category.h.splice(hi,1);
+  renderRows();
+  renderChart();
+  save();
+  showUndoToast(`Расход ${fmt(amount)} удалён`,()=>{
+    const insertAt=Math.min(hi,category.h.length);
+    category.h.splice(insertAt,0,entry);
+    category.a=(parseFloat(category.a)||0)+amount;
+    refreshAfterUndo();
+  });
+}
+
+function editExpense(mk, i, hi, newAmount, newComment){
+  const m = STORE.months[mk];
+  if(!m) return;
+  const C = m.C;
+  const entry = C[i] && C[i].h[hi];
+  if(!entry) return;
+  const oldAmount = parseFloat(entry.a)||0;
+  const diff = (newAmount||0) - oldAmount;
+  C[i].a = (parseFloat(C[i].a)||0) + diff;
+  entry.a = newAmount||0;
+  entry.c = newComment && newComment.trim() ? newComment.trim() : undefined;
+  if(!entry.c) delete entry.c;
+  renderRows();
+  renderChart();
+  renderGlobalHist();
+  save();
+}
+
+function getAllExpenses(){
+  const all=[];
+  Object.keys(STORE.months).forEach(mk=>{
+    const m = STORE.months[mk];
+    const mLabel = monthLabel(mk);
+    (m.C||[]).forEach((c,ci)=>{
+      (c.h||[]).forEach((item,hi)=>{
+        all.push({kind:'expense', mk, mLabel, ci, hi, catName:c.n, catColor:c.col || P[ci%P.length], amount:item.a, comment:item.c, date:item.d});
+      });
+    });
+    (m.IN||[]).forEach((item,ii)=>{
+      all.push({kind:'income', mk, mLabel, ii, amount:item.a, comment:item.c, date:item.d});
+    });
+    (m.EV||[]).forEach((ev,evIndex)=>{
+      if(ev.type==='del_cat'){
+        all.push({kind:'del_cat', mk, mLabel, evIndex, catName:ev.name, amount:ev.amount, h:ev.h||[], date:ev.date, restored:!!ev.restored});
+      } else if(ev.type==='add_cat'){
+        all.push({kind:'add_cat', mk, mLabel, catName:ev.name, date:ev.date});
+      } else if(ev.type==='rename_cat'){
+        all.push({kind:'rename_cat', mk, mLabel, oldName:ev.oldName, newName:ev.newName, date:ev.date});
+      }
+    });
+  });
+  (STORE.deletedMonths||[]).forEach((dm,dmIndex)=>{
+    all.push({kind:'del_month', dmIndex, monthLabel:dm.label, date:dm.date, restored:!!dm.restored});
+  });
+  all.sort((a,b)=> new Date(b.date) - new Date(a.date));
+  return all;
+}
+
+let ghEditing = null; // {mk, ci, hi} or {mk, income:true, ii}
+let ghTag = 'all'; // 'all' | 'expense' | 'income' | 'other'
+let ghSearchQuery = '';
+let ghExactDate = '';
+let ghDateFrom = '';
+let ghDateTo = '';
+
+function cancelGlobalHistoryEditing(){
+  if(!ghEditing) return;
+  ghEditing = null;
+  if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+}
+
+function tagOf(kind){
+  if(kind==='expense') return 'expense';
+  if(kind==='income') return 'income';
+  return 'other'; // add_cat, del_cat, rename_cat, del_month
+}
+
+function itemSearchText(item){
+  switch(item.kind){
+    case 'expense': return [item.catName, item.comment, fmt(item.amount), item.mLabel].filter(Boolean).join(' ');
+    case 'income': return ['доход', item.comment, fmt(item.amount), item.mLabel].filter(Boolean).join(' ');
+    case 'add_cat': return ['новая категория', item.catName, item.mLabel].filter(Boolean).join(' ');
+    case 'rename_cat': return ['переименование', item.oldName, item.newName, item.mLabel].filter(Boolean).join(' ');
+    case 'del_cat': return ['удалена категория', item.catName, item.mLabel, fmt(item.amount)].filter(Boolean).join(' ');
+    case 'del_month': return ['удалён месяц', item.monthLabel].filter(Boolean).join(' ');
+    default: return '';
+  }
+}
+
+function historyDayKey(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return 'no-date';
+  return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
+function historyDayLabel(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return 'Без даты';
+  const today=new Date();
+  today.setHours(0,0,0,0);
+  const day=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const diff=Math.round((today-day)/86400000);
+  if(diff===0) return 'Сегодня';
+  if(diff===1) return 'Вчера';
+  const options={day:'numeric',month:'long'};
+  if(d.getFullYear()!==today.getFullYear()) options.year='numeric';
+  return d.toLocaleDateString('ru-RU',options);
+}
+function historyTime(iso){
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderGlobalHist(){
+  const ghList = document.getElementById('ghList');
+  let all = getAllExpenses();
+  if(ghTag!=='all') all = all.filter(item=>tagOf(item.kind)===ghTag);
+  if(ghSearchQuery.trim()){
+    const q = ghSearchQuery.trim().toLowerCase();
+    all = all.filter(item=>itemSearchText(item).toLowerCase().includes(q));
+  }
+  if(ghExactDate){
+    all = all.filter(item=>historyDayKey(item.date)===ghExactDate);
+  } else if(ghDateFrom || ghDateTo){
+    all = all.filter(item=>{
+      const day=historyDayKey(item.date);
+      if(day==='no-date') return false;
+      if(ghDateFrom && day<ghDateFrom) return false;
+      if(ghDateTo && day>ghDateTo) return false;
+      return true;
+    });
+  }
+  const foundExpenses=all.filter(item=>item.kind==='expense').reduce((sum,item)=>sum+(parseFloat(item.amount)||0),0);
+  const foundIncome=all.filter(item=>item.kind==='income').reduce((sum,item)=>sum+(parseFloat(item.amount)||0),0);
+  const summaryHtml=`
+    <div class="gh-summary">
+      <div class="gh-summary-count">Найдено: ${all.length}</div>
+      <div class="gh-summary-totals">
+        <span>Расходы <b>${fmt(foundExpenses)}</b></span>
+        <span>Доходы <b>${fmt(foundIncome)}</b></span>
+      </div>
+    </div>`;
+  if(all.length===0){
+    ghList.innerHTML = summaryHtml+'<div class="gh-empty">Ничего не найдено</div>';
+    return;
+  }
+  let previousDayKey='';
+  ghList.innerHTML = summaryHtml+all.map(item=>{
+    const dayKey=historyDayKey(item.date);
+    const dayHeader=dayKey!==previousDayKey ? `<div class="gh-day-title">${historyDayLabel(item.date)}</div>` : '';
+    previousDayKey=dayKey;
+    if(item.kind==='add_cat'){
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-sw" style="background:var(--muted)"></div>
+            <div class="gh-cat" style="color:var(--green)">+ категория «${(item.catName||'').replace(/</g,'&lt;')}»</div>
+            <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+          </div>
+        </div>
+      `;
+    }
+    if(item.kind==='rename_cat'){
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-sw" style="background:var(--muted)"></div>
+            <div class="gh-cat" style="color:#e8c96b">переименована «${(item.oldName||'').replace(/</g,'&lt;')}» → «${(item.newName||'').replace(/</g,'&lt;')}»</div>
+            <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+          </div>
+        </div>
+      `;
+    }
+    if(item.kind==='del_month'){
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-sw" style="background:var(--muted)"></div>
+            <div class="gh-cat" style="color:#c97b5c">удалён месяц «${(item.monthLabel||'').replace(/</g,'&lt;')}»</div>
+            <div class="gh-date">${historyTime(item.date)}</div>
+          </div>
+          ${item.restored ? `<div style="font-size:12px;color:var(--green);margin-top:6px;padding-left:16px">✓ восстановлен</div>` : `<div style="margin-top:8px;padding-left:16px"><button class="gh-restore" data-ghrestoremonth="${item.dmIndex}">Вернуть месяц</button></div>`}
+        </div>
+      `;
+    }
+    if(item.kind==='del_cat'){
+      const hist=(item.h||[]).slice().sort((a,b)=>new Date(b.d)-new Date(a.d));
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-sw" style="background:var(--muted)"></div>
+            <div class="gh-cat" style="color:#c97b5c">удалена «${(item.catName||'').replace(/</g,'&lt;')}»</div>
+            <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;padding-left:16px">
+            Сумма на момент удаления: <b style="color:var(--text)">${fmt(item.amount)}</b>
+            ${hist.length>0?`<div style="margin-top:4px">${hist.map(h=>`<div>• ${fmt(h.a)}${h.c?` — ${h.c.replace(/</g,'&lt;')}`:''} <span style="opacity:.7">(${fmtDate(h.d)})</span></div>`).join('')}</div>`:''}
+          </div>
+          ${item.restored ? `<div style="font-size:12px;color:var(--green);margin-top:6px;padding-left:16px">✓ восстановлена</div>` : `<div style="margin-top:8px;padding-left:16px"><button class="gh-restore" data-ghrestore="${item.mk}:${item.evIndex}">Вернуть категорию</button></div>`}
+        </div>
+      `;
+    }
+    if(item.kind==='income'){
+      const isEditingIncome = ghEditing && ghEditing.income && ghEditing.mk===item.mk && ghEditing.ii===item.ii;
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-sw" style="background:var(--green)"></div>
+            <div class="gh-cat" style="color:var(--green)">доход</div>
+            <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+          </div>
+          ${isEditingIncome ? `
+            <div class="gh-editrow">
+              <input class="gh-amt-input" type="text" inputmode="decimal" value="${fmt(item.amount)}" data-ghincamt="1">
+              <input class="gh-comment-input" type="text" placeholder="комментарий" value="${(item.comment||'').replace(/"/g,'&quot;')}" data-ghinccomment="1">
+            </div>
+            <div class="gh-editrow">
+              <button class="gh-save" data-ghincsave="${item.mk}:${item.ii}">Сохранить</button>
+              <button class="gh-del" data-ghincdel="${item.mk}:${item.ii}">Удалить</button>
+            </div>
+          ` : `
+            <div class="gh-editrow" style="justify-content:space-between">
+              <div style="font-weight:700">${fmt(item.amount)}${item.comment?` <span style="color:var(--muted);font-weight:400;font-style:italic">— ${item.comment.replace(/</g,'&lt;')}</span>`:''}</div>
+              <button class="gh-del gh-edit-icon" data-ghincedit="${item.mk}:${item.ii}" style="color:var(--accent)">✎</button>
+            </div>
+          `}
+        </div>
+      `;
+    }
+    const isEditing = ghEditing && ghEditing.mk===item.mk && ghEditing.ci===item.ci && ghEditing.hi===item.hi;
+    return `
+      ${dayHeader}<div class="gh-item">
+        <div class="gh-row">
+          <div class="gh-sw" style="background:${item.catColor}"></div>
+          <div class="gh-cat">${(item.catName||'').replace(/</g,'&lt;')}</div>
+          <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+        </div>
+        ${isEditing ? `
+          <div class="gh-editrow">
+            <input class="gh-amt-input" type="text" inputmode="decimal" value="${fmt(item.amount)}" data-ghamt="1">
+            <input class="gh-comment-input" type="text" placeholder="комментарий" value="${(item.comment||'').replace(/"/g,'&quot;')}" data-ghcomment="1">
+          </div>
+          <div class="gh-editrow">
+            <button class="gh-save" data-ghsave="${item.mk}:${item.ci}:${item.hi}">Сохранить</button>
+            <button class="gh-del" data-ghdel="${item.mk}:${item.ci}:${item.hi}">Удалить</button>
+          </div>
+        ` : `
+          <div class="gh-editrow" style="justify-content:space-between">
+            <div style="font-weight:700">${fmt(item.amount)}${item.comment?` <span style="color:var(--muted);font-weight:400;font-style:italic">— ${item.comment.replace(/</g,'&lt;')}</span>`:''}</div>
+            <button class="gh-del gh-edit-icon" data-ghedit="${item.mk}:${item.ci}:${item.hi}" style="color:var(--accent)">✎</button>
+          </div>
+        `}
+      </div>
+    `;
+  }).join('');
+  attachGlobalHist();
+}
+
+function attachGlobalHist(){
+  document.querySelectorAll('[data-ghedit]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ci,hi] = e.target.dataset.ghedit.split(':');
+      ghEditing = {mk, ci:+ci, hi:+hi};
+      renderGlobalHist();
+    });
+  });
+  document.querySelectorAll('[data-ghincedit]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ii] = e.target.dataset.ghincedit.split(':');
+      ghEditing = {mk, income:true, ii:+ii};
+      renderGlobalHist();
+    });
+  });
+  document.querySelectorAll('[data-ghincamt]').forEach(inp=>{
+    inp.addEventListener('focus',e=>e.target.select());
+    inp.addEventListener('input',e=>{ formatLiveInput(e.target); });
+  });
+  document.querySelectorAll('[data-ghincsave]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ii] = e.target.dataset.ghincsave.split(':');
+      const amtInp = document.querySelector('[data-ghincamt]');
+      const commentInp = document.querySelector('[data-ghinccomment]');
+      editIncome(mk, +ii, numVal(amtInp.value), commentInp.value);
+      ghEditing = null;
+    });
+  });
+  document.querySelectorAll('[data-ghincdel]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ii] = e.target.dataset.ghincdel.split(':');
+      deleteIncome(mk, +ii);
+      ghEditing = null;
+    });
+  });
+  document.querySelectorAll('[data-ghamt]').forEach(inp=>{
+    inp.addEventListener('focus',e=>e.target.select());
+    inp.addEventListener('input',e=>{ formatLiveInput(e.target); });
+  });
+  document.querySelectorAll('[data-ghsave]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ci,hi] = e.target.dataset.ghsave.split(':');
+      const amtInp = document.querySelector('[data-ghamt]');
+      const commentInp = document.querySelector('[data-ghcomment]');
+      editExpense(mk, +ci, +hi, numVal(amtInp.value), commentInp.value);
+      ghEditing = null;
+    });
+  });
+  document.querySelectorAll('[data-ghdel]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,ci,hi] = e.target.dataset.ghdel.split(':');
+      deleteExpense(mk, +ci, +hi);
+      ghEditing = null;
+      renderGlobalHist();
+    });
+  });
+  document.querySelectorAll('[data-ghrestore]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,evIndexStr] = e.target.dataset.ghrestore.split(':');
+      const evIndex = +evIndexStr;
+      const m = STORE.months[mk];
+      if(!m) return;
+      const ev = m.EV[evIndex];
+      if(!ev || ev.type!=='del_cat' || ev.restored) return;
+      if(!confirm(`Вернуть категорию «${ev.name}» с суммой ${fmt(ev.amount)} и историей трат?`)) return;
+      m.C.push({n: ev.name, a: ev.amount, h: ev.h || [], col: nextColor(m.C)});
+      ev.restored = true;
+      renderRows();
+      renderChart();
+      renderGlobalHist();
+      save();
+    });
+  });
+  document.querySelectorAll('[data-ghrestoremonth]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const dmIndex = +e.target.dataset.ghrestoremonth;
+      const dm = STORE.deletedMonths[dmIndex];
+      if(!dm || dm.restored) return;
+      if(!confirm(`Вернуть месяц «${dm.label}» со всеми категориями и историей?`)) return;
+      if(STORE.months[dm.key]){
+        alert('Месяц с таким периодом уже существует — восстановление невозможно, так как это создаст конфликт.');
+        return;
+      }
+      STORE.months[dm.key] = dm.data;
+      if(!STORE.order.includes(dm.key)) STORE.order.push(dm.key);
+      dm.restored = true;
+      STORE.current = dm.key;
+      renderMonthSelect();
+      bi.value = fmt(cur().B);
+      renderRows();
+      renderChart();
+      renderGlobalHist();
+      save();
+    });
+  });
+}
+
+function attach(){
+  const C = cur().C;
+  document.querySelectorAll('.row-top').forEach(rowTop=>{
+    rowTop.addEventListener('pointerdown', e=>{
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      if(e.target.closest('button,input,select,textarea,a')) return;
+      const rowEl = rowTop.closest('.row');
+      const cat = rowEl._cat;
+      const startY = e.clientY;
+      const startX = e.clientX;
+      let startTop=0, startLeft=0, w=0, h=0, spacer=null, dragging=false;
+      const longPressDelay=e.pointerType==='mouse'?220:420;
+      const timer=setTimeout(()=>{
+        const rect = rowEl.getBoundingClientRect();
+        startTop = rect.top; startLeft = rect.left; w = rect.width; h = rect.height;
+        spacer = document.createElement('div');
+        spacer.className = 'row-spacer';
+        spacer.style.height = h+'px';
+        rowsEl.insertBefore(spacer, rowEl);
+        rowEl.style.position='fixed';
+        rowEl.style.top = startTop+'px';
+        rowEl.style.left = startLeft+'px';
+        rowEl.style.width = w+'px';
+        rowEl.style.zIndex = 1000;
+        rowEl.classList.add('row-dragging');
+        dragging=true;
+        try{ rowTop.setPointerCapture(e.pointerId); }catch(err){}
+      },longPressDelay);
+
+      function onMove(ev){
+        const moveX = Math.abs(ev.clientX-startX);
+        const moveY = Math.abs(ev.clientY-startY);
+        if(!dragging && (moveX>8 || moveY>8)){
+          clearTimeout(timer);
+          cleanup(false);
+          return;
+        }
+        if(!dragging) return;
+        ev.preventDefault();
+        const dy = ev.clientY - startY;
+        rowEl.style.top = (startTop+dy)+'px';
+        const sibs = Array.from(rowsEl.children).filter(el=>el!==rowEl && el!==spacer);
+        let targetEl = null;
+        for(const el of sibs){
+          const r = el.getBoundingClientRect();
+          if(ev.clientY < r.top + r.height/2){ targetEl = el; break; }
+        }
+        if(targetEl){
+          if(spacer.nextSibling !== targetEl) rowsEl.insertBefore(spacer, targetEl);
+        } else {
+          if(spacer !== rowsEl.lastElementChild) rowsEl.appendChild(spacer);
+        }
+      }
+      function cleanup(saveOrder, ev){
+        clearTimeout(timer);
+        try{ if(ev) rowTop.releasePointerCapture(ev.pointerId); }catch(err){}
+        rowTop.removeEventListener('pointermove', onMove);
+        rowTop.removeEventListener('pointerup', onUp);
+        rowTop.removeEventListener('pointercancel', onCancel);
+        if(!dragging) return;
+        dragging=false;
+        rowEl.classList.remove('row-dragging');
+        rowEl.style.position='';
+        rowEl.style.top='';
+        rowEl.style.left='';
+        rowEl.style.width='';
+        rowEl.style.zIndex='';
+        if(!saveOrder && spacer){
+          rowsEl.insertBefore(rowEl, spacer);
+          spacer.remove();
+        }
+        if(saveOrder && spacer) spacer.remove();
+      }
+      function onUp(ev){
+        if(!dragging){
+          cleanup(false,ev);
+          return;
+        }
+        const order = Array.from(rowsEl.children).filter(el=>el!==rowEl);
+        const newC = order.map(el => el===spacer ? cat : el._cat);
+        cur().C = newC;
+        cleanup(true,ev);
+        renderRows();
+        renderChart();
+        sched();
+      }
+      function onCancel(ev){
+        cleanup(false,ev);
+      }
+      rowTop.addEventListener('pointermove', onMove);
+      rowTop.addEventListener('pointerup', onUp);
+      rowTop.addEventListener('pointercancel', onCancel);
+    });
+  });
+  document.querySelectorAll('[data-rowtoggle]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=+btn.dataset.rowtoggle;
+      const category=C[i];
+      if(!category) return;
+      const isOpen=expandedCategories.has(category);
+      if(isOpen){
+        expandedCategories.delete(category);
+        limitEditCategories.delete(category);
+        hideKeyboardActionBar();
+        const hist=document.getElementById('hist-'+i);
+        if(hist) hist.classList.remove('open');
+      } else {
+        expandedCategories.clear();
+        limitEditCategories.clear();
+        cancelIncomeEntry();
+        expandedCategories.add(category);
+      }
+      renderRows();
+      if(!isOpen){
+        showKeyboardActionBar('expense',i);
+        const input=document.querySelector(`.plus-input[data-i="${i}"]`);
+        if(input){
+          input.focus({preventScroll:true});
+          input.select();
+        }
+      }
+    });
+  });
+  function updatePctPreview(i){
+    const inp = document.querySelector(`.plus-input[data-i="${i}"]`);
+    const pctBtn = document.querySelector(`.pct-toggle-btn[data-i="${i}"]`);
+    const preview = document.getElementById(`pctPreview-${i}`);
+    if(!inp || !pctBtn || !preview) return;
+    if(pctBtn.classList.contains('active')){
+      const raw = numVal(inp.value);
+      const m = cur();
+      const budgetTotal = parseFloat(m.B)||0;
+      const amount = Math.round(budgetTotal * raw/100);
+      preview.textContent = raw>0 ? `= ${fmt(amount)}` : '';
+    } else {
+      preview.textContent = '';
+    }
+  }
+  submitExpenseFor = function(i){
+    const inp=document.querySelector(`.plus-input[data-i="${i}"]`);
+    const pctBtn=document.querySelector(`.pct-toggle-btn[data-i="${i}"]`);
+    if(!inp) return;
+    const raw = numVal(inp.value);
+    if(raw<=0){ inp.focus(); return; }
+    const m = cur();
+    const budgetTotal = parseFloat(m.B)||0;
+    const val = pctBtn && pctBtn.classList.contains('active') ? Math.round(budgetTotal * raw/100) : raw;
+    if(val<=0){ inp.focus(); return; }
+    const comment=keyboardActionMode==='expense' && activeExpenseIndex===i ? keyboardActionComment.value : '';
+    const category=cur().C[i];
+    inp.blur();
+    if(category){
+      expandedCategories.delete(category);
+      limitEditCategories.delete(category);
+    }
+    keyboardActionComment.value='';
+    hideKeyboardActionBar();
+    addExpense(i, val, comment);
+  }
+  document.querySelectorAll('[data-plusform]').forEach(form=>{
+    form.addEventListener('submit',e=>{ e.preventDefault(); });
+  });
+  document.querySelectorAll('[data-pcttoggle]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.i;
+      const inp = document.querySelector(`.plus-input[data-i="${i}"]`);
+      const active = btn.classList.toggle('active');
+      inp.placeholder = active ? '% от доходов' : 'Сумма';
+      const digits = strip(inp.value);
+      if(active){
+        inp.value = digits ? digits+'%' : '';
+      } else {
+        formatLiveInput(inp);
+      }
+      updatePctPreview(i);
+    });
+  });
+  document.querySelectorAll('[data-plus]').forEach(inp=>{
+    inp.addEventListener('focus',e=>showKeyboardActionBar('expense',+e.target.dataset.i));
+    inp.addEventListener('input',e=>{
+      const i=+e.target.dataset.i;
+      const pctBtn=document.querySelector(`.pct-toggle-btn[data-i="${i}"]`);
+      if(pctBtn && pctBtn.classList.contains('active')){
+        const digits = strip(e.target.value);
+        e.target.value = digits ? digits+'%' : '';
+      } else {
+        formatLiveInput(e.target);
+      }
+      updatePctPreview(i);
+    });
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key==='Go'||e.key==='Done'){
+        e.preventDefault();
+        const i=+e.target.dataset.i;
+        submitExpenseFor(i);
+      }
+    });
+  });
+  document.querySelectorAll('[data-histbtn]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const i=+btn.dataset.i;
+      document.getElementById('hist-'+i).classList.toggle('open');
+    });
+  });
+  function saveCategoryLimit(i){
+    const inp=document.querySelector(`[data-limitinput="${i}"]`);
+    const c=C[i];
+    if(!inp || !c) return;
+    const hadLimit=Object.prototype.hasOwnProperty.call(c,'limit');
+    const oldLimit=c.limit;
+    const num=numVal(inp.value);
+    if(num>0){ c.limit=num; } else { delete c.limit; }
+    limitEditCategories.delete(c);
+    renderRows(); renderChart(); sched();
+    const newLimit=num>0?num:null;
+    const oldNormalized=hadLimit && Number(oldLimit)>0?Number(oldLimit):null;
+    if(newLimit!==oldNormalized){
+      showUndoToast(newLimit===null?'Лимит отключён':`Лимит ${fmt(newLimit)} установлен`,()=>{
+        if(hadLimit){ c.limit=oldLimit; } else { delete c.limit; }
+        limitEditCategories.delete(c);
+        refreshAfterUndo();
+      });
+    }
+  }
+  document.querySelectorAll('[data-limitbtn]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=+btn.dataset.i;
+      const c=C[i];
+      if(!c) return;
+      if(!limitEditCategories.has(c)){
+        limitEditCategories.clear();
+        limitEditCategories.add(c);
+        cancelIncomeEntry();
+        hideKeyboardActionBar();
+        renderRows();
+        const inp=document.querySelector(`[data-limitinput="${i}"]`);
+        if(inp){
+          inp.focus({preventScroll:true});
+          inp.select();
+        }
+      } else {
+        saveCategoryLimit(i);
+      }
+    });
+  });
+  document.querySelectorAll('[data-limitinput]').forEach(inp=>{
+    inp.addEventListener('input',e=>formatLiveInput(e.target));
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key==='Go'||e.key==='Done'){
+        e.preventDefault();
+        saveCategoryLimit(+e.target.dataset.limitinput);
+      }
+    });
+  });
+  document.querySelectorAll('[data-commenttoggle]').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.target.classList.toggle('expanded');
+    });
+  });
+  document.querySelectorAll('.hist-del').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const i=+e.target.dataset.i, hi=+e.target.dataset.hi;
+      deleteExpense(STORE.current, i, hi);
+      if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+    });
+  });
+}
+
+function attachCatSwipe(list){
+  const SWIPE_W = 80;
+  list.querySelectorAll('[data-swipeitem]').forEach(content=>{
+    let startX=0, startY=0, dx=0, dragging=false, decided=false, isHorizontal=false, pointerId=null;
+    content.addEventListener('pointerdown', e=>{
+      // Buttons must receive a normal tap. Capturing their pointer here can
+      // redirect the final click to the swipe row on touch devices.
+      if(e.target.closest('button,input,select,textarea,a')) return;
+      startX = e.clientX; startY = e.clientY; dx=0; dragging=true; decided=false; isHorizontal=false;
+      pointerId = e.pointerId;
+      content.style.transition='none';
+    });
+    content.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const rawDx = e.clientX - startX;
+      const rawDy = e.clientY - startY;
+      if(!decided){
+        if(Math.abs(rawDx) > 6 || Math.abs(rawDy) > 6){
+          decided = true;
+          isHorizontal = Math.abs(rawDx) > Math.abs(rawDy);
+          if(isHorizontal){
+            try{ content.setPointerCapture(pointerId); }catch(err){}
+          }
+        } else {
+          return;
+        }
+      }
+      if(!isHorizontal) return;
+      e.preventDefault();
+      const currentOpen = content.classList.contains('swiped') ? -SWIPE_W : 0;
+      dx = Math.min(0, Math.max(-SWIPE_W, currentOpen + rawDx));
+      content.style.transform = `translateX(${dx}px)`;
+    });
+    function endDrag(){
+      if(!dragging) return;
+      dragging=false;
+      try{
+        if(pointerId!=null && content.hasPointerCapture(pointerId)) content.releasePointerCapture(pointerId);
+      }catch(err){}
+      pointerId=null;
+      content.style.transition='transform .18s ease';
+      if(isHorizontal){
+        if(dx < -SWIPE_W/2){
+          content.style.transform = `translateX(-${SWIPE_W}px)`;
+          content.classList.add('swiped');
+        } else {
+          content.style.transform = 'translateX(0)';
+          content.classList.remove('swiped');
+        }
+      }
+    }
+    content.addEventListener('pointerup', endDrag);
+    content.addEventListener('pointercancel', endDrag);
+  });
+}
+
+function renderCatEditor(){
+  const m = cur();
+  const list = document.getElementById('catEditorList');
+  const activeNames = new Set(m.C.map(c=>c.n.trim().toLowerCase()));
+  const hiddenNames = new Set((m.hiddenC||[]).map(c=>c.n.trim().toLowerCase()));
+
+  let html = '';
+  m.C.forEach((c,i)=>{
+    html += `
+      <div class="cat-edit-item">
+        <div class="cat-edit-sw" style="background:${c.col}"></div>
+        <div class="cat-edit-name">${c.n.replace(/</g,'&lt;')}</div>
+        <button class="cat-edit-toggle on" type="button" data-cathide="${i}" aria-label="Отключить категорию"></button>
+      </div>`;
+  });
+  (m.hiddenC||[]).forEach((c,i)=>{
+    html += `
+      <div class="cat-swipe-wrap">
+        <button class="cat-swipe-delete" data-catdelhidden="${i}">Удалить</button>
+        <div class="cat-swipe-content" data-swipeitem="1">
+          <div class="cat-edit-item" style="border-bottom:none">
+            <div class="cat-edit-sw" style="background:${c.col}"></div>
+            <div class="cat-edit-name dim">${c.n.replace(/</g,'&lt;')}</div>
+            <button class="cat-edit-toggle" type="button" data-catshow="${i}" aria-label="Включить категорию"></button>
+          </div>
+        </div>
+      </div>`;
+  });
+  PRESET_CATEGORIES.forEach(name=>{
+    const key = name.trim().toLowerCase();
+    if(activeNames.has(key) || hiddenNames.has(key)) return;
+    if((STORE.dismissedPresets||[]).includes(key)) return;
+    html += `
+      <div class="cat-swipe-wrap">
+        <button class="cat-swipe-delete" data-catdismiss="${name.replace(/"/g,'&quot;')}">Убрать</button>
+        <div class="cat-swipe-content" data-swipeitem="1">
+          <div class="cat-edit-item" style="border-bottom:none">
+            <div class="cat-edit-sw" style="background:var(--line)"></div>
+            <div class="cat-edit-name dim">${name}</div>
+            <button class="cat-edit-toggle" type="button" data-catadd="${name.replace(/"/g,'&quot;')}" aria-label="Добавить категорию"></button>
+          </div>
+        </div>
+      </div>`;
+  });
+  list.innerHTML = html || '<div class="gh-empty">Нет доступных категорий</div>';
+
+  const restoreBtn = document.getElementById('catRestorePresetsBtn');
+  const dismissedCount = (STORE.dismissedPresets||[]).length;
+  restoreBtn.disabled = dismissedCount===0;
+  restoreBtn.textContent = dismissedCount>0 ? `Восстановить убранные категории (${dismissedCount})` : 'Нет убранных категорий';
+
+  list.querySelectorAll('[data-cathide]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.cathide;
+      const m2 = cur();
+      const [cat] = m2.C.splice(i,1);
+      if(!cat) return;
+      expandedCategories.delete(cat);
+      if(!m2.hiddenC) m2.hiddenC=[];
+      m2.hiddenC.push(cat);
+      renderRows(); renderChart(); renderCatEditor(); save();
+      showUndoToast(`Категория «${cat.n}» отключена`,()=>{
+        const hiddenIndex=(m2.hiddenC||[]).indexOf(cat);
+        if(hiddenIndex<0) return;
+        m2.hiddenC.splice(hiddenIndex,1);
+        m2.C.splice(Math.min(i,m2.C.length),0,cat);
+        refreshAfterUndo();
+      });
+    });
+  });
+  list.querySelectorAll('[data-catshow]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.catshow;
+      const m2 = cur();
+      const [cat] = m2.hiddenC.splice(i,1);
+      m2.C.push(cat);
+      renderRows(); renderChart(); renderCatEditor(); save();
+    });
+  });
+  list.querySelectorAll('[data-catdelhidden]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.catdelhidden;
+      const m2 = cur();
+      const cat = m2.hiddenC[i];
+      if(!cat) return;
+      if(!confirm(`Удалить категорию «${cat.n}» насовсем? Это действие нельзя отменить.`)) return;
+      expandedCategories.delete(cat);
+      m2.hiddenC.splice(i,1);
+      renderCatEditor(); save();
+    });
+  });
+  list.querySelectorAll('[data-catdismiss]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const name = btn.dataset.catdismiss;
+      const key = name.trim().toLowerCase();
+      if(!STORE.dismissedPresets) STORE.dismissedPresets=[];
+      if(!STORE.dismissedPresets.includes(key)) STORE.dismissedPresets.push(key);
+      renderCatEditor(); save();
+    });
+  });
+  attachCatSwipe(list);
+  list.querySelectorAll('[data-catadd]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const name = btn.dataset.catadd;
+      const m2 = cur();
+      m2.C.push({n:name, a:0, h:[], col:nextColor(m2.C)});
+      if(!m2.EV) m2.EV=[];
+      m2.EV.push({type:'add_cat', name, date:new Date().toISOString()});
+      renderRows(); renderChart(); renderCatEditor(); sched();
+    });
+  });
+}
+
+document.getElementById('openCatEditor').addEventListener('click',()=>{
+  renderCatEditor();
+  document.getElementById('catEditorOverlay').classList.add('open');
+});
+document.getElementById('catEditorClose').addEventListener('click',()=>{
+  document.getElementById('catEditorOverlay').classList.remove('open');
+});
+document.getElementById('catEditorOverlay').addEventListener('click',e=>{
+  if(e.target.id==='catEditorOverlay') document.getElementById('catEditorOverlay').classList.remove('open');
+});
+document.getElementById('catAddBtn').addEventListener('click',()=>{
+  const inp = document.getElementById('catAddInput');
+  const name = inp.value.trim();
+  if(!name) return;
+  const m = cur();
+  m.C.push({n:name, a:0, h:[], col:nextColor(m.C)});
+  if(!m.EV) m.EV=[];
+  m.EV.push({type:'add_cat', name, date:new Date().toISOString()});
+  inp.value='';
+  renderRows(); renderChart(); renderCatEditor(); sched();
+});
+document.getElementById('catRestorePresetsBtn').addEventListener('click',()=>{
+  STORE.dismissedPresets = [];
+  renderCatEditor();
+  save();
+});
+
+// Income field is read-only: it only changes via "Добавить доход" or history editing.
+
+const incomeForm = document.getElementById('incomeForm');
+const incomeAmt = document.getElementById('incomeAmt');
+const incomeBtn = document.getElementById('incomeBtn');
+incomeForm.addEventListener('submit',e=>{ e.preventDefault(); });
+incomeAmt.addEventListener('input',e=>{ formatLiveInput(e.target); });
+function openIncomeEntry(){
+  if(expandedCategories.size>0){
+    expandedCategories.clear();
+    limitEditCategories.clear();
+    renderRows();
+  }
+  if(!incomeAmt.classList.contains('show')){
+    incomeAmt.classList.add('show');
+    incomeBtn.classList.add('confirm');
+    incomeBtn.textContent='✓';
+    incomeBtn.setAttribute('aria-label','Сохранить доход');
+  }
+  showKeyboardActionBar('income');
+  incomeAmt.focus({preventScroll:true});
+  incomeAmt.select();
+}
+function cancelIncomeEntry(){
+  incomeAmt.value='';
+  incomeAmt.classList.remove('show');
+  incomeBtn.classList.remove('confirm');
+  incomeBtn.textContent='＋ Добавить доход';
+  incomeBtn.setAttribute('aria-label','Добавить доход');
+  if(keyboardActionMode==='income') keyboardActionComment.value='';
+}
+submitIncome = function(){
+  const val = numVal(incomeAmt.value);
+  if(val<=0){ incomeAmt.focus(); return; }
+  const comment=keyboardActionMode==='income' ? keyboardActionComment.value : '';
+  incomeAmt.blur();
+  addIncome(val, comment);
+  cancelIncomeEntry();
+  hideKeyboardActionBar();
+}
+incomeBtn.addEventListener('click',()=>{
+  if(!incomeAmt.classList.contains('show')){
+    openIncomeEntry();
+    return;
+  }
+  submitIncome();
+});
+incomeAmt.addEventListener('focus',()=>{
+  if(incomeAmt.classList.contains('show')) showKeyboardActionBar('income');
+});
+incomeAmt.addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key==='Go'||e.key==='Done'){
+    e.preventDefault();
+    submitIncome();
+  }
+});
+
+monthSelect.addEventListener('change',e=>{ switchMonth(e.target.value); });
+
+document.getElementById('newMonthBtn').addEventListener('click',()=>{
+  const calendarKeys = Object.keys(STORE.months).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+  const lastKey = calendarKeys.length ? calendarKeys[calendarKeys.length-1] : monthKey(new Date());
+  const [y,m] = lastKey.split('-').map(Number);
+  let ny=y, nm=m+1;
+  if(nm>12){ nm=1; ny++; }
+  const newKey = ny+'-'+String(nm).padStart(2,'0');
+  if(STORE.months[newKey]){
+    switchMonth(newKey);
+    document.getElementById('backupOverlay').classList.remove('open');
+    return;
+  }
+  const sourceKey = STORE.order.length ? STORE.order[STORE.order.length-1] : lastKey;
+  const prev = STORE.months[sourceKey] || STORE.months[lastKey];
+  const newCategories = prev.C.map(c=>{
+    const nc = {n:c.n, a:0, h:[], col:c.col || nextColor([])};
+    if(c.limit>0) nc.limit = c.limit;
+    return nc;
+  });
+  STORE.months[newKey] = { B: 0, C: newCategories, hiddenC: [], EV: [], IN: [] };
+  STORE.order.push(newKey);
+  STORE.current = newKey;
+  expandedCategories.clear();
+  limitEditCategories.clear();
+  hideKeyboardActionBar();
+  renderMonthSelect();
+  bi.value = fmt(cur().B);
+  renderRows();
+  renderChart();
+  save();
+  document.getElementById('backupOverlay').classList.remove('open');
+});
+
+const editMonthNameBtn=document.getElementById('editMonthNameBtn');
+const periodRenameForm=document.getElementById('periodRenameForm');
+const periodRenameInput=document.getElementById('periodRenameInput');
+function closePeriodRename(){
+  periodRenameForm.classList.remove('open');
+  editMonthNameBtn.setAttribute('aria-expanded','false');
+}
+function closeBackupOverlay(cancelHistoryEdit=false){
+  closePeriodRename();
+  document.getElementById('backupOverlay').classList.remove('open');
+  if(cancelHistoryEdit) cancelGlobalHistoryEditing();
+}
+editMonthNameBtn.addEventListener('click',()=>{
+  const open=!periodRenameForm.classList.contains('open');
+  if(!open){ closePeriodRename(); return; }
+  periodRenameInput.value=monthLabel(STORE.current);
+  periodRenameForm.classList.add('open');
+  editMonthNameBtn.setAttribute('aria-expanded','true');
+  requestAnimationFrame(()=>{
+    periodRenameInput.focus({preventScroll:true});
+    periodRenameInput.select();
+  });
+});
+periodRenameForm.addEventListener('submit',e=>{
+  e.preventDefault();
+  const trimmed = periodRenameInput.value.trim();
+  const m = cur();
+  if(!trimmed || trimmed===defaultCalendarLabel(STORE.current)){
+    delete m.customName;
+  } else {
+    m.customName = trimmed;
+  }
+  renderMonthSelect();
+  save();
+  closePeriodRename();
+  document.getElementById('backupOverlay').classList.remove('open');
+});
+
+function defaultCalendarLabel(key){
+  const parts = key.split('-');
+  if(parts.length===2 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1])){
+    const y = +parts[0], m = +parts[1];
+    return MONTH_NAMES[m-1]+' '+y;
+  }
+  return '';
+}
+
+document.getElementById('delMonthBtn').addEventListener('click',()=>{
+  const keys = Object.keys(STORE.months);
+  if(keys.length<=1){
+    alert('Нельзя удалить единственный месяц.');
+    return;
+  }
+  const label = monthLabel(STORE.current);
+  if(!confirm(`Удалить «${label}» полностью? Категории и суммы этого месяца скроются, но их можно будет восстановить из истории.`)) return;
+  const key = STORE.current;
+  const data = STORE.months[key];
+  STORE.deletedMonths.push({ key, label, data, date: new Date().toISOString(), restored:false });
+  delete STORE.months[key];
+  STORE.order = STORE.order.filter(k=>k!==key);
+  const remaining = STORE.order.filter(k=>STORE.months[k]);
+  STORE.current = remaining[remaining.length-1];
+  expandedCategories.clear();
+  limitEditCategories.clear();
+  hideKeyboardActionBar();
+  renderMonthSelect();
+  bi.value = fmt(cur().B);
+  renderRows();
+  renderChart();
+  if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+  save();
+  document.getElementById('backupOverlay').classList.remove('open');
+});
+
+document.getElementById('openGlobalHist').addEventListener('click',()=>{
+  ghEditing = null;
+  renderGlobalHist();
+  document.getElementById('ghOverlay').classList.add('open');
+});
+document.getElementById('ghExport').addEventListener('click',()=>{
+  const m = cur();
+  const rows = [];
+  m.C.forEach(c=>{
+    (c.h||[]).forEach(item=>{
+      rows.push({ date:item.d, cat:c.n, amount:item.a, comment:item.c||'' });
+    });
+  });
+  rows.sort((a,b)=> new Date(a.date) - new Date(b.date));
+  if(rows.length===0){
+    alert('Пока нет трат для выгрузки.');
+    return;
+  }
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const lines = [['Дата','Категория','Сумма','Комментарий'].map(esc).join(';')];
+  rows.forEach(r=>{
+    const d = new Date(r.date);
+    const dateStr = d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    lines.push([dateStr, r.cat, r.amount, r.comment].map(esc).join(';'));
+  });
+  const csv = '\uFEFF'+lines.join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `траты-${monthLabel(STORE.current).replace(/\s+/g,'_')}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+function renderOthersList(){
+  const list = document.getElementById('othersList');
+  const basis = othersData.basis || 0;
+  const sorted = (othersData.items||[]).slice().sort((a,b)=>b.amount-a.amount);
+  if(sorted.length===0){
+    list.innerHTML = '<div class="gh-empty" style="grid-column:1/-1">Пусто</div>';
+    return;
+  }
+  list.innerHTML = sorted.map(c=>{
+    const pct = basis>0 ? Math.round((c.amount/basis)*100) : 0;
+    return `
+      <div class="cat-tile" style="background:${hexToRgba(c.col,.16)}">
+        <span class="cat-tile-name">${(c.name||'').replace(/</g,'&lt;')}</span>
+        <span class="cat-tile-amt">${fmt(c.amount)}<span class="cat-tile-pct">· ${pct}%</span></span>
+      </div>
+    `;
+  }).join('');
+}
+document.getElementById('chartLegend').addEventListener('click', e=>{
+  if(e.target.closest('[data-other]')){
+    renderOthersList();
+    document.getElementById('othersOverlay').classList.add('open');
+  }
+});
+document.getElementById('othersClose').addEventListener('click',()=>{
+  document.getElementById('othersOverlay').classList.remove('open');
+});
+document.getElementById('othersOverlay').addEventListener('click',e=>{
+  if(e.target.id==='othersOverlay') document.getElementById('othersOverlay').classList.remove('open');
+});
+
+document.getElementById('monthMenuBtn').addEventListener('click',()=>{
+  document.getElementById('backupOverlay').classList.add('open');
+});
+document.getElementById('backupOverlayClose').addEventListener('click',()=>{
+  closeBackupOverlay(true);
+});
+document.getElementById('backupOverlay').addEventListener('click',e=>{
+  if(e.target.id==='backupOverlay') closeBackupOverlay(true);
+});
+document.getElementById('backupExportBtn').addEventListener('click',()=>{
+  const json = JSON.stringify(STORE, null, 2);
+  const blob = new Blob([json], {type:'application/json;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.download = `budget-backup-${dateStr}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  document.getElementById('backupOverlay').classList.remove('open');
+});
+document.getElementById('backupImportBtn').addEventListener('click',()=>{
+  document.getElementById('backupFileInput').click();
+});
+document.getElementById('backupFileInput').addEventListener('change',e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed || typeof parsed.months !== 'object'){
+        alert('Файл не похож на резервную копию бюджета.');
+        return;
+      }
+      if(!confirm('Заменить все текущие данные содержимым этого файла? Текущие данные будут потеряны, если вы их не сохранили отдельно.')) return;
+      STORE = {
+        months: parsed.months || {},
+        current: parsed.current || null,
+        deletedMonths: Array.isArray(parsed.deletedMonths) ? parsed.deletedMonths : [],
+        order: Array.isArray(parsed.order) ? parsed.order : Object.keys(parsed.months||{}).sort(),
+        dismissedPresets: Array.isArray(parsed.dismissedPresets) ? parsed.dismissedPresets : []
+      };
+      expandedCategories.clear();
+      limitEditCategories.clear();
+      hideKeyboardActionBar();
+      const keys = Object.keys(STORE.months);
+      if(keys.length===0){
+        STORE.months[monthKey(new Date())] = defaultMonthData();
+        STORE.order = [monthKey(new Date())];
+      }
+      if(!STORE.current || !STORE.months[STORE.current]){
+        STORE.current = STORE.order[STORE.order.length-1] || Object.keys(STORE.months)[0];
+      }
+      Object.values(STORE.months).forEach(month=>{
+        (month.C||[]).forEach((c,i)=>{ if(!c.col) c.col = nextColor((month.C||[]).slice(0,i)); });
+        if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
+        if(!Array.isArray(month.IN)) month.IN = [];
+        if(!Array.isArray(month.EV)) month.EV = [];
+      });
+      renderMonthSelect();
+      bi.value = fmt(cur().B);
+      renderRows();
+      renderChart();
+      save();
+      document.getElementById('backupOverlay').classList.remove('open');
+      alert('Данные восстановлены.');
+    }catch(err){
+      alert('Не удалось прочитать файл: '+err.message);
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('ghClose').addEventListener('click',()=>{
+  document.getElementById('ghOverlay').classList.remove('open');
+});
+document.getElementById('ghOverlay').addEventListener('click',e=>{
+  if(e.target.id==='ghOverlay'){
+    document.getElementById('ghOverlay').classList.remove('open');
+    return;
+  }
+  if(e.target.closest('button,input,select,textarea,a')) return;
+  const activeElement=document.activeElement;
+  if(activeElement && e.currentTarget.contains(activeElement) && typeof activeElement.blur==='function') activeElement.blur();
+  if(ghDateFilters.classList.contains('open')){
+    ghDateFilters.classList.remove('open');
+    ghDateToggle.classList.remove('open');
+    ghDateToggle.setAttribute('aria-expanded','false');
+  }
+  if(ghEditing){
+    ghEditing=null;
+    renderGlobalHist();
+  }
+});
+document.querySelectorAll('[data-ghtag]').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    ghTag = e.target.dataset.ghtag;
+    document.querySelectorAll('[data-ghtag]').forEach(b=>b.classList.toggle('active', b===e.target));
+    ghEditing = null;
+    renderGlobalHist();
+  });
+});
+document.getElementById('ghSearch').addEventListener('input',e=>{
+  ghSearchQuery = e.target.value;
+  ghEditing = null;
+  renderGlobalHist();
+});
+const ghExactDateInput=document.getElementById('ghExactDate');
+const ghDateFromInput=document.getElementById('ghDateFrom');
+const ghDateToInput=document.getElementById('ghDateTo');
+const ghDateToggle=document.getElementById('ghDateToggle');
+const ghDateFilters=document.getElementById('ghDateFilters');
+function syncGhDateToggle(){
+  ghDateToggle.classList.toggle('filtered',!!(ghExactDate||ghDateFrom||ghDateTo));
+}
+ghDateToggle.addEventListener('click',()=>{
+  const open=ghDateFilters.classList.toggle('open');
+  ghDateToggle.classList.toggle('open',open);
+  ghDateToggle.setAttribute('aria-expanded',open?'true':'false');
+});
+ghExactDateInput.addEventListener('change',e=>{
+  ghExactDate=e.target.value;
+  if(ghExactDate){
+    ghDateFrom='';
+    ghDateTo='';
+    ghDateFromInput.value='';
+    ghDateToInput.value='';
+  }
+  ghEditing=null;
+  syncGhDateToggle();
+  renderGlobalHist();
+});
+ghDateFromInput.addEventListener('change',e=>{
+  ghDateFrom=e.target.value;
+  ghExactDate='';
+  ghExactDateInput.value='';
+  if(ghDateFrom && ghDateTo && ghDateFrom>ghDateTo){
+    ghDateTo=ghDateFrom;
+    ghDateToInput.value=ghDateTo;
+  }
+  ghEditing=null;
+  syncGhDateToggle();
+  renderGlobalHist();
+});
+ghDateToInput.addEventListener('change',e=>{
+  ghDateTo=e.target.value;
+  ghExactDate='';
+  ghExactDateInput.value='';
+  if(ghDateFrom && ghDateTo && ghDateTo<ghDateFrom){
+    ghDateFrom=ghDateTo;
+    ghDateFromInput.value=ghDateFrom;
+  }
+  ghEditing=null;
+  syncGhDateToggle();
+  renderGlobalHist();
+});
+document.getElementById('ghDateClear').addEventListener('click',()=>{
+  ghExactDate='';
+  ghDateFrom='';
+  ghDateTo='';
+  ghExactDateInput.value='';
+  ghDateFromInput.value='';
+  ghDateToInput.value='';
+  ghEditing=null;
+  syncGhDateToggle();
+  renderGlobalHist();
+});
+
+const THEME_KEY = "icity-budget-theme";
+const themeBtn = document.getElementById('themeToggle');
+const themeIconSun = document.getElementById('themeIconSun');
+const themeIconMoon = document.getElementById('themeIconMoon');
+const themeMenuTitle = document.getElementById('themeMenuTitle');
+function applyTheme(theme){
+  if(theme==='light'){
+    document.documentElement.setAttribute('data-theme','light');
+    themeIconSun.style.display='none';
+    themeIconMoon.style.display='block';
+    themeMenuTitle.textContent='Тёмная тема';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    themeIconSun.style.display='block';
+    themeIconMoon.style.display='none';
+    themeMenuTitle.textContent='Светлая тема';
+  }
+  renderChart();
+}
+let savedTheme = 'light';
+try{ savedTheme = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){}
+
+renderMonthSelect();
+bi.value = fmt(cur().B);
+renderRows();
+renderChart();
+applyTheme(savedTheme);
+
+themeBtn.addEventListener('click',()=>{
+  const current = document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
+  const next = current==='light' ? 'dark' : 'light';
+  applyTheme(next);
+  try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+  document.getElementById('backupOverlay').classList.remove('open');
+});
+
+function toggleChartExpanded(){
+  const chartSideEl = document.querySelector('.chart-side');
+  const ringEl = document.getElementById('donut');
+  ringEl.getAnimations().forEach(animation=>animation.cancel());
+  const startRect = ringEl.getBoundingClientRect();
+  const next = !chartExpanded;
+  chartExpanded = next;
+  if(!next) chartPeriod = 'month';
+  chartSideEl.classList.toggle('expanded', next);
+  renderChart();
+
+  const endRect = ringEl.getBoundingClientRect();
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceMotion && startRect.width && endRect.width){
+    const dx = startRect.left - endRect.left;
+    const dy = startRect.top - endRect.top;
+    const scaleX = startRect.width / endRect.width;
+    const scaleY = startRect.height / endRect.height;
+    ringEl.animate([
+      {transform:`translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`},
+      {transform:'translate(0, 0) scale(1, 1)'}
+    ],{
+      duration:620,
+      easing:'cubic-bezier(.22,1,.36,1)',
+      fill:'both'
+    });
+  }
+
+  if(!next && !reduceMotion){
+    chartSideEl.animate([
+      {opacity:0, transform:'translateY(8px)'},
+      {opacity:1, transform:'translateY(0)'}
+    ],{
+      duration:320,
+      delay:110,
+      easing:'cubic-bezier(.22,1,.36,1)',
+      fill:'both'
+    });
+  }
+}
+svg.addEventListener('click', toggleChartExpanded);
+
+document.addEventListener('click',e=>{
+  const openCategoryHistories=Array.from(document.querySelectorAll('.hist.open'));
+  const hadExpandedCategory=expandedCategories.size>0;
+  const hadIncomeEntry=incomeAmt.classList.contains('show');
+  if(!hadExpandedCategory && openCategoryHistories.length===0 && !hadIncomeEntry) return;
+  if(e.target.closest('.row,.keyboard-action-bar,.overlay.open')) return;
+  if(e.target.closest('.side-income')) return;
+  if(e.target.closest('button,input,select,textarea,a')) return;
+  openCategoryHistories.forEach(hist=>hist.classList.remove('open'));
+  expandedCategories.clear();
+  limitEditCategories.clear();
+  if(hadIncomeEntry) cancelIncomeEntry();
+  hideKeyboardActionBar();
+  if(hadExpandedCategory) renderRows();
+});
+
+document.querySelectorAll('#periodTabs button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(chartPeriod===btn.dataset.period) return;
+    chartPeriod = btn.dataset.period;
+    renderChart();
+  });
+});
+
+</script></body></html>
