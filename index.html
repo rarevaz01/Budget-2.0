@@ -467,13 +467,16 @@ undoToastBtn.addEventListener('click',()=>{
 });
 
 // keeps the undo toast from overlapping the comment field/submit button
-// when a new expense/income entry is opened while the toast is still showing
+// when a new expense/income entry is opened while the toast is still showing.
+// Uses offsetHeight (a static layout size) rather than getBoundingClientRect
+// (the bar's visual position, which is animated via CSS transform and would
+// otherwise race with that transition and report a stale position).
 function updateUndoToastPosition(){
   if(!undoToast) return;
   if(keyboardActionBar.classList.contains('show')){
-    const barRect=keyboardActionBar.getBoundingClientRect();
+    const keyboardInset=parseFloat(keyboardActionBar.style.bottom)||0;
     const gap=10;
-    undoToast.style.bottom=Math.max(0,window.innerHeight-barRect.top+gap)+'px';
+    undoToast.style.bottom=(keyboardInset+keyboardActionBar.offsetHeight+gap)+'px';
   } else {
     undoToast.style.bottom='';
   }
