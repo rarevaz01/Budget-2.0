@@ -1,4 +1,11 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A041A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Финансы">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
 <style>
 :root{--bg:#0A041A;--card:#150B2E;--card-2:#1B1038;--line:#271849;--text:#F4F2F8;--muted:#AAA0C1;--accent:#F79009;--accent-soft:rgba(247,144,9,.14);--accent-soft-line:rgba(247,144,9,.3);--btn-text:#0A041A;--white-seg:#3A2C5C;--track:#241539;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--red:#E2685C;--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
 [data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#EAE5F3;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--red:#D34C40;--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
@@ -1880,7 +1887,9 @@ document.getElementById('ghExport').addEventListener('click',()=>{
     return;
   }
   const esc = v => `"${String(v).replace(/"/g,'""')}"`;
-  const lines = [['Дата','Категория','Сумма','Комментарий'].map(esc).join(';')];
+  const lines = [];
+  if(syncCode) lines.push(['Код синхронизации', syncCode].map(esc).join(';'));
+  lines.push(['Дата','Категория','Сумма','Комментарий'].map(esc).join(';'));
   rows.forEach(r=>{
     const d = new Date(r.date);
     const dateStr = d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
@@ -1939,7 +1948,8 @@ document.getElementById('backupOverlay').addEventListener('click',e=>{
   if(e.target.id==='backupOverlay') closeBackupOverlay(true);
 });
 document.getElementById('backupExportBtn').addEventListener('click',()=>{
-  const json = JSON.stringify(STORE, null, 2);
+  const exportData = syncCode ? {...STORE, _syncCode: syncCode} : STORE;
+  const json = JSON.stringify(exportData, null, 2);
   const blob = new Blob([json], {type:'application/json;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1987,6 +1997,9 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
       renderRows();
       renderChart();
       save();
+      if(typeof parsed._syncCode === 'string' && parsed._syncCode && window.CloudSync){
+        startSync(parsed._syncCode);
+      }
       document.getElementById('backupOverlay').classList.remove('open');
       alert('Данные восстановлены.');
     }catch(err){
@@ -2450,5 +2463,12 @@ document.querySelectorAll('#periodTabs button').forEach(btn=>{
     }
   };
   window.dispatchEvent(new Event('cloudsync-ready'));
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 </script>
 </body></html>
