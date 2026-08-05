@@ -916,13 +916,20 @@ function deleteIncome(mk, ii){
   if(!entry) return;
   const label = entry.c ? `${fmt(entry.a)} (${entry.c})` : fmt(entry.a);
   if(!confirm(`Удалить доход ${label}? Доходы уменьшатся.`)) return;
-  m.B = (parseFloat(m.B)||0) - (parseFloat(entry.a)||0);
+  const amount = parseFloat(entry.a)||0;
+  m.B = (parseFloat(m.B)||0) - amount;
   m.IN.splice(ii,1);
   if(mk===STORE.current) bi.value = fmt(cur().B);
   renderRows();
   renderChart();
   renderGlobalHist();
   save();
+  showUndoToast(`Доход ${fmt(amount)} удалён`,()=>{
+    const insertAt=Math.min(ii,m.IN.length);
+    m.IN.splice(insertAt,0,entry);
+    m.B=(parseFloat(m.B)||0)+amount;
+    refreshAfterUndo();
+  });
 }
 
 function editIncome(mk, ii, newAmount, newComment){
@@ -1693,6 +1700,7 @@ function renderCatEditor(){
       const [cat] = m2.C.splice(i,1);
       if(!cat) return;
       expandedCategories.delete(cat);
+      limitEditCategories.delete(cat);
       if(!m2.hiddenC) m2.hiddenC=[];
       m2.hiddenC.push(cat);
       renderRows(); renderChart(); renderCatEditor(); save();
@@ -1722,6 +1730,7 @@ function renderCatEditor(){
       if(!cat) return;
       if(!confirm(`Удалить категорию «${cat.n}» насовсем? Это действие нельзя отменить.`)) return;
       expandedCategories.delete(cat);
+      limitEditCategories.delete(cat);
       m2.hiddenC.splice(i,1);
       renderCatEditor(); save();
     });
