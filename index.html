@@ -449,6 +449,7 @@ function showUndoToast(message,undoAction){
   undoToast.classList.add('show');
   undoToast.setAttribute('aria-hidden','false');
   undoToast.inert=false;
+  updateUndoToastPosition();
   undoToastTimer=setTimeout(hideUndoToast,6000);
 }
 function refreshAfterUndo(){
@@ -465,11 +466,24 @@ undoToastBtn.addEventListener('click',()=>{
   if(typeof undoAction==='function') undoAction();
 });
 
+// keeps the undo toast from overlapping the comment field/submit button
+// when a new expense/income entry is opened while the toast is still showing
+function updateUndoToastPosition(){
+  if(!undoToast) return;
+  if(keyboardActionBar.classList.contains('show')){
+    const barRect=keyboardActionBar.getBoundingClientRect();
+    const gap=10;
+    undoToast.style.bottom=Math.max(0,window.innerHeight-barRect.top+gap)+'px';
+  } else {
+    undoToast.style.bottom='';
+  }
+}
 function updateKeyboardActionBarPosition(){
   if(!keyboardActionBar) return;
   const viewport=window.visualViewport;
   const keyboardInset=viewport ? Math.max(0,window.innerHeight-viewport.height-viewport.offsetTop) : 0;
   keyboardActionBar.style.bottom=keyboardInset+'px';
+  updateUndoToastPosition();
 }
 function showKeyboardActionBar(mode,i){
   const nextMode = mode || 'expense';
@@ -489,6 +503,7 @@ function hideKeyboardActionBar(){
   keyboardActionBar.setAttribute('aria-hidden','true');
   keyboardActionBar.inert=true;
   keyboardActionBar.style.bottom='0px';
+  updateUndoToastPosition();
 }
 keyboardActionSubmit.addEventListener('pointerdown',e=>e.preventDefault());
 keyboardActionSubmit.addEventListener('click',()=>{
