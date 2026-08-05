@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Deliberately open: the sync code itself IS the access control (no
+    // login/registration). Anyone who knows the exact document id (the
+    // code) can read/write that one budget document. There is no rule
+    // granting collection-level "list", so a client can't enumerate or
+    // guess codes by scanning /budgets — they must already have the
+    // exact code, which is generated as a long random string in the app.
+    match /budgets/{code} {
+      allow read, write: if true;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

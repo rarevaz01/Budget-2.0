@@ -125,6 +125,15 @@ svg{overflow:visible}
 .period-rename-input{min-width:0;flex:1;height:44px;padding:0 12px;border:1px solid var(--accent-soft-line);border-radius:11px;outline:0;background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;font-size:14px}
 .period-rename-input:focus{border-color:var(--accent)}
 .period-rename-save{height:44px;padding:0 15px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800}
+.sync-panel{display:none;flex-direction:column;gap:10px;padding:10px 4px 16px;border-bottom:1px solid var(--line)}
+.sync-panel.open{display:flex}
+.sync-panel .backup-option-desc{margin:0}
+.sync-join-row{display:flex;gap:8px}
+.sync-join-row .period-rename-input{font-family:inherit}
+.sync-code-box{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent-soft)}
+.sync-code-text{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;font-weight:800;letter-spacing:.03em;color:var(--text);word-break:break-all}
+.sync-status{font-size:12px;color:var(--muted)}
+.sync-status.err{color:var(--red)}
 .gh-search{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:13px;padding:9px 10px;margin-bottom:12px}
 .gh-search::placeholder{color:var(--muted)}
 .gh-month-tag{font-size:12px;color:var(--muted);font-weight:700}
@@ -347,6 +356,16 @@ svg{overflow:visible}
         <div class="backup-option-desc">Заменит все текущие данные файлом.<br><strong>Действие необратимо!</strong></div>
       </div>
     </button>
+    <button class="backup-option" type="button" id="syncBtn" aria-expanded="false">
+      <div class="backup-option-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9c-2.52 0-4.93-1-6.74-2.74L3 21"/><path d="M3 12a9 9 0 0 1 9-9c2.52 0 4.93 1 6.74 2.74L21 3"/><path d="M3 16v5h5"/><path d="M21 8V3h-5"/></svg>
+      </div>
+      <div class="backup-option-text">
+        <div class="backup-option-title" id="syncBtnTitle">Синхронизация между устройствами</div>
+        <div class="backup-option-desc" id="syncBtnDesc">Один код — одни данные на всех устройствах</div>
+      </div>
+    </button>
+    <div class="sync-panel" id="syncPanel"></div>
     <button class="backup-option" type="button" id="themeToggle">
       <div class="backup-option-icon">
         <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -392,27 +411,31 @@ if(Object.keys(STORE.months).length===0){
   STORE.months[nowKey] = defaultMonthData();
   STORE.current = nowKey;
 }
-if(!STORE.current || !STORE.months[STORE.current]){
-  const keys = Object.keys(STORE.months).sort();
-  STORE.current = keys[keys.length-1];
-}
 
-// migrate: build/repair order array so it contains exactly the existing month keys
-{
-  const existing = Object.keys(STORE.months);
-  const known = new Set(STORE.order);
+// repairs order/current + fills in fields older/foreign data might be missing.
+// Shared by the initial load, "Восстановить из копии", and cloud sync pulls,
+// so every entry point into STORE gets the same shape guarantees.
+function normalizeStore(store){
+  const existing = Object.keys(store.months);
+  const known = new Set(store.order);
   const missing = existing.filter(k=>!known.has(k)).sort();
-  STORE.order = STORE.order.filter(k=>STORE.months[k]).concat(missing);
-}
-
-// migrate old data without fixed category colors
-Object.values(STORE.months).forEach(month=>{
-  (month.C||[]).forEach((c,i)=>{
-    if(!c.col) c.col = nextColor(month.C.slice(0,i));
+  store.order = store.order.filter(k=>store.months[k]).concat(missing);
+  Object.values(store.months).forEach(month=>{
+    (month.C||[]).forEach((c,i)=>{
+      if(!c.col) c.col = nextColor(month.C.slice(0,i));
+    });
+    if(!Array.isArray(month.IN)) month.IN = [];
+    if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
+    if(!Array.isArray(month.EV)) month.EV = [];
   });
-  if(!Array.isArray(month.IN)) month.IN = [];
-  if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
-});
+  if(!Array.isArray(store.deletedMonths)) store.deletedMonths = [];
+  if(!Array.isArray(store.dismissedPresets)) store.dismissedPresets = [];
+  if(!store.current || !store.months[store.current]){
+    store.current = store.order[store.order.length-1] || Object.keys(store.months)[0];
+  }
+  return store;
+}
+normalizeStore(STORE);
 
 // active month's data, aliased for convenience
 function cur(){ return STORE.months[STORE.current]; }
@@ -547,6 +570,7 @@ function save(){
     st.textContent="Ошибка сохранения";
     st.classList.add('err');
   }
+  pushToCloud();
 }
 let t=null;function sched(){if(t)clearTimeout(t);t=setTimeout(save,800)}
 function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
@@ -1780,6 +1804,7 @@ function closePeriodRename(){
 }
 function closeBackupOverlay(cancelHistoryEdit=false){
   closePeriodRename();
+  closeSyncPanel();
   document.getElementById('backupOverlay').classList.remove('open');
   if(cancelHistoryEdit) cancelGlobalHistoryEditing();
 }
@@ -1952,20 +1977,11 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
       expandedCategories.clear();
       limitEditCategories.clear();
       hideKeyboardActionBar();
-      const keys = Object.keys(STORE.months);
-      if(keys.length===0){
+      if(Object.keys(STORE.months).length===0){
         STORE.months[monthKey(new Date())] = defaultMonthData();
         STORE.order = [monthKey(new Date())];
       }
-      if(!STORE.current || !STORE.months[STORE.current]){
-        STORE.current = STORE.order[STORE.order.length-1] || Object.keys(STORE.months)[0];
-      }
-      Object.values(STORE.months).forEach(month=>{
-        (month.C||[]).forEach((c,i)=>{ if(!c.col) c.col = nextColor((month.C||[]).slice(0,i)); });
-        if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
-        if(!Array.isArray(month.IN)) month.IN = [];
-        if(!Array.isArray(month.EV)) month.EV = [];
-      });
+      normalizeStore(STORE);
       renderMonthSelect();
       bi.value = fmt(cur().B);
       renderRows();
@@ -1980,6 +1996,224 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
   };
   reader.readAsText(file);
 });
+
+// ---------------- Cloud sync (Firestore, via window.CloudSync from the module script below) ----------------
+const SYNC_KEY = 'icity-budget-sync-code';
+let syncCode = null;
+try{ syncCode = localStorage.getItem(SYNC_KEY) || null; }catch(e){}
+let syncUnsubscribe = null;
+let applyingRemoteUpdate = false;
+let syncBusy = false;
+let syncStatus = '';
+let syncStatusErr = false;
+let syncPanelOpen = false;
+
+const syncBtn = document.getElementById('syncBtn');
+const syncPanel = document.getElementById('syncPanel');
+
+function generateSyncCode(){
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I/L ambiguity
+  const bytes = new Uint8Array(20);
+  crypto.getRandomValues(bytes);
+  let raw = '';
+  for(let i=0;i<bytes.length;i++) raw += alphabet[bytes[i] % alphabet.length];
+  return raw.match(/.{1,5}/g).join('-');
+}
+
+function pushToCloud(){
+  if(!syncCode || !window.CloudSync || applyingRemoteUpdate) return;
+  const payload = JSON.parse(JSON.stringify({store: STORE, updatedAt: Date.now()}));
+  window.CloudSync.setBudgetDoc(syncCode, payload).catch(err=>{
+    syncStatus = 'Не удалось отправить изменения в облако: '+err.message;
+    syncStatusErr = true;
+    if(syncPanelOpen) renderSyncPanel();
+  });
+}
+
+function applyRemoteStore(remoteStore){
+  applyingRemoteUpdate = true;
+  try{
+    STORE = remoteStore;
+    if(Object.keys(STORE.months||{}).length===0){
+      STORE.months = STORE.months || {};
+      STORE.months[monthKey(new Date())] = defaultMonthData();
+      STORE.order = [monthKey(new Date())];
+    }
+    normalizeStore(STORE);
+    expandedCategories.clear();
+    limitEditCategories.clear();
+    hideKeyboardActionBar();
+    renderMonthSelect();
+    bi.value = fmt(cur().B);
+    renderRows();
+    renderChart();
+    if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
+    if(document.getElementById('catEditorOverlay').classList.contains('open')) renderCatEditor();
+    try{ localStorage.setItem(K, JSON.stringify(STORE)); }catch(e){}
+  } finally {
+    applyingRemoteUpdate = false;
+  }
+}
+
+function startSync(code){
+  if(syncUnsubscribe){ syncUnsubscribe(); syncUnsubscribe = null; }
+  syncCode = code;
+  try{ localStorage.setItem(SYNC_KEY, code); }catch(e){}
+  syncUnsubscribe = window.CloudSync.subscribeBudgetDoc(code, (data, meta)=>{
+    if(meta && meta.error){
+      syncStatus = 'Ошибка синхронизации: '+meta.error.message;
+      syncStatusErr = true;
+      if(syncPanelOpen) renderSyncPanel();
+      return;
+    }
+    if(meta && meta.fromLocalWrite) return; // our own pending write echoing back — ignore
+    if(!data || !data.store) return; // doc not created yet
+    applyRemoteStore(data.store);
+    syncStatus = 'Синхронизировано только что';
+    syncStatusErr = false;
+    if(syncPanelOpen) renderSyncPanel();
+  });
+}
+
+function stopSync(){
+  if(syncUnsubscribe){ syncUnsubscribe(); syncUnsubscribe = null; }
+  syncCode = null;
+  try{ localStorage.removeItem(SYNC_KEY); }catch(e){}
+  syncStatus = '';
+  syncStatusErr = false;
+}
+
+async function createSyncCode(){
+  if(!window.CloudSync || syncBusy) return;
+  syncBusy = true;
+  renderSyncPanel();
+  const code = generateSyncCode();
+  try{
+    await window.CloudSync.setBudgetDoc(code, JSON.parse(JSON.stringify({store: STORE, updatedAt: Date.now()})));
+    startSync(code);
+    syncStatus = 'Код создан. Введите его на других устройствах в этом же меню.';
+    syncStatusErr = false;
+  }catch(err){
+    syncStatus = 'Не удалось создать синхронизацию: '+err.message;
+    syncStatusErr = true;
+  }
+  syncBusy = false;
+  renderSyncPanel();
+}
+
+async function joinSyncCode(rawCode){
+  if(!window.CloudSync || syncBusy) return;
+  const code = rawCode.trim().toUpperCase();
+  if(!code) return;
+  syncBusy = true;
+  syncStatus = 'Подключение…';
+  syncStatusErr = false;
+  renderSyncPanel();
+  try{
+    const existing = await window.CloudSync.getBudgetDoc(code);
+    if(existing && existing.store){
+      if(!confirm('На этом коде уже есть данные. Заменить текущие локальные данные этого устройства данными с других устройств?')){
+        syncBusy = false;
+        syncStatus = '';
+        renderSyncPanel();
+        return;
+      }
+      startSync(code);
+      applyRemoteStore(existing.store);
+      syncStatus = 'Подключено, данные загружены.';
+    } else {
+      if(!confirm('По этому коду в облаке ещё ничего нет. Загрузить туда текущие данные этого устройства как первую копию?')){
+        syncBusy = false;
+        syncStatus = '';
+        renderSyncPanel();
+        return;
+      }
+      await window.CloudSync.setBudgetDoc(code, JSON.parse(JSON.stringify({store: STORE, updatedAt: Date.now()})));
+      startSync(code);
+      syncStatus = 'Подключено, текущие данные загружены в облако.';
+    }
+    syncStatusErr = false;
+  }catch(err){
+    syncStatus = 'Не удалось подключиться: '+err.message;
+    syncStatusErr = true;
+  }
+  syncBusy = false;
+  renderSyncPanel();
+}
+
+function disconnectSync(){
+  if(!confirm('Отключить синхронизацию на этом устройстве? Локальные данные останутся, облачная копия не удаляется.')) return;
+  stopSync();
+  renderSyncPanel();
+}
+
+function renderSyncPanel(){
+  if(!window.CloudSync){
+    syncPanel.innerHTML = `<div class="sync-status">Загрузка модуля синхронизации…</div>`;
+    return;
+  }
+  if(syncCode){
+    syncPanel.innerHTML = `
+      <div class="backup-option-desc">Код синхронизации — храните как пароль, введите его на других устройствах в этом же меню:</div>
+      <div class="sync-code-box">
+        <span class="sync-code-text">${syncCode}</span>
+        <button class="period-rename-save" type="button" id="syncCopyBtn" style="flex-shrink:0">Копировать</button>
+      </div>
+      ${syncStatus ? `<div class="sync-status${syncStatusErr?' err':''}">${syncStatus}</div>` : ''}
+      <button class="backup-option danger" type="button" id="syncDisconnectBtn" style="border-radius:11px">
+        <div class="backup-option-text"><div class="backup-option-title">Отключить синхронизацию</div><div class="backup-option-desc">Локальные данные останутся на устройстве</div></div>
+      </button>
+    `;
+    document.getElementById('syncCopyBtn').addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText(syncCode);
+        syncStatus = 'Код скопирован';
+        syncStatusErr = false;
+      }catch(e){
+        syncStatus = 'Не удалось скопировать — выделите код вручную';
+        syncStatusErr = true;
+      }
+      renderSyncPanel();
+    });
+    document.getElementById('syncDisconnectBtn').addEventListener('click', disconnectSync);
+  } else {
+    syncPanel.innerHTML = `
+      <div class="backup-option-desc">Создайте код на этом устройстве и введите его на остальных — данные станут общими и будут обновляться в реальном времени.</div>
+      <button class="period-rename-save" type="button" id="syncCreateBtn" ${syncBusy?'disabled':''}>Создать код синхронизации</button>
+      <div class="sync-join-row">
+        <input class="period-rename-input" type="text" id="syncJoinInput" placeholder="Код с другого устройства" autocomplete="off" ${syncBusy?'disabled':''}>
+        <button class="period-rename-save" type="button" id="syncJoinBtn" ${syncBusy?'disabled':''}>Подключить</button>
+      </div>
+      ${syncStatus ? `<div class="sync-status${syncStatusErr?' err':''}">${syncStatus}</div>` : ''}
+    `;
+    document.getElementById('syncCreateBtn').addEventListener('click', createSyncCode);
+    document.getElementById('syncJoinBtn').addEventListener('click', ()=>{
+      joinSyncCode(document.getElementById('syncJoinInput').value);
+    });
+    document.getElementById('syncJoinInput').addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); joinSyncCode(e.target.value); }
+    });
+  }
+}
+
+function closeSyncPanel(){
+  syncPanelOpen = false;
+  syncPanel.classList.remove('open');
+  syncBtn.setAttribute('aria-expanded','false');
+}
+syncBtn.addEventListener('click', ()=>{
+  syncPanelOpen = !syncPanelOpen;
+  syncPanel.classList.toggle('open', syncPanelOpen);
+  syncBtn.setAttribute('aria-expanded', syncPanelOpen ? 'true' : 'false');
+  if(syncPanelOpen) renderSyncPanel();
+});
+window.addEventListener('cloudsync-ready', ()=>{
+  if(syncPanelOpen) renderSyncPanel();
+  if(syncCode) startSync(syncCode); // resume sync from a previous session
+});
+if(window.CloudSync && syncCode){
+  startSync(syncCode);
+}
 
 document.getElementById('ghClose').addEventListener('click',()=>{
   document.getElementById('ghOverlay').classList.remove('open');
@@ -2178,4 +2412,43 @@ document.querySelectorAll('#periodTabs button').forEach(btn=>{
   });
 });
 
-</script></body></html>
+</script>
+<script type="module">
+  // Bridges Firestore (loaded as an ES module) into window.CloudSync so the
+  // classic script above — which can't use `import` — can call plain
+  // async functions without needing a build step.
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDH7z9MvtNHUf0LGBf_aRRDBCU5ij5Cz3A",
+    authDomain: "finansy-app-d298b.firebaseapp.com",
+    projectId: "finansy-app-d298b",
+    storageBucket: "finansy-app-d298b.firebasestorage.app",
+    messagingSenderId: "1094409922442",
+    appId: "1:1094409922442:web:a47726de701a83d4388a73"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.CloudSync = {
+    async getBudgetDoc(code){
+      const snap = await getDoc(doc(db, 'budgets', code));
+      return snap.exists() ? snap.data() : null;
+    },
+    async setBudgetDoc(code, data){
+      await setDoc(doc(db, 'budgets', code), data);
+    },
+    // returns an unsubscribe function; callback(data|null, {fromLocalWrite} | {error})
+    subscribeBudgetDoc(code, callback){
+      return onSnapshot(
+        doc(db, 'budgets', code),
+        snap => callback(snap.exists() ? snap.data() : null, {fromLocalWrite: snap.metadata.hasPendingWrites}),
+        err => callback(null, {error: err})
+      );
+    }
+  };
+  window.dispatchEvent(new Event('cloudsync-ready'));
+</script>
+</body></html>
