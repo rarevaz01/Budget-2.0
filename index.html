@@ -17,22 +17,23 @@ body{padding:28px 14px;display:flex;justify-content:center}
 h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
 .month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 26px;padding:8px;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
 .month-nav{display:flex;align-items:center;gap:8px;flex:1;min-width:0;width:100%}
-.month-nav-arrow{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.month-nav-arrow{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:transform .12s ease,background .12s ease}
+.month-nav-arrow:active{transform:scale(.9);background:var(--track)}
 .month-nav-arrow svg{display:block}
 .month-nav-arrow:disabled{opacity:.35;pointer-events:none}
 .month-select-wrap{position:relative;flex:1;min-width:0}
-.month-select{width:100%;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 26px 9px 10px;text-align:center;text-align-last:center}
+.month-select{width:100%;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 26px 9px 10px;text-align:center;text-align-last:center;transition:transform .12s ease,background .12s ease}
+.month-select:active{transform:scale(.97);background:var(--track)}
 .month-select-chevron{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .month-select-clear{display:none;position:absolute;right:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;align-items:center;justify-content:center;border:0;border-radius:8px;background:none;color:var(--muted);padding:0;z-index:1}
 .month-select-wrap.has-custom-range .month-select-chevron{display:none}
 .month-select-wrap.has-custom-range .month-select-clear{display:flex}
-.month-menu{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
+.month-menu{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;transition:transform .12s ease,background .12s ease}
+.month-menu:active{transform:scale(.9);background:var(--track)}
 .month-menu svg{display:block}
-#status{font-size:12px;color:var(--muted)}
-#status.err{color:var(--red)}
 .chart-col{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;margin-bottom:12px}
 .chart-svg-wrap{flex:0 1 auto}
-.chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform}
+.chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform;touch-action:pan-y}
 .chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease}
 .chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
 .chart-col.expanded .chart-svg-wrap svg{width:276px;height:276px}
@@ -87,7 +88,8 @@ svg{overflow:visible}
 .ninp.is-overflowing{-webkit-mask-image:linear-gradient(to right,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 72%,transparent 100%)}
 .amt-display{font-weight:700;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
 .pct-input{font-size:12px;color:var(--text);text-align:right;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:6px;width:44px;padding:2px 3px}
-.row-expand-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--green-soft-line);background:var(--green-soft);color:var(--green);font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0}
+.row-expand-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--green-soft-line);background:var(--green-soft);color:var(--green);font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .12s ease}
+.row-expand-btn:active{transform:scale(.88)}
 .row-expand-btn span{display:block;line-height:1;transition:transform .22s cubic-bezier(.22,1,.36,1)}
 .row-expand-btn.open span{transform:rotate(45deg)}
 .row-bottom{display:none;flex-direction:column;gap:4px;margin-top:10px}
@@ -107,7 +109,8 @@ svg{overflow:visible}
 .pct-preview{font-size:12px;color:var(--text);font-weight:700;padding:2px 0 0 2px;min-height:16px}
 .pct-preview:empty{min-height:0;padding:0}
 .hist-toggle-row{display:flex;justify-content:flex-start}
-.hist-icon-btn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.hist-icon-btn{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;transition:transform .12s ease,background .12s ease}
+.hist-icon-btn:active{transform:scale(.88);background:var(--track)}
 .limit-action-btn{width:64px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:700}
 .limit-action-btn.limit-confirm{width:44px;padding:0}
 .hist-icon-btn.limit-confirm{border-color:var(--green-soft-line);background:var(--green-soft);color:var(--green)}
@@ -127,17 +130,21 @@ svg{overflow:visible}
 .hist-item .hist-comment{color:var(--muted);font-size:13px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;cursor:pointer}
 .hist-item .hist-comment.expanded{white-space:normal;overflow:visible;text-overflow:clip}
 .hist-del{background:none;border:none;color:var(--muted);font-size:13px;width:20px;height:20px;border-radius:5px;margin-left:auto;flex-shrink:0}
-.add{margin-top:14px;background:var(--accent-soft);border:1px solid var(--accent-soft-line);color:var(--accent);font-weight:700;font-size:13px;padding:12px 12px;border-radius:12px;width:100%;text-align:center}
+.add{margin-top:14px;background:var(--accent-soft);border:1px solid var(--accent-soft-line);color:var(--accent);font-weight:700;font-size:13px;padding:12px 12px;border-radius:12px;width:100%;text-align:center;transition:transform .12s ease,background .12s ease}
+.add:active{transform:scale(.97);background:var(--accent-soft-line)}
 .bottom-row{display:flex;gap:8px;margin-top:10px}
 .head-icons{display:flex;align-items:center;gap:8px}
-.icon-btn{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.icon-btn svg.spinning{animation:icon-spin 1.4s linear infinite}
+.icon-btn{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .12s ease,background .12s ease}
+.icon-btn:active{transform:scale(.9);background:var(--track)}
+.icon-btn svg.spinning{animation:icon-spin .7s linear infinite}
 @keyframes icon-spin{to{transform:rotate(360deg)}}
 .icon-btn.sync-success{border-color:var(--green-soft-line);background:var(--green-soft);color:var(--green);transition:background .2s ease,border-color .2s ease,color .2s ease}
-.overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center;z-index:100}
-.overlay.open{display:flex}
+.icon-btn.save-err{border-color:var(--red);color:var(--red);transition:background .2s ease,border-color .2s ease,color .2s ease}
+.overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .32s cubic-bezier(.22,1,.36,1),visibility 0s linear .32s,background-color .32s cubic-bezier(.22,1,.36,1)}
+.overlay.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .32s cubic-bezier(.22,1,.36,1),background-color .32s cubic-bezier(.22,1,.36,1)}
 .overlay-center{align-items:center;padding:20px}
-.sheet{background:linear-gradient(180deg,var(--card-2) 0%,var(--card) 40%);width:100%;max-width:720px;max-height:85vh;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:var(--shadow)}
+.sheet{background:linear-gradient(180deg,var(--card-2) 0%,var(--card) 40%);width:100%;max-width:720px;max-height:85vh;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:var(--shadow);transform:translateY(28px);transition:transform .38s cubic-bezier(.22,1,.36,1)}
+.overlay.open .sheet{transform:translateY(0)}
 .backup-reminder-sheet{max-width:340px;border-radius:20px;text-align:center;padding:24px 20px}
 .backup-reminder-icon{width:52px;height:52px;border-radius:14px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
 .backup-reminder-sheet h3{font-size:16px;font-weight:800;margin:0 0 8px;letter-spacing:-.01em}
@@ -269,8 +276,7 @@ svg{overflow:visible}
 <div class="head">
   <h1>Финансы</h1>
   <div class="head-icons">
-    <span id="status"></span>
-    <button class="icon-btn" id="syncRefreshBtn" title="Обновить данные из облака" aria-label="Обновить данные из облака" style="display:none">
+    <button class="icon-btn" id="syncRefreshBtn" title="Обновить данные из облака" aria-label="Обновить данные из облака">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
     </button>
     <button class="icon-btn" id="openGlobalHist" title="История" aria-label="История">
@@ -625,7 +631,7 @@ ensureCurrentRealMonth(STORE);
 // active month's data, aliased for convenience
 function cur(){ return STORE.months[STORE.current]; }
 
-const rowsEl=document.getElementById('rows'),svg=document.getElementById('donut'),bi=document.getElementById('bi'),ld=document.getElementById('ld'),st=document.getElementById('status'),chartCol=document.getElementById('chartCol');
+const rowsEl=document.getElementById('rows'),svg=document.getElementById('donut'),bi=document.getElementById('bi'),ld=document.getElementById('ld'),chartCol=document.getElementById('chartCol');
 const expandedCategories = new Set();
 const limitEditCategories = new Set();
 let submitExpenseFor = function(){};
@@ -662,9 +668,15 @@ function showUndoToast(message,undoAction){
   undoToastTimer=setTimeout(hideUndoToast,6000);
 }
 function refreshAfterUndo(){
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  const fromBudget = cur().B;
+  const fromRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
+  const fromCatAmounts = cur().C.map(c=>parseFloat(c.a)||0);
   bi.value=fmt(cur().B);
   renderRows();
   renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+  animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts);
   if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
   if(document.getElementById('catEditorOverlay').classList.contains('open')) renderCatEditor();
   save();
@@ -746,15 +758,21 @@ function fmtDate(iso){
   const d=new Date(iso);
   return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
 }
-function save(){
+let saveFlashTimer=null;
+function flashSaveIndicator(ok){
+  const btn = document.getElementById('syncRefreshBtn');
+  if(btn.classList.contains('busy')) return;
+  clearTimeout(saveFlashTimer);
+  btn.classList.remove('sync-success','save-err');
+  btn.classList.add(ok?'sync-success':'save-err');
+  saveFlashTimer = setTimeout(()=>{ btn.classList.remove('sync-success','save-err'); }, ok?900:1600);
+}
+function save(silent){
   try{
     localStorage.setItem(K,JSON.stringify(STORE));
-    st.textContent="Сохранено ✓";
-    st.classList.remove('err');
-    setTimeout(()=>st.textContent='',1200);
+    if(!silent) flashSaveIndicator(true);
   }catch(e){
-    st.textContent="Ошибка сохранения";
-    st.classList.add('err');
+    if(!silent) flashSaveIndicator(false);
   }
   pushToCloud();
 }
@@ -836,7 +854,7 @@ function switchMonth(key){
   updateChartNavArrows();
   updateMonthNavArrows();
   monthSelect.value = key;
-  save();
+  save(true);
 }
 
 function orderedMonthKeys(){
@@ -855,7 +873,15 @@ function renderRows(){
   const C = m.C;
   const openHist = new Set();
   document.querySelectorAll('.hist.open').forEach(el=>openHist.add(el.id));
+  const prevLimitWidths = new Map();
+  rowsEl.querySelectorAll('.row').forEach(r=>{
+    if(r._cat){
+      const bar = r.querySelector('.limit-bar');
+      if(bar) prevLimitWidths.set(r._cat, bar.style.width);
+    }
+  });
   rowsEl.innerHTML='';
+  const barsToAnimate = [];
   C.forEach((c,i)=>{
     const isExpanded=expandedCategories.has(c);
     const isLimitEditing=limitEditCategories.has(c);
@@ -893,9 +919,28 @@ function renderRows(){
     `;
     row._cat = c;
     rowsEl.appendChild(row);
+    if(c.limit>0){
+      const bar = row.querySelector('.limit-bar');
+      const targetWidth = bar.style.width;
+      const prevWidth = prevLimitWidths.get(c);
+      if(prevWidth!==undefined && prevWidth!==targetWidth){
+        bar.style.transition='none';
+        bar.style.width = prevWidth;
+        barsToAnimate.push({bar, targetWidth});
+      }
+    }
   });
   updateCategoryNameFades();
   attach();
+  if(barsToAnimate.length){
+    void rowsEl.offsetHeight;
+    requestAnimationFrame(()=>{
+      barsToAnimate.forEach(({bar,targetWidth})=>{
+        bar.style.transition='';
+        bar.style.width = targetWidth;
+      });
+    });
+  }
 }
 
 function updateCategoryNameFades(){
@@ -1352,6 +1397,10 @@ function addExpense(i, amount, comment){
   if(!amount || amount<=0) return;
   const category=C[i];
   if(!category) return;
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  const fromBudget = cur().B;
+  const fromRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
+  const fromCatAmounts = cur().C.map(c=>parseFloat(c.a)||0);
   category.a = (parseFloat(category.a)||0) + amount;
   if(!category.h) category.h=[];
   const entry = {a:amount, d:new Date().toISOString()};
@@ -1359,6 +1408,8 @@ function addExpense(i, amount, comment){
   category.h.push(entry);
   renderRows();
   renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+  animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts);
   if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
   save();
   showUndoToast(`Расход ${fmt(amount)} добавлен`,()=>{
@@ -1373,6 +1424,10 @@ function addExpense(i, amount, comment){
 function addIncome(amount, comment){
   const m = cur();
   if(!amount || amount<=0) return;
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  const fromBudget = m.B;
+  const fromRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
+  const fromCatAmounts = m.C.map(c=>parseFloat(c.a)||0);
   m.B = (parseFloat(m.B)||0) + amount;
   if(!m.IN) m.IN=[];
   const entry = {a:amount, d:new Date().toISOString()};
@@ -1381,6 +1436,8 @@ function addIncome(amount, comment){
   bi.value = fmt(m.B);
   renderRows();
   renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+  animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts);
   if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
   save();
   showUndoToast(`Доход ${fmt(amount)} добавлен`,()=>{
@@ -2363,7 +2420,7 @@ function stepYear(delta){
   renderChart();
   animateChartTransition(fromRanges, fromLeft, fromTotal);
 }
-monthPrevBtn.addEventListener('click',()=>{
+function goPrevPeriod(){
   if(chartExpanded && chartPeriod==='week'){ stepWeek(-1); return; }
   if(chartExpanded && chartPeriod==='year'){ stepYear(-1); return; }
   const keys = orderedMonthKeys();
@@ -2376,14 +2433,16 @@ monthPrevBtn.addEventListener('click',()=>{
   const newKey = y+'-'+String(m).padStart(2,'0');
   ensurePastMonth(newKey);
   switchMonth(newKey);
-});
-monthNextBtn.addEventListener('click',()=>{
+}
+function goNextPeriod(){
   if(chartExpanded && chartPeriod==='week'){ if(weekOffset<0) stepWeek(1); return; }
   if(chartExpanded && chartPeriod==='year'){ if(yearOffset<0) stepYear(1); return; }
   const keys = orderedMonthKeys();
   const idx = keys.indexOf(STORE.current);
   if(idx>=0 && idx<keys.length-1) switchMonth(keys[idx+1]);
-});
+}
+monthPrevBtn.addEventListener('click', goPrevPeriod);
+monthNextBtn.addEventListener('click', goNextPeriod);
 
 document.getElementById('chartPrevMonth').addEventListener('click',()=>{
   const keys = orderedMonthKeys();
@@ -2630,8 +2689,10 @@ function applyRemoteStore(remoteStore){
 
 const syncRefreshBtn = document.getElementById('syncRefreshBtn');
 function updateSyncRefreshBtn(){
-  syncRefreshBtn.style.display = syncCode ? 'flex' : 'none';
+  syncRefreshBtn.title = syncCode ? 'Обновить данные из облака' : 'Индикатор сохранения';
+  syncRefreshBtn.setAttribute('aria-label', syncRefreshBtn.title);
 }
+updateSyncRefreshBtn();
 syncRefreshBtn.addEventListener('click', async ()=>{
   if(!syncCode || !window.CloudSync || syncRefreshBtn.classList.contains('busy')) return;
   syncRefreshBtn.classList.add('busy');
@@ -2999,7 +3060,52 @@ function toggleChartExpanded(){
 
   requestAnimationFrame(renderChart);
 }
-svg.addEventListener('click', toggleChartExpanded);
+svg.addEventListener('click', e=>{
+  if(chartSwipeSuppressClick){ chartSwipeSuppressClick=false; return; }
+  toggleChartExpanded();
+});
+
+// When the ring is expanded full-screen, horizontal swipes step through
+// periods (prev/next week, month or year) instead of toggling the ring.
+let chartSwipeSuppressClick=false;
+(function(){
+  let startX=0, startY=0, dragging=false, decided=false, isHorizontal=false, pointerId=null;
+  svg.addEventListener('pointerdown', e=>{
+    if(!chartExpanded) return;
+    startX=e.clientX; startY=e.clientY; dragging=true; decided=false; isHorizontal=false;
+    pointerId=e.pointerId;
+  });
+  svg.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    const rawDx = e.clientX-startX, rawDy = e.clientY-startY;
+    if(!decided){
+      if(Math.abs(rawDx)>8 || Math.abs(rawDy)>8){
+        decided=true;
+        isHorizontal = Math.abs(rawDx)>Math.abs(rawDy);
+        if(isHorizontal){ try{ svg.setPointerCapture(pointerId); }catch(err){} }
+      } else {
+        return;
+      }
+    }
+    if(isHorizontal) e.preventDefault();
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging=false;
+    try{ if(pointerId!=null && svg.hasPointerCapture(pointerId)) svg.releasePointerCapture(pointerId); }catch(err){}
+    pointerId=null;
+    if(isHorizontal){
+      const rawDx = e.clientX-startX;
+      chartSwipeSuppressClick=true;
+      setTimeout(()=>{ chartSwipeSuppressClick=false; },0);
+      const SWIPE_THRESHOLD=40;
+      if(rawDx<=-SWIPE_THRESHOLD) goNextPeriod();
+      else if(rawDx>=SWIPE_THRESHOLD) goPrevPeriod();
+    }
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+})();
 
 document.addEventListener('click',e=>{
   const openCategoryHistories=Array.from(document.querySelectorAll('.hist.open'));
