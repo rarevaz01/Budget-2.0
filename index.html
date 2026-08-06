@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0A041A">
+<meta name="theme-color" content="#121314">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Финансы">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" href="icons/icon-192.png">
 <style>
-:root{--bg:#0A041A;--card:#150B2E;--card-2:#1B1038;--line:#271849;--text:#F4F2F8;--muted:#AAA0C1;--accent:#F79009;--accent-soft:rgba(247,144,9,.14);--accent-soft-line:rgba(247,144,9,.3);--btn-text:#0A041A;--white-seg:#9096A8;--track:#241539;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--other-seg:#8B7FE8;--red:#E2685C;--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
-[data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#9096A8;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--other-seg:#6D5FD1;--red:#D34C40;--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
+:root{--bg:#121314;--card:#121314;--card-2:#121314;--line:#2A2B2D;--text:#F4F2F8;--muted:#8B8D90;--accent:#9AA0A6;--accent-soft:rgba(255,255,255,.1);--accent-soft-line:rgba(255,255,255,.22);--btn-text:#121314;--white-seg:#9096A8;--track:#2A2B2D;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--other-seg:#8B7FE8;--red:#E2685C;--blue:#5B9EE8;--blue-soft:rgba(91,158,232,.14);--purple:#8B7FE8;--purple-soft:rgba(139,127,232,.14);--orange:#E29A4E;--orange-soft:rgba(226,154,78,.14);--red-soft:rgba(226,104,92,.14);--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
+[data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#9096A8;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--other-seg:#6D5FD1;--red:#D34C40;--blue:#3D7DC9;--blue-soft:rgba(61,125,201,.1);--purple:#6D5FD1;--purple-soft:rgba(109,95,209,.1);--orange:#C97D1E;--orange-soft:rgba(201,125,30,.1);--red-soft:rgba(211,76,64,.1);--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--card);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;-webkit-font-smoothing:antialiased}
 body{padding:28px 14px;display:flex;justify-content:center}
@@ -20,7 +20,12 @@ h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
 .month-nav-arrow{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .month-nav-arrow svg{display:block}
 .month-nav-arrow:disabled{opacity:.35;pointer-events:none}
-.month-select{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 10px;flex:1;min-width:0;text-align:center;text-align-last:center}
+.month-select-wrap{position:relative;flex:1;min-width:0}
+.month-select{width:100%;-webkit-appearance:none;appearance:none;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;color:var(--text);font-weight:700;font-size:13px;letter-spacing:.01em;padding:9px 26px 9px 10px;text-align:center;text-align-last:center}
+.month-select-chevron{position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.month-select-clear{display:none;position:absolute;right:5px;top:50%;transform:translateY(-50%);width:26px;height:26px;align-items:center;justify-content:center;border:0;border-radius:8px;background:none;color:var(--muted);padding:0;z-index:1}
+.month-select-wrap.has-custom-range .month-select-chevron{display:none}
+.month-select-wrap.has-custom-range .month-select-clear{display:flex}
 .month-menu{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .month-menu svg{display:block}
 #status{font-size:12px;color:var(--muted)}
@@ -138,8 +143,11 @@ svg{overflow:visible}
 .backup-option-title{font-size:14px;font-weight:700;color:var(--text)}
 .backup-option-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
 .backup-option.danger .backup-option-icon{color:var(--red)}
-.period-rename-form{display:none;align-items:center;gap:8px;padding:10px 4px 14px;border-bottom:1px solid var(--line)}
-.period-rename-form.open{display:flex}
+.backup-option .backup-option-icon.icon-blue{background:var(--blue-soft);color:var(--blue)}
+.backup-option .backup-option-icon.icon-green{background:var(--green-soft);color:var(--green)}
+.backup-option .backup-option-icon.icon-orange{background:var(--orange-soft);color:var(--orange)}
+.backup-option .backup-option-icon.icon-red{background:var(--red-soft);color:var(--red)}
+.backup-option .backup-option-icon.icon-purple{background:var(--purple-soft);color:var(--purple)}
 .period-rename-input{min-width:0;flex:1;height:44px;padding:0 12px;border:1px solid var(--accent-soft-line);border-radius:11px;outline:0;background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;font-size:14px}
 .period-rename-input:focus{border-color:var(--accent)}
 .period-rename-save{height:44px;padding:0 15px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800}
@@ -173,17 +181,16 @@ svg{overflow:visible}
 .week-range-sheet{max-height:88vh;display:flex;flex-direction:column;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
 .week-range-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
 .week-range-head h2{font-size:16px;font-weight:800;margin:0;letter-spacing:-.01em}
-.week-range-cancel,.week-range-done{background:none;border:none;padding:4px 2px;color:var(--accent);font-family:inherit;font-size:15px;font-weight:600}
-.week-range-done{font-weight:800}
+.week-range-cancel,.week-range-done{background:none;border:none;padding:4px 2px;color:var(--text);font-family:inherit;font-size:16px;font-weight:800;letter-spacing:-.01em}
 .week-range-labels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .week-range-label-box{display:flex;flex-direction:column;gap:4px;padding-bottom:8px;border-bottom:2px solid transparent}
 .week-range-label-box.active{border-bottom-color:var(--accent)}
-.week-range-label-title{font-size:12px;color:var(--muted);font-weight:700}
+.week-range-label-title{font-size:12px;color:#8B8D90;font-weight:700}
 .week-range-label-value{font-size:17px;font-weight:700;color:var(--text)}
 .week-range-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.03em;padding:4px 0 8px;position:sticky;top:0;background:var(--card-2);z-index:2}
 .week-range-calendar{overflow-y:auto;flex:1;padding-bottom:8px}
-.week-range-month-name{font-size:14px;font-weight:800;margin:14px 2px 8px;padding:4px 10px;border-radius:16px;color:var(--text);background:none;border:0;font-family:inherit;cursor:pointer}
-.week-range-month-name.active{margin-left:-10px;background:var(--accent);color:var(--btn-text)}
+.week-range-month-name{font-size:14px;font-weight:800;margin:14px 0 8px 2px;padding:4px 10px;border-radius:16px;color:var(--text);background:none;border:0;font-family:inherit;cursor:pointer}
+.week-range-month-name.active{background:var(--accent);color:var(--btn-text)}
 .week-range-month:first-child .week-range-month-name{margin-top:2px}
 .week-range-days{display:grid;grid-template-columns:repeat(7,1fr);row-gap:3px}
 .week-range-day{position:relative;height:40px}
@@ -264,7 +271,13 @@ svg{overflow:visible}
     <button type="button" class="month-nav-arrow" id="monthPrevBtn" aria-label="Предыдущий месяц">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <select class="month-select" id="monthSelect"></select>
+    <div class="month-select-wrap" id="monthSelectWrap">
+      <select class="month-select" id="monthSelect"></select>
+      <svg class="month-select-chevron" id="monthSelectChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      <button type="button" class="month-select-clear" id="monthSelectClear" aria-label="Сбросить период" title="Сбросить период">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
     <button type="button" class="month-nav-arrow" id="monthNextBtn" aria-label="Следующий месяц">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
@@ -374,31 +387,9 @@ svg{overflow:visible}
 </div>
 <div class="overlay" id="backupOverlay">
   <div class="sheet">
-    <div class="sheet-head"><h2>Период и данные</h2><button class="sheet-close" id="backupOverlayClose">×</button></div>
-    <button class="backup-option" type="button" id="newMonthBtn">
-      <div class="backup-option-icon">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M12 14v4M10 16h4"/></svg>
-      </div>
-      <div class="backup-option-text"><div class="backup-option-title">Создать следующий месяц</div><div class="backup-option-desc">Перенесёт категории и лимиты, но без расходов</div></div>
-    </button>
-    <button class="backup-option" type="button" id="editMonthNameBtn">
-      <div class="backup-option-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
-      </div>
-      <div class="backup-option-text"><div class="backup-option-title">Переименовать период</div><div class="backup-option-desc">Изменить название выбранного месяца</div></div>
-    </button>
-    <form class="period-rename-form" id="periodRenameForm">
-      <input class="period-rename-input" id="periodRenameInput" type="text" maxlength="40" autocomplete="off" placeholder="Название периода" aria-label="Название периода">
-      <button class="period-rename-save" type="submit">Сохранить</button>
-    </form>
-    <button class="backup-option danger" type="button" id="delMonthBtn">
-      <div class="backup-option-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
-      </div>
-      <div class="backup-option-text"><div class="backup-option-title">Удалить выбранный месяц</div><div class="backup-option-desc">Месяц можно будет восстановить из истории</div></div>
-    </button>
+    <div class="sheet-head"><h2>Данные и настройки</h2><button class="sheet-close" id="backupOverlayClose">×</button></div>
     <button class="backup-option" type="button" id="backupExportBtn">
-      <div class="backup-option-icon">
+      <div class="backup-option-icon icon-blue">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
       </div>
       <div class="backup-option-text">
@@ -406,17 +397,8 @@ svg{overflow:visible}
         <div class="backup-option-desc">Сохранит все месяцы, категории и расходы<br>в файл на устройство</div>
       </div>
     </button>
-    <button class="backup-option danger" type="button" id="backupImportBtn">
-      <div class="backup-option-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-      </div>
-      <div class="backup-option-text">
-        <div class="backup-option-title">Восстановить из копии</div>
-        <div class="backup-option-desc">Заменит все текущие данные файлом.<br><strong>Действие необратимо!</strong></div>
-      </div>
-    </button>
     <button class="backup-option" type="button" id="syncBtn" aria-expanded="false">
-      <div class="backup-option-icon">
+      <div class="backup-option-icon icon-green">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9c-2.52 0-4.93-1-6.74-2.74L3 21"/><path d="M3 12a9 9 0 0 1 9-9c2.52 0 4.93 1 6.74 2.74L21 3"/><path d="M3 16v5h5"/><path d="M21 8V3h-5"/></svg>
       </div>
       <div class="backup-option-text">
@@ -425,8 +407,23 @@ svg{overflow:visible}
       </div>
     </button>
     <div class="sync-panel" id="syncPanel"></div>
+    <button class="backup-option danger" type="button" id="backupImportBtn">
+      <div class="backup-option-icon icon-orange">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      </div>
+      <div class="backup-option-text">
+        <div class="backup-option-title">Восстановить из копии</div>
+        <div class="backup-option-desc">Заменит все текущие данные файлом.<br><strong>Действие необратимо!</strong></div>
+      </div>
+    </button>
+    <button class="backup-option danger" type="button" id="clearMonthExpensesBtn">
+      <div class="backup-option-icon icon-red">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H7a2 2 0 0 1-1.4-.6L2 17l9-9 9.4 9.4a2 2 0 0 1 0 2.8L21 21Z"/><path d="M14 4l6 6"/></svg>
+      </div>
+      <div class="backup-option-text"><div class="backup-option-title">Очистить расходы в этом месяце</div><div class="backup-option-desc">Сбросит суммы и историю трат, категории и бюджет останутся</div></div>
+    </button>
     <button class="backup-option" type="button" id="themeToggle">
-      <div class="backup-option-icon">
+      <div class="backup-option-icon icon-purple">
         <svg id="themeIconSun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg id="themeIconMoon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
       </div>
@@ -558,7 +555,44 @@ function normalizeStore(store){
   }
   return store;
 }
+
+// Fills in any real calendar months between the latest tracked one and
+// today — cloning categories/limits forward the same way the old "next
+// month" button did — so there's always a real month to switch into, without
+// ever letting the user manually create or jump to one that isn't real yet.
+function ensureRealMonthsUpTo(store, nowKey){
+  if(store.months[nowKey]) return;
+  const calendarKeys = Object.keys(store.months).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+  const lastKey = calendarKeys.length ? calendarKeys[calendarKeys.length-1] : nowKey;
+  if(lastKey >= nowKey) return;
+  let [y,m] = lastKey.split('-').map(Number);
+  for(let guard=0; guard<240; guard++){
+    m++;
+    if(m>12){ m=1; y++; }
+    const key = y+'-'+String(m).padStart(2,'0');
+    const sourceKey = store.order.length ? store.order[store.order.length-1] : lastKey;
+    const prev = store.months[sourceKey] || store.months[lastKey];
+    const newCategories = (prev.C||[]).map(c=>{
+      const nc = {n:c.n, a:0, h:[], col:c.col || nextColor([])};
+      if(c.limit>0) nc.limit = c.limit;
+      return nc;
+    });
+    store.months[key] = { B: 0, C: newCategories, hiddenC: [], EV: [], IN: [] };
+    store.order.push(key);
+    if(key===nowKey) break;
+  }
+}
+// The active month follows the real calendar on every app open (fresh
+// start or restoring a backup) — creating today's month if needed and
+// switching to it. Going back to an already-existing month during a
+// session is still free and won't get overridden mid-session.
+function ensureCurrentRealMonth(store){
+  const nowKey = monthKey(new Date());
+  ensureRealMonthsUpTo(store, nowKey);
+  if(store.months[nowKey]) store.current = nowKey;
+}
 normalizeStore(STORE);
+ensureCurrentRealMonth(STORE);
 
 // active month's data, aliased for convenience
 function cur(){ return STORE.months[STORE.current]; }
@@ -706,13 +740,17 @@ function hexToRgba(hex, alpha){
   const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
   return `rgba(${r},${g},${b},${alpha})`;
 }
+// Whichever period tab is effectively driving the ring/label right now —
+// always "month" when the chart isn't expanded into the period-tabs view.
+function effectivePeriod(){ return chartExpanded ? chartPeriod : 'month'; }
 function renderMonthSelect(){
   const keys = STORE.order.filter(k=>STORE.months[k]);
-  const period = chartExpanded ? chartPeriod : 'month';
+  const period = effectivePeriod();
   monthSelect.innerHTML = keys.map(k=>{
     const label = k===STORE.current ? periodHeaderLabel(k, period) : monthLabel(k);
     return `<option value="${k}" ${k===STORE.current?'selected':''}>${label}</option>`;
   }).join('');
+  document.getElementById('monthSelectWrap').classList.toggle('has-custom-range', !!periodCustomRange);
   updateMonthNavArrows();
 }
 
@@ -1139,7 +1177,7 @@ function renderChart(){
   const legend = document.getElementById('chartLegend');
   const periodTabs = document.getElementById('periodTabs');
 
-  const period = chartExpanded ? chartPeriod : 'month';
+  const period = effectivePeriod();
   const isMonth = period==='month' && !periodCustomRange;
   const catRanges=[];
   let periodTotal = total;
@@ -1499,7 +1537,7 @@ function renderGlobalHist(){
   const foundIncome=all.filter(item=>item.kind==='income').reduce((sum,item)=>sum+(parseFloat(item.amount)||0),0);
   const summaryHtml=`
     <div class="gh-summary">
-      <div class="gh-summary-count">Найдено: ${all.length}</div>
+      ${ghSearchQuery.trim() ? `<div class="gh-summary-count">Найдено: ${all.length}</div>` : ''}
       <div class="gh-summary-totals">
         <span>Расходы <b>${fmt(foundExpenses)}</b></span>
         <span>Доходы <b>${fmt(foundIncome)}</b></span>
@@ -2245,18 +2283,26 @@ monthSelect.addEventListener('change',e=>{ switchMonth(e.target.value); });
 // Once the chart is expanded into a period tab (Неделя/Месяц/Год), the date
 // label above the ring opens the manual range picker instead of the native
 // month dropdown — every tab now supports an arbitrary hand-picked range.
+// The date/month label always opens the manual range picker instead of the
+// native dropdown — including the collapsed view, where it defaults to the
+// currently active real month.
 monthSelect.addEventListener('mousedown',e=>{
-  if(chartExpanded){
+  e.preventDefault();
+  monthSelect.blur();
+  openCustomRangeModal();
+});
+monthSelect.addEventListener('keydown',e=>{
+  if(e.key===' '||e.key==='Enter'||e.key==='ArrowDown'||e.key==='ArrowUp'){
     e.preventDefault();
-    monthSelect.blur();
     openCustomRangeModal();
   }
 });
-monthSelect.addEventListener('keydown',e=>{
-  if(chartExpanded && (e.key===' '||e.key==='Enter'||e.key==='ArrowDown'||e.key==='ArrowUp')){
-    e.preventDefault();
-    openCustomRangeModal();
-  }
+document.getElementById('monthSelectClear').addEventListener('click',e=>{
+  e.stopPropagation();
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  periodCustomRange = null;
+  renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
 });
 function stepWeek(delta){
   const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
@@ -2298,104 +2344,34 @@ document.getElementById('chartNextMonth').addEventListener('click',()=>{
   if(idx>=0 && idx<keys.length-1) switchMonth(keys[idx+1]);
 });
 
-document.getElementById('newMonthBtn').addEventListener('click',()=>{
-  const calendarKeys = Object.keys(STORE.months).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
-  const lastKey = calendarKeys.length ? calendarKeys[calendarKeys.length-1] : monthKey(new Date());
-  const [y,m] = lastKey.split('-').map(Number);
-  let ny=y, nm=m+1;
-  if(nm>12){ nm=1; ny++; }
-  const newKey = ny+'-'+String(nm).padStart(2,'0');
-  if(STORE.months[newKey]){
-    switchMonth(newKey);
-    document.getElementById('backupOverlay').classList.remove('open');
-    return;
-  }
-  const sourceKey = STORE.order.length ? STORE.order[STORE.order.length-1] : lastKey;
-  const prev = STORE.months[sourceKey] || STORE.months[lastKey];
-  const newCategories = prev.C.map(c=>{
-    const nc = {n:c.n, a:0, h:[], col:c.col || nextColor([])};
-    if(c.limit>0) nc.limit = c.limit;
-    return nc;
-  });
-  STORE.months[newKey] = { B: 0, C: newCategories, hiddenC: [], EV: [], IN: [] };
-  STORE.order.push(newKey);
-  STORE.current = newKey;
-  expandedCategories.clear();
-  limitEditCategories.clear();
-  hideKeyboardActionBar();
-  renderMonthSelect();
-  bi.value = fmt(cur().B);
-  renderRows();
-  renderChart();
-  save();
-  document.getElementById('backupOverlay').classList.remove('open');
-});
-
-const editMonthNameBtn=document.getElementById('editMonthNameBtn');
-const periodRenameForm=document.getElementById('periodRenameForm');
-const periodRenameInput=document.getElementById('periodRenameInput');
-function closePeriodRename(){
-  periodRenameForm.classList.remove('open');
-  editMonthNameBtn.setAttribute('aria-expanded','false');
-}
-function closeBackupOverlay(cancelHistoryEdit=false){
-  closePeriodRename();
-  closeSyncPanel();
-  document.getElementById('backupOverlay').classList.remove('open');
-  if(cancelHistoryEdit) cancelGlobalHistoryEditing();
-}
-editMonthNameBtn.addEventListener('click',()=>{
-  const open=!periodRenameForm.classList.contains('open');
-  if(!open){ closePeriodRename(); return; }
-  periodRenameInput.value=monthLabel(STORE.current);
-  periodRenameForm.classList.add('open');
-  editMonthNameBtn.setAttribute('aria-expanded','true');
-  requestAnimationFrame(()=>{
-    periodRenameInput.focus({preventScroll:true});
-    periodRenameInput.select();
-  });
-});
-periodRenameForm.addEventListener('submit',e=>{
-  e.preventDefault();
-  const trimmed = periodRenameInput.value.trim();
+document.getElementById('clearMonthExpensesBtn').addEventListener('click',()=>{
   const m = cur();
-  if(!trimmed || trimmed===defaultCalendarLabel(STORE.current)){
-    delete m.customName;
-  } else {
-    m.customName = trimmed;
-  }
-  renderMonthSelect();
-  save();
-  closePeriodRename();
-  document.getElementById('backupOverlay').classList.remove('open');
-});
-
-document.getElementById('delMonthBtn').addEventListener('click',()=>{
-  const keys = Object.keys(STORE.months);
-  if(keys.length<=1){
-    alert('Нельзя удалить единственный месяц.');
+  const hasExpenses = (m.C||[]).some(c=>(parseFloat(c.a)||0)>0 || (c.h||[]).length>0);
+  if(!hasExpenses){
+    alert('В этом месяце пока нет расходов.');
     return;
   }
-  const label = monthLabel(STORE.current);
-  if(!confirm(`Удалить «${label}» полностью? Категории и суммы этого месяца скроются, но их можно будет восстановить из истории.`)) return;
-  const key = STORE.current;
-  const data = STORE.months[key];
-  STORE.deletedMonths.push({ key, label, data, date: new Date().toISOString(), restored:false });
-  delete STORE.months[key];
-  STORE.order = STORE.order.filter(k=>k!==key);
-  const remaining = STORE.order.filter(k=>STORE.months[k]);
-  STORE.current = remaining[remaining.length-1];
+  const snapshot = m.C.map(c=>({a:c.a, h:(c.h||[]).slice()}));
+  m.C.forEach(c=>{ c.a=0; c.h=[]; });
   expandedCategories.clear();
   limitEditCategories.clear();
   hideKeyboardActionBar();
-  renderMonthSelect();
-  bi.value = fmt(cur().B);
   renderRows();
   renderChart();
   if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
   save();
   document.getElementById('backupOverlay').classList.remove('open');
+  showUndoToast('Расходы месяца очищены',()=>{
+    m.C.forEach((c,i)=>{ c.a=snapshot[i].a; c.h=snapshot[i].h; });
+    refreshAfterUndo();
+  });
 });
+
+function closeBackupOverlay(cancelHistoryEdit=false){
+  closeSyncPanel();
+  document.getElementById('backupOverlay').classList.remove('open');
+  if(cancelHistoryEdit) cancelGlobalHistoryEditing();
+}
 
 document.getElementById('openGlobalHist').addEventListener('click',()=>{
   ghEditing = null;
@@ -2521,6 +2497,7 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
         STORE.order = [monthKey(new Date())];
       }
       normalizeStore(STORE);
+      ensureCurrentRealMonth(STORE);
       renderMonthSelect();
       bi.value = fmt(cur().B);
       renderRows();
@@ -2582,6 +2559,7 @@ function applyRemoteStore(remoteStore){
       STORE.order = [monthKey(new Date())];
     }
     normalizeStore(STORE);
+    ensureRealMonthsUpTo(STORE, monthKey(new Date()));
     expandedCategories.clear();
     limitEditCategories.clear();
     hideKeyboardActionBar();
@@ -3006,7 +2984,7 @@ function defaultRangeForPeriod(period){
 }
 
 function openCustomRangeModal(){
-  const {from, to} = defaultRangeForPeriod(chartPeriod);
+  const {from, to} = defaultRangeForPeriod(effectivePeriod());
   weekRangePickStart = dateOnly(from);
   weekRangePickEnd = dateOnly(to);
   weekRangeCalendarAnchor = dateOnly(new Date());
