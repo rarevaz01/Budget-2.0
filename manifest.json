@@ -1,6 +1,6 @@
 {
-  "name": "Финансы",
-  "short_name": "Финансы",
+  "name": "Мои финансы",
+  "short_name": "Мои финансы",
   "description": "Личный трекер бюджета и расходов",
   "start_url": "./index.html",
   "scope": "./",
