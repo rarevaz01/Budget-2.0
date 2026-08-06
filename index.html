@@ -438,6 +438,15 @@ svg{overflow:visible}
       </div>
       <div class="backup-option-text"><div class="backup-option-title">Очистить расходы в этом месяце</div><div class="backup-option-desc">Сбросит суммы и историю трат.<br>Категории и бюджет останутся</div></div>
     </button>
+    <button class="backup-option" type="button" id="pushToggleBtn">
+      <div class="backup-option-icon icon-purple">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div class="backup-option-text">
+        <div class="backup-option-title" id="pushToggleTitle">Вечернее напоминание</div>
+        <div class="backup-option-desc" id="pushToggleDesc">Каждый вечер — напомнить внести расходы за день</div>
+      </div>
+    </button>
     <button class="backup-option" type="button" id="themeToggle" aria-expanded="false">
       <div class="backup-option-icon icon-purple">
         <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
@@ -491,14 +500,42 @@ svg{overflow:visible}
     <div class="backup-reminder-icon" style="background:var(--green-soft);color:var(--green)">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9c-2.52 0-4.93-1-6.74-2.74L3 21"/><path d="M3 12a9 9 0 0 1 9-9c2.52 0 4.93 1 6.74 2.74L21 3"/><path d="M3 16v5h5"/><path d="M21 8V3h-5"/></svg>
     </div>
-    <h3>Облачное сохранение включено</h3>
-    <p>Данные теперь сохраняются в облако автоматически. Но без кода синхронизации восстановить их на новом устройстве не получится — сохраните код в удобном месте.</p>
+    <h3>Сохранили код синхронизации?</h3>
+    <p>Без него данные будет не восстановить на другом устройстве или после сброса. Сохраните его в надёжном месте — например в заметках или менеджере паролей.</p>
     <div class="sync-code-box" style="margin-top:16px">
       <span class="sync-code-text" id="cloudNoticeCode"></span>
     </div>
     <div class="backup-reminder-actions">
-      <button type="button" id="cloudNoticeLater">Позже</button>
+      <button type="button" id="cloudNoticeLater">Напомнить позже</button>
       <button type="button" id="cloudNoticeCopy" class="backup-reminder-do">Скопировать код</button>
+    </div>
+  </div>
+</div>
+<div class="overlay overlay-center" id="firstRunSyncOverlay">
+  <div class="sheet backup-reminder-sheet" style="text-align:left;max-width:360px">
+    <div class="backup-reminder-icon" style="background:var(--green-soft);color:var(--green);margin:0 auto 14px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9c-2.52 0-4.93-1-6.74-2.74L3 21"/><path d="M3 12a9 9 0 0 1 9-9c2.52 0 4.93 1 6.74 2.74L21 3"/><path d="M3 16v5h5"/><path d="M21 8V3h-5"/></svg>
+    </div>
+    <h3 style="text-align:center">Синхронизация с облаком</h3>
+    <p style="text-align:center">Уже пользовались приложением на другом устройстве? Введите код, чтобы подтянуть свои данные. Если нет — создайте новый.</p>
+    <div id="firstRunJoinSection" style="margin-top:16px">
+      <div class="sync-join-row">
+        <input class="period-rename-input" type="text" id="firstRunJoinInput" placeholder="Есть код? Вставьте его" autocomplete="off">
+        <button class="period-rename-save" type="button" id="firstRunJoinBtn">Подключить</button>
+      </div>
+      <div class="sync-status" id="firstRunStatus" style="display:none"></div>
+    </div>
+    <div id="firstRunDivider" style="text-align:center;margin:14px 0;color:var(--muted);font-size:12px">— или —</div>
+    <div id="firstRunCreateSection">
+      <button type="button" id="firstRunCreateBtn" class="backup-reminder-do" style="width:100%;height:46px;border-radius:10px">Создать новый код</button>
+    </div>
+    <div id="firstRunCodeSection" style="display:none;margin-top:16px">
+      <div class="backup-option-desc">Сохраните этот код — без него данные будет не восстановить на другом устройстве:</div>
+      <div class="sync-code-box" style="margin-top:8px">
+        <span class="sync-code-text" id="firstRunCodeText"></span>
+        <button class="period-rename-save" type="button" id="firstRunCopyBtn" style="flex-shrink:0;height:34px;padding:0 10px;font-size:12px">Копировать</button>
+      </div>
+      <button type="button" id="firstRunConfirmBtn" class="backup-reminder-do" style="width:100%;height:46px;border-radius:10px;margin-top:12px;opacity:.5" disabled>Я сохранил(а) код — продолжить</button>
     </div>
   </div>
 </div>
@@ -2648,7 +2685,6 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
 
 // ---------------- Cloud sync (Firestore, via window.CloudSync from the module script below) ----------------
 const SYNC_KEY = 'icity-budget-sync-code';
-const AUTH_EMAIL_KEY = 'icity-auth-pending-email';
 let syncCode = null;
 try{ syncCode = localStorage.getItem(SYNC_KEY) || null; }catch(e){}
 let syncCollection = 'budgets';
@@ -2659,18 +2695,6 @@ let syncStatus = '';
 let syncStatusErr = false;
 let syncPanelOpen = false;
 let syncJustCopied = false;
-
-// Account-based sync (email-link login) layered on top of the anonymous
-// code system above: once signed in, syncCode/syncCollection point at
-// users/{uid} instead of budgets/{code}, so a new device just needs the
-// same email — no code to lose.
-let authUser = null;
-let authPendingEmail = null;
-try{ authPendingEmail = localStorage.getItem(AUTH_EMAIL_KEY) || null; }catch(e){}
-let authEmailSent = false;
-let authBusy = false;
-let authStatus = '';
-let authStatusErr = false;
 
 const syncBtn = document.getElementById('syncBtn');
 const syncPanel = document.getElementById('syncPanel');
@@ -2785,144 +2809,41 @@ function startSync(code, collection){
   }, collection);
 }
 
-function getOrCreateAnonCode(){
-  let code = null;
-  try{ code = localStorage.getItem(SYNC_KEY); }catch(e){}
-  if(!code){
-    code = generateSyncCode();
-    try{ localStorage.setItem(SYNC_KEY, code); }catch(e){}
-  }
-  return code;
-}
-
-// The always-on fallback: anonymous code-based sync, active whenever nobody
-// is logged in. Never blocks on the user finding the sync menu.
-function ensureAnonymousSync(){
-  const code = getOrCreateAnonCode();
-  startSync(code, 'budgets');
-  pushToCloud();
-  setTimeout(()=>maybeShowCloudNotice(code), 800);
-}
-
-// Called once we know who's signed in: adopts users/{uid} as the sync
-// target, merging with whatever's already there the same way joining a
-// code does (confirm before overwriting local data).
-async function switchToAuthSync(uid){
-  syncStatus = 'Подключение аккаунта…';
+// Manual bridge between separate storage contexts (e.g. Safari vs. a
+// Home Screen icon on iOS, which don't share localStorage/IndexedDB) —
+// paste the anonymous code shown in one context into the other.
+async function joinSyncCode(rawCode){
+  if(!window.CloudSync || syncBusy) return;
+  const code = rawCode.trim().toUpperCase();
+  if(!code) return;
+  syncBusy = true;
+  syncStatus = 'Подключение…';
   syncStatusErr = false;
-  if(syncPanelOpen) renderSyncPanel();
+  renderSyncPanel();
   try{
-    const existing = await window.CloudSync.getBudgetDoc(uid, 'users');
+    const existing = await window.CloudSync.getBudgetDoc(code, 'budgets');
     if(existing && existing.store){
-      if(!confirm('В этом аккаунте уже есть сохранённые данные. Заменить текущие локальные данные этого устройства данными из аккаунта?')){
-        await window.CloudAuth.signOut();
+      if(!confirm('По этому коду уже есть данные. Заменить текущие локальные данные этого устройства данными с другого устройства?')){
+        syncBusy = false;
+        syncStatus = '';
+        renderSyncPanel();
         return;
       }
-      startSync(uid, 'users');
+      startSync(code, 'budgets');
       applyRemoteStore(existing.store, true);
-      syncStatus = 'Вход выполнен, данные загружены.';
+      syncStatus = 'Подключено, данные загружены.';
     } else {
-      await window.CloudSync.setBudgetDoc(uid, JSON.parse(JSON.stringify({store: STORE, updatedAt: Date.now()})), 'users');
-      startSync(uid, 'users');
-      syncStatus = 'Вход выполнен, текущие данные загружены в аккаунт.';
+      await window.CloudSync.setBudgetDoc(code, JSON.parse(JSON.stringify({store: STORE, updatedAt: Date.now()})), 'budgets');
+      startSync(code, 'budgets');
+      syncStatus = 'Подключено, текущие данные загружены в облако.';
     }
     syncStatusErr = false;
   }catch(err){
-    syncStatus = 'Не удалось подключить аккаунт: '+err.message;
+    syncStatus = 'Не удалось подключиться: '+err.message;
     syncStatusErr = true;
   }
-  if(syncPanelOpen) renderSyncPanel();
-}
-
-async function sendAuthLink(rawEmail){
-  const email = (rawEmail||'').trim();
-  if(!email || !email.includes('@')){
-    authStatus = 'Введите корректный email';
-    authStatusErr = true;
-    renderSyncPanel();
-    return;
-  }
-  if(!window.CloudAuth || authBusy) return;
-  authBusy = true;
+  syncBusy = false;
   renderSyncPanel();
-  try{
-    await window.CloudAuth.sendLink(email);
-    authPendingEmail = email;
-    try{ localStorage.setItem(AUTH_EMAIL_KEY, email); }catch(e){}
-    authEmailSent = true;
-    authStatus = '';
-    authStatusErr = false;
-  }catch(err){
-    authStatus = 'Не удалось отправить ссылку: '+err.message;
-    authStatusErr = true;
-  }
-  authBusy = false;
-  renderSyncPanel();
-}
-
-async function completeEmailLinkSignIn(){
-  let email = authPendingEmail;
-  if(!email){
-    email = window.prompt('Подтвердите email, на который была отправлена ссылка для входа:');
-  }
-  if(!email) return;
-  try{
-    await window.CloudAuth.completeSignIn(email, window.location.href);
-    try{ localStorage.removeItem(AUTH_EMAIL_KEY); }catch(e){}
-    history.replaceState(null, '', window.location.pathname);
-  }catch(err){
-    authStatus = 'Не удалось войти по ссылке: '+err.message;
-    authStatusErr = true;
-    if(syncPanelOpen) renderSyncPanel();
-  }
-}
-
-function signOutAuth(){
-  if(!confirm('Выйти из аккаунта? Локальные данные останутся на устройстве, синхронизация переключится обратно на анонимный код.')) return;
-  window.CloudAuth.signOut();
-}
-
-function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
-
-function renderAuthSection(){
-  if(authUser){
-    return `
-      <div class="backup-option-desc">Вход выполнен: <b style="color:var(--text)">${escHtml(authUser.email)}</b>. На новом устройстве войдите с той же почтой — данные подтянутся сами.</div>
-      ${syncStatus ? `<div class="sync-status${syncStatusErr?' err':''}">${syncStatus}</div>` : ''}
-      <button class="backup-option danger" type="button" id="authSignOutBtn" style="border-radius:10px">
-        <div class="backup-option-text"><div class="backup-option-title">Выйти из аккаунта</div><div class="backup-option-desc">Локальные данные останутся на устройстве</div></div>
-      </button>
-    `;
-  }
-  if(authEmailSent){
-    return `
-      <div class="backup-option-desc">Ссылка для входа отправлена на <b style="color:var(--text)">${escHtml(authPendingEmail)}</b>. Откройте её в почте на этом устройстве.</div>
-      <button class="period-rename-save" type="button" id="authResendBtn" ${authBusy?'disabled':''}>Отправить ещё раз</button>
-      ${authStatus ? `<div class="sync-status${authStatusErr?' err':''}">${authStatus}</div>` : ''}
-    `;
-  }
-  return `
-    <div class="backup-option-desc">Войдите по email — данные привяжутся к аккаунту, и вы всегда сможете восстановить их на новом устройстве, просто войдя снова.</div>
-    <div class="sync-join-row">
-      <input class="period-rename-input" type="email" id="authEmailInput" placeholder="Ваш email" autocomplete="email" value="${escHtml(authPendingEmail||'')}" ${authBusy?'disabled':''}>
-      <button class="period-rename-save" type="button" id="authSendBtn" ${authBusy?'disabled':''}>Войти</button>
-    </div>
-    ${authStatus ? `<div class="sync-status${authStatusErr?' err':''}">${authStatus}</div>` : ''}
-  `;
-}
-
-function attachAuthSectionEvents(){
-  const signOutBtn = document.getElementById('authSignOutBtn');
-  if(signOutBtn) signOutBtn.addEventListener('click', signOutAuth);
-  const resendBtn = document.getElementById('authResendBtn');
-  if(resendBtn) resendBtn.addEventListener('click', ()=>sendAuthLink(authPendingEmail));
-  const sendBtn = document.getElementById('authSendBtn');
-  if(sendBtn){
-    sendBtn.addEventListener('click', ()=>sendAuthLink(document.getElementById('authEmailInput').value));
-    document.getElementById('authEmailInput').addEventListener('keydown', e=>{
-      if(e.key==='Enter'){ e.preventDefault(); sendAuthLink(e.target.value); }
-    });
-  }
 }
 
 function renderSyncPanel(){
@@ -2930,29 +2851,41 @@ function renderSyncPanel(){
     syncPanel.innerHTML = `<div class="sync-status">Загрузка модуля синхронизации…</div>`;
     return;
   }
-  let html = renderAuthSection();
-  if(!authUser && syncCode){
+  let html = '';
+  if(syncCode){
     html += `
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">
-        <div class="backup-option-desc">Пока вы не вошли, данные всё равно бэкапятся анонимно — вот этот код (на всякий случай, можно скопировать):</div>
-        <div class="sync-code-box">
-          <span class="sync-code-text">${syncCode}</span>
-          <button class="period-rename-save${syncJustCopied?' copied':''}" type="button" id="syncCopyBtn" style="flex-shrink:0;height:34px;padding:0 10px;font-size:12px">${syncJustCopied?'Скопировано ✓':'Копировать'}</button>
-        </div>
+      <div class="backup-option-desc">Код синхронизации привязан именно к текущему хранилищу (Safari и иконка на экране «Домой» на iPhone — разные хранилища). Храните код как пароль и вводите его в поле «Подключить» в другом месте, чтобы свести данные вместе:</div>
+      <div class="sync-code-box">
+        <span class="sync-code-text">${syncCode}</span>
+        <button class="period-rename-save${syncJustCopied?' copied':''}" type="button" id="syncCopyBtn" style="flex-shrink:0;height:34px;padding:0 10px;font-size:12px">${syncJustCopied?'Скопировано ✓':'Копировать'}</button>
       </div>
+      <div class="sync-join-row" style="margin-top:10px">
+        <input class="period-rename-input" type="text" id="syncJoinInput" placeholder="Код с другого устройства" autocomplete="off" ${syncBusy?'disabled':''}>
+        <button class="period-rename-save" type="button" id="syncJoinBtn" ${syncBusy?'disabled':''}>Подключить</button>
+      </div>
+      ${syncStatus ? `<div class="sync-status${syncStatusErr?' err':''}">${syncStatus}</div>` : ''}
     `;
   }
   syncPanel.innerHTML = html;
-  attachAuthSectionEvents();
   const copyBtn = document.getElementById('syncCopyBtn');
   if(copyBtn) copyBtn.addEventListener('click', async ()=>{
     try{
       await navigator.clipboard.writeText(syncCode);
       syncJustCopied = true;
+      markSyncCodeSaved();
       setTimeout(()=>{ syncJustCopied = false; if(syncPanelOpen) renderSyncPanel(); }, 1400);
     }catch(e){}
     renderSyncPanel();
   });
+  const joinBtn = document.getElementById('syncJoinBtn');
+  if(joinBtn){
+    joinBtn.addEventListener('click', ()=>{
+      joinSyncCode(document.getElementById('syncJoinInput').value);
+    });
+    document.getElementById('syncJoinInput').addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); joinSyncCode(e.target.value); }
+    });
+  }
 }
 
 function closeSyncPanel(){
@@ -2966,34 +2899,55 @@ syncBtn.addEventListener('click', ()=>{
   syncBtn.setAttribute('aria-expanded', syncPanelOpen ? 'true' : 'false');
   if(syncPanelOpen) renderSyncPanel();
 });
-function updateSyncBtnLabel(){
-  const descEl = document.getElementById('syncBtnDesc');
-  if(!descEl) return;
-  descEl.textContent = authUser ? ('Вход выполнен: '+authUser.email) : 'Один код — одни данные на всех устройствах';
+const PUSH_ENABLED_KEY = 'icity-push-enabled';
+const pushToggleBtn = document.getElementById('pushToggleBtn');
+const pushToggleDesc = document.getElementById('pushToggleDesc');
+function renderPushToggle(){
+  let enabled = false;
+  try{ enabled = localStorage.getItem(PUSH_ENABLED_KEY) === '1'; }catch(e){}
+  pushToggleDesc.textContent = enabled
+    ? 'Включено — напишем вечером, если не внесли расходы'
+    : 'Каждый вечер — напомнить внести расходы за день';
 }
-
-window.addEventListener('cloudsync-ready', ()=>{
-  // Returning from the emailed sign-in link — complete the login before
-  // anything else touches sync state.
-  if(window.CloudAuth.isSignInLink(window.location.href)){
-    completeEmailLinkSignIn();
-  }
-  // onChange fires once immediately with whatever session Firebase Auth
-  // already has persisted (or null), then again on every future
-  // sign-in/out — this is the single source of truth for which sync
-  // target (anonymous code vs. account) should be active, so nothing
-  // else starts a sync subscription outside of this callback.
-  window.CloudAuth.onChange(user=>{
-    authUser = user;
-    if(user){
-      authEmailSent = false;
-      switchToAuthSync(user.uid);
-    } else if(syncCollection!=='budgets' || !syncCode){
-      ensureAnonymousSync();
+pushToggleBtn.addEventListener('click', async ()=>{
+  let enabled = false;
+  try{ enabled = localStorage.getItem(PUSH_ENABLED_KEY) === '1'; }catch(e){}
+  if(!window.CloudSync){ return; }
+  pushToggleBtn.disabled = true;
+  try{
+    if(enabled){
+      await window.CloudSync.disablePush();
+      try{ localStorage.setItem(PUSH_ENABLED_KEY, '0'); }catch(e){}
+    } else {
+      await window.CloudSync.enablePush();
+      try{ localStorage.setItem(PUSH_ENABLED_KEY, '1'); }catch(e){}
     }
-    updateSyncBtnLabel();
-    if(syncPanelOpen) renderSyncPanel();
-  });
+  }catch(err){
+    pushToggleDesc.textContent = err && err.message === 'denied'
+      ? 'Уведомления запрещены в настройках iPhone'
+      : 'Не удалось включить. Попробуйте ещё раз';
+    pushToggleBtn.disabled = false;
+    return;
+  }
+  pushToggleBtn.disabled = false;
+  renderPushToggle();
+});
+renderPushToggle();
+window.addEventListener('cloudsync-ready', ()=>{
+  let existingCode = null;
+  try{ existingCode = localStorage.getItem(SYNC_KEY); }catch(e){}
+  if(existingCode){
+    // Returning device/tab — just resume with the code it already has.
+    startSync(existingCode, 'budgets');
+    pushToCloud();
+    setTimeout(()=>maybeShowCloudNotice(existingCode), 800);
+  } else {
+    // Brand-new storage context (first run, or — on iOS — a Home Screen
+    // icon, which doesn't share storage with Safari): ask explicitly
+    // instead of silently minting an empty cloud doc.
+    showFirstRunSyncOverlay();
+  }
+  if(syncPanelOpen) renderSyncPanel();
 });
 
 document.getElementById('ghClose').addEventListener('click',()=>{
@@ -3460,27 +3414,102 @@ document.getElementById('backupReminderDo').addEventListener('click', ()=>{
 });
 setTimeout(maybeShowBackupReminder, 600);
 
-// Shown once, right after cloud sync is auto-provisioned (see the
-// 'cloudsync-ready' listener below) — without this the auto-generated code
-// only lives in this device's localStorage, so wiping the device loses the
-// one thing needed to recover cloud data.
-const CLOUD_NOTICE_KEY = 'icity-cloud-notice-shown';
+// Nags every 3 days — same cadence as the backup reminder — until the user
+// has actually copied their sync code at least once. Without the code,
+// the cloud copy is unreachable if this device's storage ever gets wiped.
+const SYNC_CODE_SAVED_KEY = 'icity-sync-code-saved';
+const SYNC_REMINDER_LAST_KEY = 'icity-sync-reminder-last';
+const SYNC_REMINDER_INTERVAL = 3*24*60*60*1000;
+function markSyncCodeSaved(){
+  try{ localStorage.setItem(SYNC_CODE_SAVED_KEY, '1'); }catch(e){}
+}
 function maybeShowCloudNotice(code){
-  let shown = null;
-  try{ shown = localStorage.getItem(CLOUD_NOTICE_KEY); }catch(e){}
-  if(shown) return;
+  let saved = null;
+  try{ saved = localStorage.getItem(SYNC_CODE_SAVED_KEY); }catch(e){}
+  if(saved) return;
+  let last = null;
+  try{ last = parseInt(localStorage.getItem(SYNC_REMINDER_LAST_KEY), 10); }catch(e){}
+  const now = Date.now();
+  if(last && !isNaN(last) && now - last < SYNC_REMINDER_INTERVAL) return;
+  try{ localStorage.setItem(SYNC_REMINDER_LAST_KEY, String(now)); }catch(e){}
   document.getElementById('cloudNoticeCode').textContent = code;
   document.getElementById('cloudNoticeOverlay').classList.add('open');
 }
 function dismissCloudNotice(){
   document.getElementById('cloudNoticeOverlay').classList.remove('open');
-  try{ localStorage.setItem(CLOUD_NOTICE_KEY, '1'); }catch(e){}
+  try{ localStorage.setItem(SYNC_REMINDER_LAST_KEY, String(Date.now())); }catch(e){}
 }
 document.getElementById('cloudNoticeLater').addEventListener('click', dismissCloudNotice);
 document.getElementById('cloudNoticeCopy').addEventListener('click', async ()=>{
   const code = document.getElementById('cloudNoticeCode').textContent;
   try{ await navigator.clipboard.writeText(code); }catch(e){}
+  markSyncCodeSaved();
   dismissCloudNotice();
+});
+
+// First run in a storage context that has never had a sync code before
+// (a brand-new browser profile, or — notably on iOS — a Home Screen icon,
+// which doesn't share storage with Safari): ask explicitly instead of
+// silently minting a fresh empty cloud doc, so existing data never looks
+// like it "disappeared".
+function showFirstRunSyncOverlay(){
+  document.getElementById('firstRunSyncOverlay').classList.add('open');
+}
+function hideFirstRunSyncOverlay(){
+  document.getElementById('firstRunSyncOverlay').classList.remove('open');
+}
+document.getElementById('firstRunJoinBtn').addEventListener('click', async ()=>{
+  const input = document.getElementById('firstRunJoinInput');
+  const code = input.value.trim().toUpperCase();
+  const statusEl = document.getElementById('firstRunStatus');
+  if(!code) return;
+  statusEl.style.display = 'block';
+  statusEl.className = 'sync-status';
+  statusEl.textContent = 'Подключение…';
+  try{
+    const existing = await window.CloudSync.getBudgetDoc(code, 'budgets');
+    if(existing && existing.store){
+      try{ localStorage.setItem(SYNC_KEY, code); }catch(e){}
+      startSync(code, 'budgets');
+      applyRemoteStore(existing.store, true);
+      markSyncCodeSaved();
+      hideFirstRunSyncOverlay();
+    } else {
+      statusEl.textContent = 'По этому коду данных не найдено — проверьте код или создайте новый ниже.';
+      statusEl.classList.add('err');
+    }
+  }catch(err){
+    statusEl.textContent = 'Не удалось подключиться: '+err.message;
+    statusEl.classList.add('err');
+  }
+});
+document.getElementById('firstRunJoinInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ e.preventDefault(); document.getElementById('firstRunJoinBtn').click(); }
+});
+document.getElementById('firstRunCreateBtn').addEventListener('click', ()=>{
+  const code = generateSyncCode();
+  document.getElementById('firstRunSyncOverlay').dataset.pendingCode = code;
+  document.getElementById('firstRunCodeText').textContent = code;
+  document.getElementById('firstRunJoinSection').style.display = 'none';
+  document.getElementById('firstRunDivider').style.display = 'none';
+  document.getElementById('firstRunCreateSection').style.display = 'none';
+  document.getElementById('firstRunCodeSection').style.display = 'block';
+});
+document.getElementById('firstRunCopyBtn').addEventListener('click', async ()=>{
+  const code = document.getElementById('firstRunSyncOverlay').dataset.pendingCode;
+  try{ await navigator.clipboard.writeText(code); }catch(e){}
+  const confirmBtn = document.getElementById('firstRunConfirmBtn');
+  confirmBtn.disabled = false;
+  confirmBtn.style.opacity = '1';
+  document.getElementById('firstRunCopyBtn').textContent = 'Скопировано ✓';
+});
+document.getElementById('firstRunConfirmBtn').addEventListener('click', ()=>{
+  const code = document.getElementById('firstRunSyncOverlay').dataset.pendingCode;
+  try{ localStorage.setItem(SYNC_KEY, code); }catch(e){}
+  startSync(code, 'budgets');
+  pushToCloud();
+  markSyncCodeSaved();
+  hideFirstRunSyncOverlay();
 });
 </script>
 <script type="module">
@@ -3488,8 +3517,8 @@ document.getElementById('cloudNoticeCopy').addEventListener('click', async ()=>{
   // classic script above — which can't use `import` — can call plain
   // async functions without needing a build step.
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-  import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import { getMessaging, getToken, deleteToken, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDH7z9MvtNHUf0LGBf_aRRDBCU5ij5Cz3A",
@@ -3500,14 +3529,17 @@ document.getElementById('cloudNoticeCopy').addEventListener('click', async ()=>{
     appId: "1:1094409922442:web:a47726de701a83d4388a73"
   };
 
+  // Generated in Firebase Console → Project settings → Cloud Messaging →
+  // Web Push certificates. Needed to request an FCM token from the browser.
+  const VAPID_KEY = "REPLACE_WITH_YOUR_VAPID_KEY";
+
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const auth = getAuth(app);
 
-  // 'budgets' is the anonymous, code-is-the-password collection used before
-  // login existed (and still used as the fallback when nobody's signed in).
-  // 'users' is keyed by Firebase Auth uid and gated by Firestore rules to
-  // that same uid — only reachable once actually signed in.
+  // 'budgets' is the anonymous, code-is-the-password collection — the only
+  // sync mechanism now (no login). Keeping the collection param around
+  // even though it's always 'budgets' costs nothing and avoids reshuffling
+  // every call site again if this ever needs to change.
   window.CloudSync = {
     async getBudgetDoc(code, collection='budgets'){
       const snap = await getDoc(doc(db, collection, code));
@@ -3523,25 +3555,33 @@ document.getElementById('cloudNoticeCopy').addEventListener('click', async ()=>{
         snap => callback(snap.exists() ? snap.data() : null, {fromLocalWrite: snap.metadata.hasPendingWrites}),
         err => callback(null, {error: err})
       );
+    },
+    // Requests notification permission, registers the device's FCM token in
+    // /pushTokens/{token}, and returns it. Throws if permission is denied or
+    // messaging isn't supported (e.g. Safari outside an installed PWA).
+    async enablePush(){
+      if(!(await isSupported())) throw new Error('unsupported');
+      const permission = await Notification.requestPermission();
+      if(permission !== 'granted') throw new Error('denied');
+      const registration = await navigator.serviceWorker.ready;
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration });
+      if(!token) throw new Error('no-token');
+      await setDoc(doc(db, 'pushTokens', token), { token, updatedAt: Date.now() });
+      return token;
+    },
+    // Best-effort: removes this device's token from FCM and Firestore.
+    async disablePush(){
+      if(!(await isSupported())) return;
+      const registration = await navigator.serviceWorker.ready;
+      const messaging = getMessaging(app);
+      let token = null;
+      try{ token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registration }); }catch(e){}
+      if(token){
+        try{ await deleteDoc(doc(db, 'pushTokens', token)); }catch(e){}
+        try{ await deleteToken(messaging); }catch(e){}
+      }
     }
-  };
-
-  window.CloudAuth = {
-    async sendLink(email){
-      const url = window.location.origin + window.location.pathname;
-      await sendSignInLinkToEmail(auth, email, {url, handleCodeInApp: true});
-    },
-    isSignInLink(url){ return isSignInWithEmailLink(auth, url); },
-    async completeSignIn(email, url){
-      const cred = await signInWithEmailLink(auth, email, url);
-      return {uid: cred.user.uid, email: cred.user.email};
-    },
-    // fires once immediately with the current (possibly persisted) session,
-    // then again on every future sign-in/out
-    onChange(cb){
-      return onAuthStateChanged(auth, user => cb(user ? {uid: user.uid, email: user.email} : null));
-    },
-    async signOut(){ await signOut(auth); }
   };
 
   window.dispatchEvent(new Event('cloudsync-ready'));

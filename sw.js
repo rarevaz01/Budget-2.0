@@ -1,3 +1,28 @@
+importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyDH7z9MvtNHUf0LGBf_aRRDBCU5ij5Cz3A",
+  authDomain: "finansy-app-d298b.firebaseapp.com",
+  projectId: "finansy-app-d298b",
+  storageBucket: "finansy-app-d298b.firebasestorage.app",
+  messagingSenderId: "1094409922442",
+  appId: "1:1094409922442:web:a47726de701a83d4388a73"
+});
+
+// Shows the evening reminder (and any other data-only push) while the app
+// isn't in the foreground. Pushes with a "notification" payload are shown
+// automatically by the browser, so this only fires for data-only messages.
+firebase.messaging().onBackgroundMessage((payload) => {
+  const { title, body } = payload.data || {};
+  if (!title) return;
+  self.registration.showNotification(title, {
+    body,
+    icon: './icons/icon-192.png',
+    badge: './icons/icon-192.png',
+  });
+});
+
 const CACHE_NAME = 'finansy-shell-v1';
 const SHELL_FILES = [
   './',

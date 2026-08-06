@@ -10,10 +10,13 @@ service cloud.firestore {
     match /budgets/{code} {
       allow read, write: if true;
     }
-    // Logged-in budgets: doc id is the Firebase Auth uid, so only that
-    // account can ever read or write its own document.
-    match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+    // FCM device tokens for the evening expense reminder. Doc id is the
+    // token itself (opaque, device-generated) so writes are self-scoped;
+    // no read/list rule, so a client can't harvest other devices' tokens.
+    // The GitHub Actions sender uses the Admin SDK, which bypasses rules.
+    match /pushTokens/{token} {
+      allow read: if false;
+      allow write: if true;
     }
     match /{document=**} {
       allow read, write: if false;

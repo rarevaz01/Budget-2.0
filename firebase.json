@@ -6,6 +6,7 @@
       ".firebaserc",
       "firestore.rules",
       "test/**",
+      "scripts/**",
       ".git/**",
       ".claude/**",
       ".vscode/**",
