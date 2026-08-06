@@ -131,9 +131,19 @@ svg{overflow:visible}
 .bottom-row{display:flex;gap:8px;margin-top:10px}
 .head-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.icon-btn svg.spinning{animation:icon-spin .7s linear infinite}
+@keyframes icon-spin{to{transform:rotate(360deg)}}
 .overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center;z-index:100}
 .overlay.open{display:flex}
+.overlay-center{align-items:center;padding:20px}
 .sheet{background:linear-gradient(180deg,var(--card-2) 0%,var(--card) 40%);width:100%;max-width:720px;max-height:85vh;border-radius:22px 22px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));overflow-y:auto;box-shadow:var(--shadow)}
+.backup-reminder-sheet{max-width:340px;border-radius:20px;text-align:center;padding:24px 20px}
+.backup-reminder-icon{width:52px;height:52px;border-radius:14px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.backup-reminder-sheet h3{font-size:16px;font-weight:800;margin:0 0 8px;letter-spacing:-.01em}
+.backup-reminder-sheet p{font-size:13px;color:var(--muted);margin:0;line-height:1.4}
+.backup-reminder-actions{display:flex;gap:10px;margin-top:20px}
+.backup-reminder-actions button{flex:1;height:46px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:800;border:1px solid var(--line);background:none;color:var(--muted)}
+.backup-reminder-actions .backup-reminder-do{border-color:var(--accent-soft-line);background:var(--accent);color:var(--btn-text)}
 .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .sheet-head h2{font-size:18px;font-weight:800;margin:0;letter-spacing:-.01em}
 .backup-option{display:flex;align-items:center;gap:14px;padding:14px 4px;border-bottom:1px solid var(--line);text-align:left;background:none;border-top:none;border-left:none;border-right:none;width:100%}
@@ -258,6 +268,9 @@ svg{overflow:visible}
   <h1>Финансы</h1>
   <div class="head-icons">
     <span id="status"></span>
+    <button class="icon-btn" id="syncRefreshBtn" title="Обновить данные из облака" aria-label="Обновить данные из облака" style="display:none">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    </button>
     <button class="icon-btn" id="openGlobalHist" title="История" aria-label="История">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
     </button>
@@ -453,6 +466,19 @@ svg{overflow:visible}
       <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
     </div>
     <div class="week-range-calendar" id="weekRangeCalendar"></div>
+  </div>
+</div>
+<div class="overlay overlay-center" id="backupReminderOverlay">
+  <div class="sheet backup-reminder-sheet">
+    <div class="backup-reminder-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+    </div>
+    <h3>Сделать резервную копию?</h3>
+    <p>Прошло уже 3 дня — сохраните файл с данными на устройство, чтобы точно их не потерять.</p>
+    <div class="backup-reminder-actions">
+      <button type="button" id="backupReminderSkip">Не делать</button>
+      <button type="button" id="backupReminderDo" class="backup-reminder-do">Сделать</button>
+    </div>
   </div>
 </div>
 <script src="logic.js"></script>
@@ -2575,10 +2601,35 @@ function applyRemoteStore(remoteStore){
   }
 }
 
+const syncRefreshBtn = document.getElementById('syncRefreshBtn');
+function updateSyncRefreshBtn(){
+  syncRefreshBtn.style.display = syncCode ? 'flex' : 'none';
+}
+syncRefreshBtn.addEventListener('click', async ()=>{
+  if(!syncCode || !window.CloudSync || syncRefreshBtn.classList.contains('busy')) return;
+  syncRefreshBtn.classList.add('busy');
+  syncRefreshBtn.querySelector('svg').classList.add('spinning');
+  try{
+    const data = await window.CloudSync.getBudgetDoc(syncCode);
+    if(data && data.store){
+      applyRemoteStore(data.store);
+      syncStatus = 'Синхронизировано только что';
+      syncStatusErr = false;
+    }
+  }catch(err){
+    syncStatus = 'Не удалось обновить: '+err.message;
+    syncStatusErr = true;
+  }
+  if(syncPanelOpen) renderSyncPanel();
+  syncRefreshBtn.classList.remove('busy');
+  syncRefreshBtn.querySelector('svg').classList.remove('spinning');
+});
+
 function startSync(code){
   if(syncUnsubscribe){ syncUnsubscribe(); syncUnsubscribe = null; }
   syncCode = code;
   try{ localStorage.setItem(SYNC_KEY, code); }catch(e){}
+  updateSyncRefreshBtn();
   syncUnsubscribe = window.CloudSync.subscribeBudgetDoc(code, (data, meta)=>{
     if(meta && meta.error){
       syncStatus = 'Ошибка синхронизации: '+meta.error.message;
@@ -2601,6 +2652,7 @@ function stopSync(){
   try{ localStorage.removeItem(SYNC_KEY); }catch(e){}
   syncStatus = '';
   syncStatusErr = false;
+  updateSyncRefreshBtn();
 }
 
 async function createSyncCode(){
@@ -3085,6 +3137,35 @@ document.getElementById('weekRangeDone').addEventListener('click',()=>{
   renderChart();
   animateChartTransition(fromRanges, fromLeft, fromTotal);
 });
+
+// Every 3 days (from the last time this prompt was shown, not from the
+// last actual backup — we don't track that), nudge the user to export a
+// backup file. Both choices push the timer forward so it doesn't nag again
+// until the next 3-day window.
+const BACKUP_REMINDER_KEY = 'icity-backup-reminder-last';
+const BACKUP_REMINDER_INTERVAL = 3*24*60*60*1000;
+function maybeShowBackupReminder(){
+  let last = null;
+  try{ last = parseInt(localStorage.getItem(BACKUP_REMINDER_KEY), 10); }catch(e){}
+  const now = Date.now();
+  if(!last || isNaN(last)){
+    try{ localStorage.setItem(BACKUP_REMINDER_KEY, String(now)); }catch(e){}
+    return;
+  }
+  if(now - last >= BACKUP_REMINDER_INTERVAL){
+    document.getElementById('backupReminderOverlay').classList.add('open');
+  }
+}
+function dismissBackupReminder(){
+  document.getElementById('backupReminderOverlay').classList.remove('open');
+  try{ localStorage.setItem(BACKUP_REMINDER_KEY, String(Date.now())); }catch(e){}
+}
+document.getElementById('backupReminderSkip').addEventListener('click', dismissBackupReminder);
+document.getElementById('backupReminderDo').addEventListener('click', ()=>{
+  dismissBackupReminder();
+  document.getElementById('backupExportBtn').click();
+});
+setTimeout(maybeShowBackupReminder, 600);
 </script>
 <script type="module">
   // Bridges Firestore (loaded as an ES module) into window.CloudSync so the
