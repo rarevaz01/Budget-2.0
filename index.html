@@ -161,7 +161,8 @@ svg{overflow:visible}
 .backup-option .backup-option-icon.icon-purple{background:var(--purple-soft);color:var(--purple)}
 .period-rename-input{min-width:0;flex:1;height:44px;padding:0 12px;border:1px solid var(--accent-soft-line);border-radius:11px;outline:0;background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;font-size:14px}
 .period-rename-input:focus{border-color:var(--accent)}
-.period-rename-save{height:44px;padding:0 15px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800}
+.period-rename-save{height:44px;padding:0 15px;border:1px solid var(--accent-soft-line);border-radius:11px;background:var(--accent);color:var(--btn-text);font-family:inherit;font-size:13px;font-weight:800;transition:background .18s ease,border-color .18s ease}
+.period-rename-save.copied{background:var(--green);border-color:var(--green)}
 .sync-panel{display:none;flex-direction:column;gap:10px;padding:10px 4px 16px;border-bottom:1px solid var(--line)}
 .sync-panel.open{display:flex}
 .sync-panel .backup-option-desc{margin:0}
@@ -2577,6 +2578,7 @@ let syncBusy = false;
 let syncStatus = '';
 let syncStatusErr = false;
 let syncPanelOpen = false;
+let syncJustCopied = false;
 
 const syncBtn = document.getElementById('syncBtn');
 const syncPanel = document.getElementById('syncPanel');
@@ -2763,7 +2765,7 @@ function renderSyncPanel(){
       <div class="backup-option-desc">Код синхронизации — храните как пароль, введите его на других устройствах в этом же меню:</div>
       <div class="sync-code-box">
         <span class="sync-code-text">${syncCode}</span>
-        <button class="period-rename-save" type="button" id="syncCopyBtn" style="flex-shrink:0">Копировать</button>
+        <button class="period-rename-save${syncJustCopied?' copied':''}" type="button" id="syncCopyBtn" style="flex-shrink:0">${syncJustCopied?'Скопировано ✓':'Копировать'}</button>
       </div>
       ${syncStatus ? `<div class="sync-status${syncStatusErr?' err':''}">${syncStatus}</div>` : ''}
       <button class="backup-option danger" type="button" id="syncDisconnectBtn" style="border-radius:11px">
@@ -2775,6 +2777,8 @@ function renderSyncPanel(){
         await navigator.clipboard.writeText(syncCode);
         syncStatus = 'Код скопирован';
         syncStatusErr = false;
+        syncJustCopied = true;
+        setTimeout(()=>{ syncJustCopied = false; if(syncPanelOpen) renderSyncPanel(); }, 1400);
       }catch(e){
         syncStatus = 'Не удалось скопировать — выделите код вручную';
         syncStatusErr = true;
