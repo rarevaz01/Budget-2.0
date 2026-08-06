@@ -66,35 +66,62 @@
     return (r*299+g*587+b*114)/1000>155 ? '#170B33' : '#FFFFFF';
   }
 
-  // now defaults to the real clock but accepts an override so tests can pin the date
-  function getWeekBounds(now){
+  // now defaults to the real clock but accepts an override so tests can pin the date.
+  // from: optional explicit start of the window (used for a user-picked custom range)
+  // instead of the usual "6 days before now".
+  function getWeekBounds(now, from){
     now = now || new Date();
-    const from=new Date(now.getTime()-6*24*60*60*1000);
-    from.setHours(0,0,0,0);
+    if(!from){
+      from = new Date(now.getTime()-6*24*60*60*1000);
+      from.setHours(0,0,0,0);
+    }
     return {from, now};
   }
 
-  // store: the full STORE object ({months, current, ...}). now: optional Date override for tests.
-  function getPeriodCats(period, store, otherColor, now){
-    const currentMonth = store.months[store.current] || {C:[]};
-    if(period==='week'){
-      const {from, now:nowD} = getWeekBounds(now);
-      const map={};
-      Object.values(store.months).forEach(mo=>{
-        (mo.C||[]).forEach(c=>{
-          (c.h||[]).forEach(item=>{
-            const d=new Date(item.d);
-            if(d>=from && d<=nowD){
-              if(!map[c.n]) map[c.n]={name:c.n, col:c.col, amount:0};
-              map[c.n].amount += parseFloat(item.a)||0;
-            }
-          });
+  // Sums history entries across every stored month whose date falls in
+  // [from, to] — the generic building block behind "Неделя" and any other
+  // arbitrary user-picked date range.
+  function getRangeCats(store, otherColor, from, to){
+    const map={};
+    Object.values(store.months).forEach(mo=>{
+      (mo.C||[]).forEach(c=>{
+        (c.h||[]).forEach(item=>{
+          const d=new Date(item.d);
+          if(d>=from && d<=to){
+            if(!map[c.n]) map[c.n]={name:c.n, col:c.col, amount:0};
+            map[c.n].amount += parseFloat(item.a)||0;
+          }
         });
       });
-      return Object.values(map).filter(x=>x.amount>0);
+    });
+    return Object.values(map).filter(x=>x.amount>0);
+  }
+
+  // Prorates each stored month's budget by how many days of [from, to] fall
+  // inside it — the generic building block behind "Неделя" and any other
+  // arbitrary user-picked date range.
+  function getRangeBudget(store, from, to){
+    let budget=0;
+    for(let d=new Date(from); d<=to; d.setDate(d.getDate()+1)){
+      const mo = store.months[monthKey(d)];
+      if(mo){
+        const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+        budget += (parseFloat(mo.B)||0)/daysInMonth;
+      }
+    }
+    return budget;
+  }
+
+  // store: the full STORE object ({months, current, ...}). now: optional Date override for tests.
+  // weekFrom: optional explicit range start, see getWeekBounds.
+  function getPeriodCats(period, store, otherColor, now, weekFrom){
+    const currentMonth = store.months[store.current] || {C:[]};
+    if(period==='week'){
+      const {from, now:nowD} = getWeekBounds(now, weekFrom);
+      return getRangeCats(store, otherColor, from, nowD);
     }
     if(period==='year'){
-      const year=(store.current||'').split('-')[0];
+      const year=now ? String(now.getFullYear()) : (store.current||'').split('-')[0];
       const map={};
       Object.keys(store.months).forEach(mk=>{
         if(!mk.startsWith(year+'-')) return;
@@ -109,10 +136,10 @@
     return (currentMonth.C||[]).map(c=>({name:c.n, col:c.col, amount:parseFloat(c.a)||0})).filter(x=>x.amount>0);
   }
 
-  function getPeriodBudget(period, store, now){
+  function getPeriodBudget(period, store, now, weekFrom){
     const currentMonth = store.months[store.current] || {B:0};
     if(period==='year'){
-      const year=(store.current||'').split('-')[0];
+      const year=now ? String(now.getFullYear()) : (store.current||'').split('-')[0];
       let budget=0;
       Object.keys(store.months).forEach(mk=>{
         if(mk.startsWith(year+'-')) budget += parseFloat(store.months[mk].B)||0;
@@ -120,16 +147,8 @@
       return budget;
     }
     if(period==='week'){
-      const {from, now:nowD} = getWeekBounds(now);
-      let budget=0;
-      for(let d=new Date(from); d<=nowD; d.setDate(d.getDate()+1)){
-        const mo = store.months[monthKey(d)];
-        if(mo){
-          const daysInMonth = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
-          budget += (parseFloat(mo.B)||0)/daysInMonth;
-        }
-      }
-      return budget;
+      const {from, now:nowD} = getWeekBounds(now, weekFrom);
+      return getRangeBudget(store, from, nowD);
     }
     return parseFloat(currentMonth.B)||0;
   }
@@ -151,7 +170,7 @@
     nextColor, monthKey, defaultCalendarLabel, defaultMonthData,
     fmt, strip, numVal,
     pol, arc, contrastTextColor,
-    getWeekBounds, getPeriodCats, getPeriodBudget, reduceToTopWithRest
+    getWeekBounds, getPeriodCats, getPeriodBudget, getRangeCats, getRangeBudget, reduceToTopWithRest
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

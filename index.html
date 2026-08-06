@@ -170,6 +170,33 @@ svg{overflow:visible}
 .gh-date-dash{color:var(--muted);font-size:12px}
 .gh-date-clear{grid-column:1/-1;justify-self:end;margin-top:-2px;border:0;background:none;color:var(--muted);font-family:inherit;font-size:12px;text-decoration:underline;padding:2px 0}
 @media(max-width:430px){.gh-date-filters{grid-template-columns:1fr}.gh-date-clear{grid-column:1}}
+.week-range-sheet{max-height:88vh;display:flex;flex-direction:column;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.week-range-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.week-range-head h2{font-size:16px;font-weight:800;margin:0;letter-spacing:-.01em}
+.week-range-cancel,.week-range-done{background:none;border:none;padding:4px 2px;color:var(--accent);font-family:inherit;font-size:15px;font-weight:600}
+.week-range-done{font-weight:800}
+.week-range-labels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.week-range-label-box{display:flex;flex-direction:column;gap:4px;padding-bottom:8px;border-bottom:2px solid transparent}
+.week-range-label-box.active{border-bottom-color:var(--accent)}
+.week-range-label-title{font-size:12px;color:var(--muted);font-weight:700}
+.week-range-label-value{font-size:17px;font-weight:700;color:var(--text)}
+.week-range-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.03em;padding:4px 0 8px;position:sticky;top:0;background:var(--card-2);z-index:2}
+.week-range-calendar{overflow-y:auto;flex:1;padding-bottom:8px}
+.week-range-month-name{font-size:14px;font-weight:800;margin:14px 2px 8px;padding:4px 10px;border-radius:16px;color:var(--text);background:none;border:0;font-family:inherit;cursor:pointer}
+.week-range-month-name.active{margin-left:-10px;background:var(--accent);color:var(--btn-text)}
+.week-range-month:first-child .week-range-month-name{margin-top:2px}
+.week-range-days{display:grid;grid-template-columns:repeat(7,1fr);row-gap:3px}
+.week-range-day{position:relative;height:40px}
+.week-range-day.empty{visibility:hidden}
+.week-range-day-bg{display:none;position:absolute;top:3px;bottom:3px;left:0;right:0;background:var(--accent-soft);z-index:0}
+.week-range-day.in-range .week-range-day-bg{display:block}
+.week-range-day.range-start .week-range-day-bg{left:50%;border-radius:16px 0 0 16px}
+.week-range-day.range-end .week-range-day-bg{right:50%;border-radius:0 16px 16px 0}
+.week-range-day.range-start.range-end .week-range-day-bg{display:none}
+.week-range-day-num{position:relative;z-index:1;width:34px;height:34px;margin:3px auto 0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--text);border-radius:50%;background:none;border:0;font-family:inherit}
+.week-range-day.disabled .week-range-day-num{color:var(--line);pointer-events:none}
+.week-range-day.today .week-range-day-num{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.week-range-day.range-start .week-range-day-num,.week-range-day.range-end .week-range-day-num{background:var(--accent);color:var(--btn-text);box-shadow:none}
 .gh-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035)}
 .gh-summary-count{color:var(--text);font-size:13px;font-weight:700}
 .gh-summary-totals{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px}
@@ -263,7 +290,7 @@ svg{overflow:visible}
     <div class="side-block side-income">
       <form class="income-row" id="incomeForm">
         <input class="income-input" id="incomeAmt" type="text" inputmode="decimal" placeholder="Сумма дохода">
-        <button class="income-btn" type="button" id="incomeBtn" aria-label="Добавить доход">Добавить доход</button>
+        <button class="income-btn" type="button" id="incomeBtn" aria-label="Новый доход">Новый доход</button>
       </form>
     </div>
   </div>
@@ -408,9 +435,32 @@ svg{overflow:visible}
     <input type="file" id="backupFileInput" accept="application/json" style="display:none">
   </div>
 </div>
+<div class="overlay" id="weekRangeOverlay">
+  <div class="sheet week-range-sheet">
+    <div class="week-range-head">
+      <button class="week-range-cancel" id="weekRangeCancel" type="button">Закрыть</button>
+      <h2>Выберите период</h2>
+      <button class="week-range-done" id="weekRangeDone" type="button">Готово</button>
+    </div>
+    <div class="week-range-labels">
+      <div class="week-range-label-box" id="weekRangeStartBox">
+        <span class="week-range-label-title">Дата начала</span>
+        <span class="week-range-label-value" id="weekRangeStartValue">—</span>
+      </div>
+      <div class="week-range-label-box" id="weekRangeEndBox">
+        <span class="week-range-label-title">Дата окончания</span>
+        <span class="week-range-label-value" id="weekRangeEndValue">—</span>
+      </div>
+    </div>
+    <div class="week-range-weekdays">
+      <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
+    </div>
+    <div class="week-range-calendar" id="weekRangeCalendar"></div>
+  </div>
+</div>
 <script src="logic.js"></script>
 <script>
-const {P, MONTH_NAMES, nextColor, monthKey, defaultCalendarLabel, defaultMonthData, fmt, strip, numVal, pol, arc, contrastTextColor, getWeekBounds} = Logic;
+const {P, MONTH_NAMES, nextColor, monthKey, defaultCalendarLabel, defaultMonthData, fmt, strip, numVal, pol, arc, contrastTextColor, getWeekBounds, getRangeCats, getRangeBudget} = Logic;
 const K="icity-budget-v2";
 const PRESET_CATEGORIES=["Спорт","Красота и уход","Образование","Подарки","Ребёнок","Животные","Другое"];
 
@@ -423,6 +473,47 @@ function monthLabel(key){
     return MONTH_NAMES[m-1]+' '+y;
   }
   return key;
+}
+
+// The header above the ring shows different granularity depending on which
+// period tab is active: just the month name for "Месяц" (no year — the year
+// only matters once you're looking at a whole year), just the year for
+// "Год", and a fixed "last real week" label for "Неделя" (that tab always
+// shows the last 7 real calendar days, independent of the browsed month).
+const MONTH_NAMES_GEN = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+// A date range collapses to just a month name when it exactly spans that
+// month's 1st to last day — used both for the default rolling week and for
+// any arbitrary range the user picks by hand.
+function customRangeLabel(from, to){
+  const d1=from.getDate(), d2=to.getDate(), m1=from.getMonth(), m2=to.getMonth(), y1=from.getFullYear(), y2=to.getFullYear();
+  const lastDayOfMonth = new Date(y2, m2+1, 0).getDate();
+  if(d1===1 && d2===lastDayOfMonth && m1===m2 && y1===y2){
+    return y1!==new Date().getFullYear() ? `${MONTH_NAMES[m1]} ${y1}` : MONTH_NAMES[m1];
+  }
+  if(m1===m2 && y1===y2) return `${d1} - ${d2} ${MONTH_NAMES_GEN[m2]}`;
+  const y1Suffix = y1!==y2 ? ' '+y1 : '', y2Suffix = y1!==y2 ? ' '+y2 : '';
+  return `${d1} ${MONTH_NAMES_GEN[m1]}${y1Suffix} - ${d2} ${MONTH_NAMES_GEN[m2]}${y2Suffix}`;
+}
+function weekRangeLabel(){
+  const {from, now} = getWeekBounds(weekRefDate());
+  return customRangeLabel(from, now);
+}
+
+function periodHeaderLabel(key, period){
+  // A hand-picked date range (any period tab) always overrides the tab's
+  // normal label — it's showing that exact window, not the month/year.
+  if(periodCustomRange) return customRangeLabel(periodCustomRange.from, periodCustomRange.to);
+  const month = STORE.months[key];
+  if(month && month.customName) return month.customName;
+  const parts = key.split('-');
+  const isPlainKey = parts.length===2 && /^\d+$/.test(parts[0]) && /^\d+$/.test(parts[1]);
+  if(period==='week') return weekRangeLabel();
+  if(period==='year'){
+    const baseYear = isPlainKey ? +parts[0] : new Date().getFullYear();
+    return String(baseYear+yearOffset);
+  }
+  if(isPlainKey) return MONTH_NAMES[+parts[1]-1];
+  return monthLabel(key);
 }
 
 let STORE = { months:{}, current:null, deletedMonths:[], order:[], dismissedPresets:[] };
@@ -617,11 +708,25 @@ function hexToRgba(hex, alpha){
 }
 function renderMonthSelect(){
   const keys = STORE.order.filter(k=>STORE.months[k]);
-  monthSelect.innerHTML = keys.map(k=>`<option value="${k}" ${k===STORE.current?'selected':''}>${monthLabel(k)}</option>`).join('');
+  const period = chartExpanded ? chartPeriod : 'month';
+  monthSelect.innerHTML = keys.map(k=>{
+    const label = k===STORE.current ? periodHeaderLabel(k, period) : monthLabel(k);
+    return `<option value="${k}" ${k===STORE.current?'selected':''}>${label}</option>`;
+  }).join('');
   updateMonthNavArrows();
 }
 
 function updateMonthNavArrows(){
+  if(chartExpanded && chartPeriod==='week'){
+    monthPrevBtn.disabled = false;
+    monthNextBtn.disabled = weekOffset>=0;
+    return;
+  }
+  if(chartExpanded && chartPeriod==='year'){
+    monthPrevBtn.disabled = false;
+    monthNextBtn.disabled = yearOffset>=0;
+    return;
+  }
   const keys = STORE.order.filter(k=>STORE.months[k]);
   const idx = keys.indexOf(STORE.current);
   monthPrevBtn.disabled = idx<=0;
@@ -634,6 +739,7 @@ function switchMonth(key){
   const fromBudget = cur().B;
   const fromRemaining = parseFloat(ld.getAttribute('data-raw'))||0;
   const fromCatAmounts = cur().C.map(c=>parseFloat(c.a)||0);
+  periodCustomRange = null;
   STORE.current = key;
   expandedCategories.clear();
   limitEditCategories.clear();
@@ -718,10 +824,41 @@ window.addEventListener('resize',updateCategoryNameFades);
 
 let chartExpanded = false;
 let chartPeriod = 'month';
+// How many 7-day windows back from the real current week the "Неделя" tab is
+// showing. 0 = the real current week; the prev/next month-nav arrows step
+// this instead of switching months while that tab is active.
+let weekOffset = 0;
+function weekRefDate(){ return new Date(Date.now() + weekOffset*7*24*60*60*1000); }
+// Same idea for "Год": 0 = the year of whichever month was open when the tab
+// was entered (Logic's year math keys off store.current by default); a
+// nonzero offset overrides just the year used for that filter.
+let yearOffset = 0;
+function yearRefDate(){
+  if(yearOffset===0) return undefined;
+  const baseYear = +((STORE.current||'').split('-')[0]) || new Date().getFullYear();
+  return new Date(baseYear+yearOffset, 0, 1);
+}
+function periodRefDate(period){
+  if(period==='week') return weekRefDate();
+  if(period==='year') return yearRefDate();
+  return undefined;
+}
+
+// Set by the manual date-range picker (tapping the date label above the ring,
+// in any period tab) to an arbitrary {from, to} pair that overrides whatever
+// that tab would normally show. Cleared by the nav arrows, switching months,
+// switching tabs, or collapsing the chart.
+let periodCustomRange = null;
 
 // thin wrappers: inject the live STORE / theme color into the pure logic.js implementations
-function getPeriodCats(period){ return Logic.getPeriodCats(period, STORE, cssVar('--other-seg')); }
-function getPeriodBudget(period){ return Logic.getPeriodBudget(period, STORE); }
+function getPeriodCats(period){
+  if(periodCustomRange) return Logic.getRangeCats(STORE, cssVar('--other-seg'), periodCustomRange.from, periodCustomRange.to);
+  return Logic.getPeriodCats(period, STORE, cssVar('--other-seg'), periodRefDate(period));
+}
+function getPeriodBudget(period){
+  if(periodCustomRange) return Logic.getRangeBudget(STORE, periodCustomRange.from, periodCustomRange.to);
+  return Logic.getPeriodBudget(period, STORE, periodRefDate(period));
+}
 function reduceToTopWithRest(items, limit){ return Logic.reduceToTopWithRest(items, limit, cssVar('--other-seg')); }
 
 let othersData = { items: [], basis: 0 };
@@ -842,61 +979,88 @@ function appendArcGradient(defs, ns, cx, cy, ringR, id, a, sw, colA, colB){
 const CHART_CX=150, CHART_CY=150, CHART_R=130, CHART_RI=100, CHART_THICK=CHART_R-CHART_RI, CHART_RINGR=(CHART_R+CHART_RI)/2, CHART_NS="http://www.w3.org/2000/svg";
 
 // Fixed physical gap between ring segments, independent of segment size.
-// A round stroke-linecap doesn't stop painting at its path's mathematical
-// endpoint — it bulges outward by another stroke-width/2 (in the direction
-// the path was heading), on BOTH sides of the gap. So to get an actual
-// visible gap of RING_GAP_PX between two painted shapes, the angular
-// distance reserved between their skeletons has to be the visual gap PLUS
-// both caps' bulge (thick/2 each) — otherwise adjacent pills/dots visually
-// overlap even though their skeletons don't.
-const RING_GAP_PX = 15;
-function ringGapDeg(ringR, thick){
-  const visualGap = RING_GAP_PX/ringR*180/Math.PI;
-  const capBulge = (thick/2)/ringR*180/Math.PI;
-  return visualGap + 2*capBulge;
+// Segments are filled annulus-sector paths whose corners are inset INTO
+// [a, a+sw) — they never paint past their own boundary, so every pair of
+// neighbors just needs this plain visual gap between them.
+const RING_GAP_PX = 7;
+function ringGapDeg(ringR){
+  return RING_GAP_PX/ringR*180/Math.PI;
 }
 
-// Reserves N fixed-size gaps out of the 360° circle FIRST, then distributes
-// what's left among segments by share (with a MIN_SEG_SWEEP floor for the
-// ones marked `floor`). Because the gap is baked into the layout up front —
-// rather than carved out of an already-final slot at render time — every
-// segment's [a, a+sw) is already its true visible arc, segments never touch,
-// and the ring always closes exactly on 360° with no special-case seam fix.
+// Reserves a fixed gap after each segment out of the 360° circle FIRST, then
+// distributes what's left among segments by share (with a MIN_SEG_SWEEP
+// floor for the ones marked `floor`). Because the gap is baked into the
+// layout up front — rather than carved out of an already-final slot at
+// render time — every segment's [a, a+sw) is already its true visible arc,
+// segments never touch, and the ring always closes exactly on 360° with no
+// special-case seam fix.
 function layoutRingSweeps(shareItems, ringR, thick){
-  const gapDeg = ringGapDeg(ringR, thick);
-  const availableDeg = Math.max(0, 360 - shareItems.length*gapDeg);
+  const n = shareItems.length;
+  const gapDeg = ringGapDeg(ringR);
+  const availableDeg = Math.max(0, 360 - n*gapDeg);
   const sweepItems = shareItems.map(it=>({sweep: it.share*availableDeg, floor: it.floor||0}));
   return { adjSweeps: applyMinSweep(sweepItems, availableDeg), gapDeg };
 }
 
-// A segment whose real share is tiny (e.g. ~1%) is drawn as a dot instead of
-// a stretched pill: a zero-length path at the slot's mid-angle, which a
-// round stroke-linecap renders as a perfect circle of diameter = thick.
-function dotPath(cx, cy, ringR, angle){
-  const p = pol(cx, cy, ringR, angle);
-  return `M ${p.x} ${p.y} L ${p.x} ${p.y}`;
+// Corner radius for segment ends. Independent of ring thickness — unlike a
+// stroke-linecap, whose rounding is always tied to stroke-width/2, this
+// stays a fixed 5px regardless of how thick the ring is.
+const SEGMENT_CORNER_PX = 5;
+
+// Builds a filled annulus-sector (donut-slice) path with a small fixed-radius
+// fillet at each of its 4 corners, instead of relying on stroke-linecap
+// (which can only round by exactly half the stroke width). The two straight
+// radial edges and the two arcs are each inset by the angle the corner
+// radius eats at their own radius, then joined by small round-radius arcs.
+function roundedSegmentPath(cx, cy, outerR, innerR, sDeg, eDeg, cornerPx){
+  const sw = eDeg - sDeg;
+  const rMax = Math.min(cornerPx, (outerR-innerR)/2);
+  let insetOuter = (rMax/outerR)*180/Math.PI;
+  let insetInner = (rMax/innerR)*180/Math.PI;
+  const maxInset = sw/2 - 0.05;
+  let r = rMax;
+  const worstInset = Math.max(insetOuter, insetInner);
+  if(worstInset > maxInset && worstInset > 0){
+    const scale = Math.max(0, maxInset/worstInset);
+    r *= scale; insetOuter *= scale; insetInner *= scale;
+  }
+  const oStart = pol(cx, cy, outerR, sDeg+insetOuter);
+  const oEnd = pol(cx, cy, outerR, eDeg-insetOuter);
+  const iEnd = pol(cx, cy, innerR, eDeg-insetInner);
+  const iStart = pol(cx, cy, innerR, sDeg+insetInner);
+  const outerEndCorner = pol(cx, cy, outerR-r, eDeg);
+  const innerEndCorner = pol(cx, cy, innerR+r, eDeg);
+  const innerStartCorner = pol(cx, cy, innerR+r, sDeg);
+  const outerStartCorner = pol(cx, cy, outerR-r, sDeg);
+  const bigArc = sw > 180 ? 1 : 0;
+  return [
+    `M ${oStart.x} ${oStart.y}`,
+    `A ${outerR} ${outerR} 0 ${bigArc} 1 ${oEnd.x} ${oEnd.y}`,
+    `A ${r} ${r} 0 0 1 ${outerEndCorner.x} ${outerEndCorner.y}`,
+    `L ${innerEndCorner.x} ${innerEndCorner.y}`,
+    `A ${r} ${r} 0 0 1 ${iEnd.x} ${iEnd.y}`,
+    `A ${innerR} ${innerR} 0 ${bigArc} 0 ${iStart.x} ${iStart.y}`,
+    `A ${r} ${r} 0 0 1 ${innerStartCorner.x} ${innerStartCorner.y}`,
+    `L ${outerStartCorner.x} ${outerStartCorner.y}`,
+    `A ${r} ${r} 0 0 1 ${oStart.x} ${oStart.y}`,
+    `Z`
+  ].join(' ');
 }
 
-// Each ring segment is ONE path with a native round stroke-linecap on both
-// ends. [a, a+sw) is already the exact visible arc (gaps are reserved by
-// layoutRingSweeps beforehand), so segments simply never touch — no paint
-// ordering or seam patching needed.
-function buildRingSegment(ns, cx, cy, ringR, thick, a, sw, paintRef, key, isDot){
+// Each ring segment's [a, a+sw) is already the exact visible arc (gaps are
+// reserved by layoutRingSweeps beforehand), so segments simply never touch —
+// no paint ordering or seam patching needed.
+function buildRingSegment(ns, cx, cy, ringR, thick, a, sw, paintRef, key){
   const el=document.createElementNS(ns,"path");
-  if(isDot){
-    el.setAttribute("d",dotPath(cx,cy,ringR,a+sw/2));
-    el.setAttribute("data-s",a+sw/2);el.setAttribute("data-e",a+sw/2);
-  } else {
-    el.setAttribute("d",arc(cx,cy,ringR,a,a+sw));
-    el.setAttribute("data-s",a);el.setAttribute("data-e",a+sw);
-  }
-  el.setAttribute("stroke",paintRef);el.setAttribute("stroke-width",thick);el.setAttribute("stroke-linecap","round");el.setAttribute("fill","none");
+  el.setAttribute("d",roundedSegmentPath(cx,cy,ringR+thick/2,ringR-thick/2,a,a+sw,SEGMENT_CORNER_PX));
+  el.setAttribute("data-s",a);el.setAttribute("data-e",a+sw);
+  el.setAttribute("fill",paintRef);el.setAttribute("stroke","none");
   el.setAttribute("data-seg",key);
   return el;
 }
 
 function appendClosedRing(svg, ns, cx, cy, ringR, thick, segDescs){
-  segDescs.forEach(d=>svg.appendChild(buildRingSegment(ns, cx, cy, ringR, thick, d.a, d.sw, d.paint, d.key, d.isDot)));
+  segDescs.forEach(d=>svg.appendChild(buildRingSegment(ns, cx, cy, ringR, thick, d.a, d.sw, d.paint, d.key)));
 }
 let lastCatRanges = [];
 let lastLeftRange = null;
@@ -959,11 +1123,7 @@ function animateChartTransition(fromRanges, fromLeft, fromTotal){
     jobs.forEach(j=>{
       const s=j.fromS+(j.toS-j.fromS)*k;
       const e=j.fromE+(j.toE-j.fromE)*k;
-      if(Math.abs(e-s)<0.01){
-        j.el.setAttribute('d', dotPath(CHART_CX,CHART_CY,CHART_RINGR,(s+e)/2));
-      } else {
-        j.el.setAttribute('d', arc(CHART_CX,CHART_CY,CHART_RINGR, s, e));
-      }
+      j.el.setAttribute('d', roundedSegmentPath(CHART_CX,CHART_CY,CHART_RINGR+CHART_THICK/2,CHART_RINGR-CHART_THICK/2, s, e, SEGMENT_CORNER_PX));
     });
     if(animateTotal) totalEl.textContent = fmt(Math.round(fromTotal+(toTotal-fromTotal)*k));
     if(t<1) requestAnimationFrame(frame);
@@ -980,10 +1140,12 @@ function renderChart(){
   const periodTabs = document.getElementById('periodTabs');
 
   const period = chartExpanded ? chartPeriod : 'month';
-  const isMonth = period==='month';
+  const isMonth = period==='month' && !periodCustomRange;
   const catRanges=[];
   let periodTotal = total;
   let lastLeftRangeNext = null;
+
+  renderMonthSelect();
 
   const periodBudget = getPeriodBudget(period);
   const periodSpentSoFar = isMonth ? total : getPeriodCats(period).reduce((s,c)=>s+c.amount,0);
@@ -1016,15 +1178,14 @@ function renderChart(){
         const sw=adjSweeps[idx], col=c.col||cssVar('--muted');
         const gradId=`donutGrad${idx}`;
         appendArcGradient(defs, ns, cx, cy, ringR, gradId, a, sw, lightenHex(col,0.32), col);
-        const isDot = (c.amount/ct)*100 < 1.5;
-        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name, isDot});
+        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name});
         catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/ct)*100), isOther:c.isOther});
         a+=sw+gapDeg;
       });
       if(left>0){
-        const sw=adjSweeps[displayCats.length];
-        const isDot = (left/ct)*100 < 1.5;
-        segDescs.push({a, sw, paint:cssVar('--white-seg'), key:'__left__', isDot});
+        const idx = displayCats.length;
+        const sw=adjSweeps[idx];
+        segDescs.push({a, sw, paint:cssVar('--white-seg'), key:'__left__'});
         lastLeftRangeNext = {s:a, e:a+sw};
       }
       appendClosedRing(svg, ns, cx, cy, ringR, thick, segDescs);
@@ -1051,8 +1212,7 @@ function renderChart(){
         const sw=adjSweeps[idx], col=c.col||cssVar('--muted');
         const gradId=`donutGrad${idx}`;
         appendArcGradient(defs, ns, cx, cy, ringR, gradId, a, sw, lightenHex(col,0.32), col);
-        const isDot = (c.amount/periodTotal)*100 < 1.5;
-        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name, isDot});
+        segDescs.push({a, sw, paint:`url(#${gradId})`, key:c.name});
         catRanges.push({s:a, e:a+sw, col, name:c.name, amount:c.amount, pct: Math.round((c.amount/periodTotal)*100), isOther:c.isOther});
         a+=sw+gapDeg;
       });
@@ -1060,7 +1220,7 @@ function renderChart(){
     }
   }
 
-  const centerLabel = period==='week' ? 'За неделю' : period==='year' ? 'За год' : 'За месяц';
+  const centerLabel = periodCustomRange ? 'За период' : period==='week' ? 'За неделю' : period==='year' ? 'За год' : 'За месяц';
   const t1=document.createElementNS(ns,"text");t1.setAttribute("x",cx);t1.setAttribute("y",cy+2);t1.setAttribute("text-anchor","middle");t1.setAttribute("fill",cssVar('--text'));t1.setAttribute("font-weight","800");t1.setAttribute("letter-spacing","-0.02em");t1.setAttribute("font-size",periodTotal>=1000000?25:31);t1.setAttribute("data-role","chart-total");t1.setAttribute("data-raw",periodTotal);t1.textContent=fmt(periodTotal);svg.appendChild(t1);
   const t2=document.createElementNS(ns,"text");t2.setAttribute("x",cx);t2.setAttribute("y",cy+25);t2.setAttribute("text-anchor","middle");t2.setAttribute("fill",cssVar('--muted'));t2.setAttribute("font-size","12");t2.setAttribute("letter-spacing","1.1px");t2.setAttribute("font-weight","700");t2.textContent=centerLabel;svg.appendChild(t2);
 
@@ -2024,7 +2184,7 @@ document.getElementById('catRestorePresetsBtn').addEventListener('click',()=>{
   save();
 });
 
-// Income field is read-only: it only changes via "Добавить доход" or history editing.
+// Income field is read-only: it only changes via "Новый доход" or history editing.
 
 const incomeForm = document.getElementById('incomeForm');
 const incomeAmt = document.getElementById('incomeAmt');
@@ -2051,8 +2211,8 @@ function cancelIncomeEntry(){
   incomeAmt.value='';
   incomeAmt.classList.remove('show');
   incomeBtn.classList.remove('confirm');
-  incomeBtn.textContent='Добавить доход';
-  incomeBtn.setAttribute('aria-label','Добавить доход');
+  incomeBtn.textContent='Новый доход';
+  incomeBtn.setAttribute('aria-label','Новый доход');
   if(keyboardActionMode==='income') keyboardActionComment.value='';
 }
 submitIncome = function(){
@@ -2082,12 +2242,46 @@ incomeAmt.addEventListener('keydown',e=>{
 });
 
 monthSelect.addEventListener('change',e=>{ switchMonth(e.target.value); });
+// Once the chart is expanded into a period tab (Неделя/Месяц/Год), the date
+// label above the ring opens the manual range picker instead of the native
+// month dropdown — every tab now supports an arbitrary hand-picked range.
+monthSelect.addEventListener('mousedown',e=>{
+  if(chartExpanded){
+    e.preventDefault();
+    monthSelect.blur();
+    openCustomRangeModal();
+  }
+});
+monthSelect.addEventListener('keydown',e=>{
+  if(chartExpanded && (e.key===' '||e.key==='Enter'||e.key==='ArrowDown'||e.key==='ArrowUp')){
+    e.preventDefault();
+    openCustomRangeModal();
+  }
+});
+function stepWeek(delta){
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  periodCustomRange = null;
+  weekOffset += delta;
+  renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+}
+function stepYear(delta){
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  periodCustomRange = null;
+  yearOffset += delta;
+  renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+}
 monthPrevBtn.addEventListener('click',()=>{
+  if(chartExpanded && chartPeriod==='week'){ stepWeek(-1); return; }
+  if(chartExpanded && chartPeriod==='year'){ stepYear(-1); return; }
   const keys = orderedMonthKeys();
   const idx = keys.indexOf(STORE.current);
   if(idx>0) switchMonth(keys[idx-1]);
 });
 monthNextBtn.addEventListener('click',()=>{
+  if(chartExpanded && chartPeriod==='week'){ if(weekOffset<0) stepWeek(1); return; }
+  if(chartExpanded && chartPeriod==='year'){ if(yearOffset<0) stepYear(1); return; }
   const keys = orderedMonthKeys();
   const idx = keys.indexOf(STORE.current);
   if(idx>=0 && idx<keys.length-1) switchMonth(keys[idx+1]);
@@ -2701,7 +2895,7 @@ function toggleChartExpanded(){
   const startRect = ringEl.getBoundingClientRect();
   const next = !chartExpanded;
   chartExpanded = next;
-  if(!next) chartPeriod = 'month';
+  if(!next){ chartPeriod = 'month'; weekOffset = 0; yearOffset = 0; periodCustomRange = null; }
   chartSideEl.classList.toggle('expanded', next);
   chartCol.classList.toggle('expanded', next);
   if(next) updateChartNavArrows();
@@ -2760,11 +2954,159 @@ document.querySelectorAll('#periodTabs button').forEach(btn=>{
     if(chartPeriod===btn.dataset.period) return;
     const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
     chartPeriod = btn.dataset.period;
+    weekOffset = 0;
+    yearOffset = 0;
+    periodCustomRange = null;
     renderChart();
     animateChartTransition(fromRanges, fromLeft, fromTotal);
   });
 });
 
+// ---- Manual date-range picker (any period tab) ----
+const weekRangeOverlay = document.getElementById('weekRangeOverlay');
+const weekRangeCalendar = document.getElementById('weekRangeCalendar');
+const weekRangeStartBox = document.getElementById('weekRangeStartBox');
+const weekRangeEndBox = document.getElementById('weekRangeEndBox');
+const weekRangeStartValue = document.getElementById('weekRangeStartValue');
+const weekRangeEndValue = document.getElementById('weekRangeEndValue');
+let weekRangePickStart = null;
+let weekRangePickEnd = null;
+const WEEK_RANGE_MONTHS_BACK = 11;
+
+function dateOnly(d){ const r=new Date(d); r.setHours(0,0,0,0); return r; }
+function sameDay(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+function formatRangePoint(d){
+  const suffix = d.getFullYear()!==new Date().getFullYear() ? ' '+d.getFullYear() : '';
+  return d.getDate()+' '+MONTH_NAMES_GEN[d.getMonth()]+suffix;
+}
+
+// The set of months rendered is fixed for the lifetime of one "open" —
+// otherwise re-centering it on whichever date was just tapped would make the
+// list jump under the user's finger after every pick.
+let weekRangeCalendarAnchor = null;
+
+// What the sheet opens pre-filled with when there's no custom range yet:
+// whatever window that tab is currently showing by default.
+function defaultRangeForPeriod(period){
+  if(periodCustomRange) return periodCustomRange;
+  const today = dateOnly(new Date());
+  if(period==='year'){
+    const y = yearRefDate() ? yearRefDate().getFullYear() : (+((STORE.current||'').split('-')[0]) || today.getFullYear());
+    const dec31 = new Date(y, 11, 31);
+    return {from: new Date(y, 0, 1), to: dec31>today ? today : dec31};
+  }
+  if(period==='month'){
+    const parts = (STORE.current||'').split('-');
+    const y = +parts[0] || today.getFullYear(), m = (+parts[1]||1)-1;
+    const lastDay = new Date(y, m+1, 0);
+    return {from: new Date(y, m, 1), to: lastDay>today ? today : lastDay};
+  }
+  const {from, now} = getWeekBounds(weekRefDate());
+  return {from: dateOnly(from), to: dateOnly(now)};
+}
+
+function openCustomRangeModal(){
+  const {from, to} = defaultRangeForPeriod(chartPeriod);
+  weekRangePickStart = dateOnly(from);
+  weekRangePickEnd = dateOnly(to);
+  weekRangeCalendarAnchor = dateOnly(new Date());
+  renderWeekRangeModal(true);
+  weekRangeOverlay.classList.add('open');
+}
+
+function renderWeekRangeModal(scrollToSelection){
+  const startText = weekRangePickStart ? formatRangePoint(weekRangePickStart) : '';
+  const endText = weekRangePickEnd ? formatRangePoint(weekRangePickEnd) : '';
+  weekRangeStartValue.textContent = startText || '—';
+  weekRangeEndValue.textContent = endText || '—';
+  const pickingStart = !weekRangePickStart || (weekRangePickStart && weekRangePickEnd);
+  weekRangeStartBox.classList.toggle('active', pickingStart);
+  weekRangeEndBox.classList.toggle('active', !pickingStart);
+
+  const today = dateOnly(new Date());
+  const anchor = weekRangeCalendarAnchor || today;
+  const prevScrollTop = weekRangeCalendar.scrollTop;
+  const months = [];
+  for(let i=WEEK_RANGE_MONTHS_BACK;i>=0;i--){
+    months.push(new Date(anchor.getFullYear(), anchor.getMonth()-i, 1));
+  }
+  weekRangeCalendar.innerHTML = months.map(monthDate=>{
+    const y = monthDate.getFullYear(), mo = monthDate.getMonth();
+    const daysInMonth = new Date(y, mo+1, 0).getDate();
+    const firstWeekday = (new Date(y, mo, 1).getDay()+6)%7; // Monday=0
+    const nameLabel = MONTH_NAMES[mo] + (y!==today.getFullYear() ? ' '+y : '');
+    const monthLastDay = new Date(y, mo, daysInMonth)>today ? today : new Date(y, mo, daysInMonth);
+    const isFullMonthSelected = weekRangePickStart && weekRangePickEnd && sameDay(weekRangePickStart, new Date(y, mo, 1)) && sameDay(weekRangePickEnd, monthLastDay);
+    let cells = '';
+    for(let i=0;i<firstWeekday;i++) cells += '<div class="week-range-day empty"></div>';
+    for(let day=1;day<=daysInMonth;day++){
+      const d = new Date(y, mo, day);
+      const disabled = d>today;
+      const isStart = sameDay(d, weekRangePickStart);
+      const isEnd = sameDay(d, weekRangePickEnd);
+      const inRange = weekRangePickStart && weekRangePickEnd && d>=weekRangePickStart && d<=weekRangePickEnd;
+      const cls = ['week-range-day'];
+      if(disabled) cls.push('disabled');
+      if(inRange) cls.push('in-range');
+      if(isStart) cls.push('range-start');
+      if(isEnd) cls.push('range-end');
+      if(sameDay(d, today)) cls.push('today');
+      cells += `<div class="${cls.join(' ')}" data-y="${y}" data-m="${mo}" data-d="${day}"><span class="week-range-day-bg"></span><button type="button" class="week-range-day-num">${day}</button></div>`;
+    }
+    return `<div class="week-range-month"><button type="button" class="week-range-month-name${isFullMonthSelected?' active':''}" data-y="${y}" data-m="${mo}">${nameLabel}</button><div class="week-range-days">${cells}</div></div>`;
+  }).join('');
+
+  if(scrollToSelection){
+    const targetDay = weekRangeCalendar.querySelector('.range-start') || weekRangeCalendar.querySelector('.today');
+    if(targetDay) targetDay.scrollIntoView({block:'center'});
+    else weekRangeCalendar.scrollTop = weekRangeCalendar.scrollHeight;
+  } else {
+    weekRangeCalendar.scrollTop = prevScrollTop;
+  }
+}
+
+weekRangeCalendar.addEventListener('click',e=>{
+  const monthBtn = e.target.closest('.week-range-month-name');
+  if(monthBtn){
+    const y=+monthBtn.dataset.y, mo=+monthBtn.dataset.m;
+    const today = dateOnly(new Date());
+    const lastDay = new Date(y, mo+1, 0);
+    weekRangePickStart = new Date(y, mo, 1);
+    weekRangePickEnd = lastDay>today ? today : lastDay;
+    renderWeekRangeModal();
+    return;
+  }
+  const cell = e.target.closest('.week-range-day');
+  if(!cell || cell.classList.contains('empty') || cell.classList.contains('disabled')) return;
+  const d = new Date(+cell.dataset.y, +cell.dataset.m, +cell.dataset.d);
+  if(!weekRangePickStart || weekRangePickEnd){
+    weekRangePickStart = d;
+    weekRangePickEnd = null;
+  } else if(d<weekRangePickStart){
+    weekRangePickStart = d;
+  } else {
+    weekRangePickEnd = d;
+  }
+  renderWeekRangeModal();
+});
+
+document.getElementById('weekRangeCancel').addEventListener('click',()=>{
+  weekRangeOverlay.classList.remove('open');
+});
+weekRangeOverlay.addEventListener('click',e=>{
+  if(e.target===weekRangeOverlay) weekRangeOverlay.classList.remove('open');
+});
+document.getElementById('weekRangeDone').addEventListener('click',()=>{
+  if(!weekRangePickStart) return;
+  const from = dateOnly(weekRangePickStart);
+  const to = weekRangePickEnd ? dateOnly(weekRangePickEnd) : dateOnly(weekRangePickStart);
+  to.setHours(23,59,59,999);
+  const fromRanges = lastCatRanges, fromLeft = lastLeftRange, fromTotal = lastPeriodTotal;
+  periodCustomRange = {from, to};
+  weekRangeOverlay.classList.remove('open');
+  renderChart();
+  animateChartTransition(fromRanges, fromLeft, fromTotal);
+});
 </script>
 <script type="module">
   // Bridges Firestore (loaded as an ES module) into window.CloudSync so the
