@@ -1,11 +1,11 @@
 <!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json?v=2">
 <meta name="theme-color" content="#121314">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Финансы">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2">
+<link rel="icon" href="icons/icon-192.png?v=2">
 <style>
 :root{--bg:#121314;--card:#121314;--card-2:#121314;--line:#2A2B2D;--text:#F4F2F8;--muted:#8B8D90;--accent:#9AA0A6;--accent-soft:rgba(255,255,255,.1);--accent-soft-line:rgba(255,255,255,.22);--btn-text:#121314;--white-seg:#9096A8;--track:#2A2B2D;--green:#5FC787;--green-soft:rgba(95,199,135,.14);--green-soft-line:rgba(95,199,135,.32);--other-seg:#8B7FE8;--red:#E2685C;--blue:#5B9EE8;--blue-soft:rgba(91,158,232,.14);--purple:#8B7FE8;--purple-soft:rgba(139,127,232,.14);--orange:#E29A4E;--orange-soft:rgba(226,154,78,.14);--red-soft:rgba(226,104,92,.14);--shadow:0 28px 64px -30px rgba(0,0,0,.65);--shadow-sm:0 10px 26px -16px rgba(0,0,0,.55)}
 [data-theme="light"]{--bg:#F3F1F9;--card:#ffffff;--card-2:#FBFAFD;--line:#E7E2F1;--text:#170B33;--muted:#756B91;--accent:#F79009;--accent-soft:rgba(247,144,9,.1);--accent-soft-line:rgba(247,144,9,.28);--btn-text:#170B33;--white-seg:#9096A8;--track:#EFEBF7;--green:#3E9C64;--green-soft:rgba(62,156,100,.1);--green-soft-line:rgba(62,156,100,.28);--other-seg:#6D5FD1;--red:#D34C40;--blue:#3D7DC9;--blue-soft:rgba(61,125,201,.1);--purple:#6D5FD1;--purple-soft:rgba(109,95,209,.1);--orange:#C97D1E;--orange-soft:rgba(201,125,30,.1);--red-soft:rgba(211,76,64,.1);--shadow:0 24px 50px -26px rgba(30,15,60,.16);--shadow-sm:0 10px 24px -16px rgba(30,15,60,.12)}
@@ -15,7 +15,7 @@ body{padding:28px 14px;display:flex;justify-content:center}
 .card{background:linear-gradient(165deg,var(--card-2) 0%,var(--card) 60%);border:none;border-radius:0;padding:22px 18px;width:100%;max-width:720px;box-shadow:none}
 .head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px}
 h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
-.month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 12px;padding:8px;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
+.month-row{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:8px;margin:0 -8px 26px;padding:8px;background:var(--card);box-shadow:0 10px 18px -18px rgba(23,11,51,.42)}
 .month-nav{display:flex;align-items:center;gap:8px;flex:1;min-width:0;width:100%}
 .month-nav-arrow{background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--text);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
 .month-nav-arrow svg{display:block}
@@ -35,7 +35,7 @@ h1{font-weight:800;font-size:24px;margin:0;letter-spacing:-.02em}
 .chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform}
 .chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease}
 .chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
-.chart-col.expanded .chart-svg-wrap svg{width:230px;height:230px}
+.chart-col.expanded .chart-svg-wrap svg{width:276px;height:276px}
 .chart-col.expanded{row-gap:8px}
 .chart-nav-arrow{display:none;position:absolute;top:115px;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-sm);z-index:2;transition:opacity .15s ease,transform .12s ease}
 .chart-nav-arrow:active{transform:translateY(-50%) scale(.92)}
@@ -131,8 +131,9 @@ svg{overflow:visible}
 .bottom-row{display:flex;gap:8px;margin-top:10px}
 .head-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.icon-btn svg.spinning{animation:icon-spin .7s linear infinite}
+.icon-btn svg.spinning{animation:icon-spin 1.4s linear infinite}
 @keyframes icon-spin{to{transform:rotate(360deg)}}
+.icon-btn.sync-success{border-color:var(--green-soft-line);background:var(--green-soft);color:var(--green);transition:background .2s ease,border-color .2s ease,color .2s ease}
 .overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:none;align-items:flex-end;justify-content:center;z-index:100}
 .overlay.open{display:flex}
 .overlay-center{align-items:center;padding:20px}
@@ -315,7 +316,7 @@ svg{overflow:visible}
     </div>
     <div class="side-block side-income">
       <form class="income-row" id="incomeForm">
-        <input class="income-input" id="incomeAmt" type="text" inputmode="decimal" placeholder="Сумма дохода">
+        <input class="income-input" id="incomeAmt" type="text" inputmode="decimal" placeholder="Сумма">
         <button class="income-btn" type="button" id="incomeBtn" aria-label="Новый доход">Новый доход</button>
       </form>
     </div>
@@ -793,8 +794,25 @@ function updateMonthNavArrows(){
   }
   const keys = STORE.order.filter(k=>STORE.months[k]);
   const idx = keys.indexOf(STORE.current);
-  monthPrevBtn.disabled = idx<=0;
+  monthPrevBtn.disabled = false;
   monthNextBtn.disabled = idx<0 || idx>=keys.length-1;
+}
+// Creates the calendar month right before `key` if it doesn't exist yet —
+// cloning categories/limits from the earliest month currently tracked, the
+// same way ensureRealMonthsUpTo clones forward — so the "‹" arrow can always
+// step one more month into the past to backfill forgotten expenses.
+function ensurePastMonth(key){
+  if(STORE.months[key]) return;
+  const calendarKeys = Object.keys(STORE.months).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+  const sourceKey = calendarKeys.length ? calendarKeys[0] : STORE.current;
+  const source = STORE.months[sourceKey];
+  const newCategories = (source.C||[]).map(c=>{
+    const nc = {n:c.n, a:0, h:[], col:c.col || nextColor([])};
+    if(c.limit>0) nc.limit = c.limit;
+    return nc;
+  });
+  STORE.months[key] = { B: 0, C: newCategories, hiddenC: [], EV: [], IN: [] };
+  STORE.order.unshift(key);
 }
 
 function switchMonth(key){
@@ -2349,7 +2367,14 @@ monthPrevBtn.addEventListener('click',()=>{
   if(chartExpanded && chartPeriod==='year'){ stepYear(-1); return; }
   const keys = orderedMonthKeys();
   const idx = keys.indexOf(STORE.current);
-  if(idx>0) switchMonth(keys[idx-1]);
+  if(idx>0){ switchMonth(keys[idx-1]); return; }
+  const earliestKey = keys.length ? keys[0] : STORE.current;
+  let [y,m] = earliestKey.split('-').map(Number);
+  m--;
+  if(m<1){ m=12; y--; }
+  const newKey = y+'-'+String(m).padStart(2,'0');
+  ensurePastMonth(newKey);
+  switchMonth(newKey);
 });
 monthNextBtn.addEventListener('click',()=>{
   if(chartExpanded && chartPeriod==='week'){ if(weekOffset<0) stepWeek(1); return; }
@@ -2609,6 +2634,8 @@ syncRefreshBtn.addEventListener('click', async ()=>{
   if(!syncCode || !window.CloudSync || syncRefreshBtn.classList.contains('busy')) return;
   syncRefreshBtn.classList.add('busy');
   syncRefreshBtn.querySelector('svg').classList.add('spinning');
+  const minSpin = new Promise(r=>setTimeout(r, 1000));
+  let ok = true;
   try{
     const data = await window.CloudSync.getBudgetDoc(syncCode);
     if(data && data.store){
@@ -2617,12 +2644,19 @@ syncRefreshBtn.addEventListener('click', async ()=>{
       syncStatusErr = false;
     }
   }catch(err){
+    ok = false;
     syncStatus = 'Не удалось обновить: '+err.message;
     syncStatusErr = true;
   }
+  await minSpin;
   if(syncPanelOpen) renderSyncPanel();
-  syncRefreshBtn.classList.remove('busy');
   syncRefreshBtn.querySelector('svg').classList.remove('spinning');
+  if(ok){
+    syncRefreshBtn.classList.add('sync-success');
+    setTimeout(()=>{ syncRefreshBtn.classList.remove('sync-success'); syncRefreshBtn.classList.remove('busy'); }, 1000);
+  } else {
+    syncRefreshBtn.classList.remove('busy');
+  }
 });
 
 function startSync(code){
@@ -3040,8 +3074,8 @@ function openCustomRangeModal(){
   weekRangePickStart = dateOnly(from);
   weekRangePickEnd = dateOnly(to);
   weekRangeCalendarAnchor = dateOnly(new Date());
-  renderWeekRangeModal(true);
   weekRangeOverlay.classList.add('open');
+  renderWeekRangeModal(true);
 }
 
 function renderWeekRangeModal(scrollToSelection){
