@@ -33,11 +33,14 @@ h1{font-weight:800;font-size:14px;margin:0;letter-spacing:-.02em;display:inline-
 .month-menu svg{display:block}
 .chart-col{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:22px;margin-bottom:12px}
 .chart-svg-wrap{flex:0 1 auto}
-.chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform;touch-action:pan-y}
-.chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease}
+.chart-svg-wrap svg{display:block;cursor:pointer;transform-origin:center;will-change:transform;touch-action:pan-y;view-transition-name:chart-ring}
+.chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease;view-transition-name:chart-side}
+::view-transition-group(chart-ring){animation-duration:500ms;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+::view-transition-group(chart-side){animation-duration:280ms;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 .chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
 .chart-col.expanded .chart-svg-wrap svg{width:276px;height:276px}
-.chart-col.expanded{row-gap:8px}
+.chart-col.expanded{row-gap:8px;margin-top:18px}
 .chart-nav-arrow{display:none;position:absolute;top:115px;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-sm);z-index:2;transition:opacity .15s ease,transform .12s ease}
 .chart-nav-arrow:active{transform:translateY(-50%) scale(.92)}
 .chart-nav-arrow:disabled{opacity:.35;pointer-events:none}
@@ -70,7 +73,7 @@ h1{font-weight:800;font-size:14px;margin:0;letter-spacing:-.02em;display:inline-
 .income-input{background:var(--accent-soft);border:1px solid var(--accent-soft-line);border-radius:10px;color:var(--text);font-family:inherit;font-size:14px;padding:0 10px;width:0;min-width:0;height:44px;flex:1;display:none;text-align:center}
 .income-input.show{display:block}
 .income-input::placeholder{color:var(--placeholder);font-weight:700;font-size:12px}
-.income-btn{display:flex;align-items:center;justify-content:center;background:var(--accent-action);border:1px solid transparent;color:#141414;font-family:inherit;font-weight:700;font-size:14px;padding:0 14px;border-radius:10px;flex-shrink:0;white-space:nowrap;width:100%;height:44px;transition:background .18s ease,transform .12s ease,width .18s ease}
+.income-btn{display:flex;align-items:center;justify-content:center;background:var(--accent-action);border:1px solid transparent;color:#141414;font-family:inherit;font-weight:700;font-size:14px;padding:0 14px;border-radius:10px;flex-shrink:0;white-space:nowrap;width:100%;height:38px;transition:background .18s ease,transform .12s ease,width .18s ease}
 .income-btn:active{transform:scale(.99)}
 .income-input.show ~ .income-btn,.income-btn.confirm{width:44px;padding:0;font-size:18px;border-color:var(--accent-action-2)}
 .side-value.neg{color:var(--red)}
@@ -3115,46 +3118,23 @@ themeBtn.addEventListener('click',()=>{
 
 function toggleChartExpanded(){
   const chartSideEl = document.querySelector('.chart-side');
-  const ringEl = document.getElementById('donut');
-  ringEl.getAnimations().forEach(animation=>animation.cancel());
-  const startRect = ringEl.getBoundingClientRect();
-  const next = !chartExpanded;
-  chartExpanded = next;
-  if(!next){ chartPeriod = 'month'; weekOffset = 0; yearOffset = 0; periodCustomRange = null; }
-  chartSideEl.classList.toggle('expanded', next);
-  chartCol.classList.toggle('expanded', next);
-  if(next) updateChartNavArrows();
-
-  const endRect = ringEl.getBoundingClientRect();
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!reduceMotion && startRect.width && endRect.width){
-    const dx = startRect.left - endRect.left;
-    const dy = startRect.top - endRect.top;
-    const scaleX = startRect.width / endRect.width;
-    const scaleY = startRect.height / endRect.height;
-    ringEl.animate([
-      {transform:`translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`},
-      {transform:'translate(0, 0) scale(1, 1)'}
-    ],{
-      duration:620,
-      easing:'cubic-bezier(.22,1,.36,1)',
-      fill:'both'
-    });
+  const applyState = () => {
+    const next = !chartExpanded;
+    chartExpanded = next;
+    if(!next){ chartPeriod = 'month'; weekOffset = 0; yearOffset = 0; periodCustomRange = null; }
+    chartSideEl.classList.toggle('expanded', next);
+    chartCol.classList.toggle('expanded', next);
+    if(next) updateChartNavArrows();
+    renderChart();
+  };
+  // The browser snapshots before/after states (matched via view-transition-name
+  // in CSS) and cross-fades/morphs between them itself — no manual FLIP math,
+  // no DOM rebuild competing with a hand-rolled transform animation.
+  if(document.startViewTransition){
+    document.startViewTransition(applyState);
+  } else {
+    applyState();
   }
-
-  if(!next && !reduceMotion){
-    chartSideEl.animate([
-      {opacity:0, transform:'translateY(8px)'},
-      {opacity:1, transform:'translateY(0)'}
-    ],{
-      duration:320,
-      delay:110,
-      easing:'cubic-bezier(.22,1,.36,1)',
-      fill:'both'
-    });
-  }
-
-  requestAnimationFrame(renderChart);
 }
 svg.addEventListener('click', e=>{
   if(chartSwipeSuppressClick){ chartSwipeSuppressClick=false; return; }
