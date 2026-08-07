@@ -43,8 +43,10 @@ async function main() {
   const tokens = snap.docs.map((d) => d.id);
   const message = {
     notification: {
-      // No title: on iOS the PWA's own name is already shown above the
-      // body, so a title here just duplicates it as "Финансы from Финансы".
+      // iOS Safari appears to require a non-empty title to display the
+      // push at all. Keep it distinct from the PWA's own name ("Мои
+      // финансы") so it doesn't repeat as "Мои финансы from Мои финансы".
+      title: 'Напоминание',
       body: pickMessage(),
     },
     tokens,
