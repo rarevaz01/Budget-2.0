@@ -2,8 +2,8 @@ name: Evening expense reminder
 
 on:
   schedule:
-    # 17:00 UTC = 20:00 MSK (no DST in Russia)
-    - cron: '0 17 * * *'
+    # 19:00 UTC = 22:00 MSK (no DST in Russia)
+    - cron: '0 19 * * *'
   workflow_dispatch: {}
 
 jobs:
