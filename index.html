@@ -586,7 +586,7 @@ svg{overflow:visible}
 <script>
 const {P, MONTH_NAMES, nextColor, monthKey, defaultCalendarLabel, defaultMonthData, fmt, strip, numVal, pol, arc, contrastTextColor, getWeekBounds, getRangeCats, getRangeBudget} = Logic;
 const K="icity-budget-v2";
-const PRESET_CATEGORIES=["Спорт","Красота и уход","Образование","Подарки","Ребёнок","Животные","Другое"];
+const PRESET_CATEGORIES=["Путешествия","Спорт","Красота и уход","Образование","Подарки","Дети","Животные","Другое"];
 
 function monthLabel(key){
   const month = STORE.months[key];
@@ -2555,6 +2555,9 @@ document.getElementById('openAddCategoryBtn').addEventListener('click',()=>{
 });
 document.getElementById('addCategoryClose').addEventListener('click',()=>{
   document.getElementById('addCategoryOverlay').classList.remove('open');
+});
+document.getElementById('addCategoryOverlay').addEventListener('click',e=>{
+  if(e.target.id==='addCategoryOverlay') document.getElementById('addCategoryOverlay').classList.remove('open');
 });
 document.getElementById('catEditorOverlay').addEventListener('click',e=>{
   if(e.target.id==='catEditorOverlay') document.getElementById('catEditorOverlay').classList.remove('open');

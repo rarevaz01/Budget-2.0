@@ -145,10 +145,10 @@ test('defaultCalendarLabel converts a month key into a Russian label', () => {
   assert.equal(defaultCalendarLabel('custom-key'), '');
 });
 
-test('defaultMonthData starts with zero budget and ten preset categories', () => {
+test('defaultMonthData starts with zero budget and nine preset categories', () => {
   const m = defaultMonthData();
   assert.equal(m.B, 0);
-  assert.equal(m.C.length, 10);
+  assert.equal(m.C.length, 9);
   assert.deepEqual(m.hiddenC, []);
   assert.deepEqual(m.IN, []);
 });
