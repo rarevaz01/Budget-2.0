@@ -39,6 +39,9 @@ h1{font-weight:800;font-size:14px;margin:0;letter-spacing:-.02em;display:inline-
 .chart-side{display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;transition:opacity .2s ease;view-transition-name:chart-side}
 ::view-transition-group(chart-ring){animation-duration:500ms;animation-timing-function:cubic-bezier(.22,1,.36,1)}
 ::view-transition-group(chart-side){animation-duration:280ms;animation-timing-function:cubic-bezier(.22,1,.36,1)}
+/* Theme switch (light/dark/system) cross-fades the whole page instead of
+   every themed element snapping at once - see applyTheme(). */
+::view-transition-old(root),::view-transition-new(root){animation-duration:.32s}
 @media(prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 .chart-col.expanded .chart-svg-wrap{flex-basis:100%;display:flex;justify-content:center}
 .chart-col.expanded .chart-svg-wrap svg{width:276px;height:276px}
@@ -83,11 +86,12 @@ svg{overflow:visible}
 .binp{background:none;border:none;color:var(--text);font-weight:800;font-size:21px;line-height:1;padding:4px 0;width:100%;max-width:150px;cursor:default;letter-spacing:-.01em;font-family:inherit;font-variant-numeric:tabular-nums}
 .binp:focus{outline:none}
 .row{padding:13px 0;border-bottom:1px solid var(--line)}
-.row-top{display:grid;grid-template-columns:12px minmax(0,1fr) 88px 44px 44px;align-items:center;gap:8px;touch-action:pan-y}
-@media(max-width:430px){.row-top{grid-template-columns:12px minmax(0,1fr) 72px 44px 44px;gap:6px}}
+.row-top{display:grid;grid-template-columns:30px minmax(0,1fr) 88px 44px 44px;align-items:center;gap:8px;touch-action:pan-y}
+@media(max-width:430px){.row-top{grid-template-columns:30px minmax(0,1fr) 72px 44px 44px;gap:6px}}
 .row-dragging{opacity:.95;box-shadow:0 10px 24px rgba(0,0,0,.3);border-radius:14px;background:var(--card);pointer-events:none}
 .row-spacer{border:2px dashed var(--line);border-radius:12px;margin:2px 0;box-sizing:border-box}
-.sw{width:10px;height:10px;border-radius:3px}
+.sw{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.sw svg{width:16px;height:16px}
 .ninp{color:var(--text);font-weight:700;font-size:13px;line-height:1.2;letter-spacing:0;width:100%;min-width:0;padding:3px 2px;overflow:hidden;white-space:nowrap}
 .ninp.is-overflowing{-webkit-mask-image:linear-gradient(to right,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 72%,transparent 100%)}
 .amt-display{font-weight:700;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
@@ -96,6 +100,7 @@ svg{overflow:visible}
 .row-expand-btn span{display:flex;transition:transform .22s cubic-bezier(.22,1,.36,1)}
 .row-expand-btn span svg{display:block}
 .row-expand-btn.open span{transform:rotate(45deg)}
+.row-expand-btn.open{border-color:var(--accent-soft-line);background:var(--accent-soft);color:var(--text)}
 .row-bottom{display:none;flex-direction:column;gap:4px;margin-top:10px}
 .row.expanded .row-bottom{display:flex;animation:rowReveal .24s cubic-bezier(.22,1,.36,1)}
 @keyframes rowReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
@@ -116,7 +121,7 @@ svg{overflow:visible}
 .hist-icon-btn:active{transform:scale(.88);background:var(--track)}
 .limit-action-btn{width:64px;padding:0 8px;font-family:inherit;font-size:12px;font-weight:700}
 .limit-action-btn.limit-confirm{width:44px;padding:0}
-.hist-icon-btn.limit-confirm{border-color:var(--accent-soft-line);background:var(--accent-soft);color:var(--text)}
+.hist-icon-btn.limit-confirm{border-color:var(--accent-action);background:var(--accent-action);color:#141414}
 .row-top .hist-icon-btn{width:44px;height:44px}
 .amt-display.over-limit{color:var(--red)}
 .limit-bar-wrap{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:4px 0 0}
@@ -137,10 +142,36 @@ svg{overflow:visible}
 .head-icons{display:flex;align-items:center;gap:8px}
 .icon-btn{background:none;border:none;color:var(--text);width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .12s ease}
 .icon-btn:active{transform:scale(.9)}
-.icon-btn svg.spinning{animation:icon-spin .7s linear infinite}
-@keyframes icon-spin{to{transform:rotate(360deg)}}
 .icon-btn.sync-success{color:var(--accent-action);transition:color .2s ease}
 .icon-btn.save-err{border-color:var(--red);color:var(--red);transition:background .2s ease,border-color .2s ease,color .2s ease}
+/* The refresh/save spinner only earns a place in the header while something
+   is actually happening - idle, the slot is empty rather than showing a
+   static icon nobody asked to click. */
+#syncRefreshBtn svg{visibility:hidden}
+#syncRefreshBtn.busy svg,#syncRefreshBtn.sync-success svg,#syncRefreshBtn.save-err svg{visibility:visible}
+/* Cloud auto-sync completion: a dark ring draws itself in with a soft brush-like
+   blur (no rotation), then pops into accent green with a springy scale + glow,
+   distinct from the plain color flash local saves use. stroke-dashoffset stays
+   pinned at 0 through the success keyframes - dropping the .sweep-run class
+   (which is what held the ring fully drawn) would otherwise snap it back to
+   empty right as the green phase starts. */
+.icon-btn .sync-arc{stroke:var(--text);fill:none;stroke-linecap:round;stroke-dasharray:56.549;stroke-dashoffset:56.549;transform-origin:12px 12px;transform:rotate(-90deg);opacity:0}
+#syncRefreshBtn.busy .sync-arrow{opacity:0}
+#syncRefreshBtn.busy .sync-arc{opacity:1}
+@keyframes sync-ring-draw{
+  0%{stroke-dashoffset:56.549;filter:blur(2.5px)}
+  70%{stroke-dashoffset:10.18;filter:blur(2.5px)}
+  92%{stroke-dashoffset:0;filter:blur(0)}
+  100%{stroke-dashoffset:0;filter:blur(0)}
+}
+#syncRefreshBtn.sweep-run .sync-arc{animation:sync-ring-draw .6s linear forwards}
+@keyframes sync-ring-success{
+  0%{stroke:var(--text);stroke-dashoffset:0;transform:rotate(-90deg) scale(1);filter:drop-shadow(0 0 0 transparent)}
+  32%{stroke:var(--accent-action);stroke-dashoffset:0;transform:rotate(-90deg) scale(1.16);filter:drop-shadow(0 0 16px var(--accent-action))}
+  62%{stroke:var(--accent-action);stroke-dashoffset:0;transform:rotate(-90deg) scale(.97);filter:drop-shadow(0 0 8px var(--accent-action))}
+  100%{stroke:var(--accent-action);stroke-dashoffset:0;transform:rotate(-90deg) scale(1);filter:drop-shadow(0 0 0 transparent)}
+}
+#syncRefreshBtn.sweep-flash .sync-arc{animation:sync-ring-success .9s cubic-bezier(.34,1.56,.64,1) forwards}
 .overlay{position:fixed;inset:0;background:rgba(6,2,16,.65);backdrop-filter:blur(2px);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .32s cubic-bezier(.22,1,.36,1),visibility 0s linear .32s,background-color .32s cubic-bezier(.22,1,.36,1)}
 .overlay.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .32s cubic-bezier(.22,1,.36,1),background-color .32s cubic-bezier(.22,1,.36,1)}
 .overlay-center{align-items:center;padding:20px}
@@ -276,7 +307,8 @@ svg{overflow:visible}
 .cat-swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .cat-swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
 .cat-swipe-delete{position:absolute;top:0;right:0;bottom:0;width:80px;background:var(--red);color:#fff;font-weight:700;font-size:12px;border:none}
-.cat-edit-sw{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+.cat-edit-sw{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.cat-edit-sw svg{width:15px;height:15px}
 .cat-edit-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
 .cat-edit-name.dim{color:var(--muted);font-weight:500}
 .cat-edit-toggle{width:51px;height:23px;border-radius:11.5px;border:none;background:var(--line);position:relative;flex-shrink:0;transition:background .25s ease}
@@ -285,9 +317,19 @@ svg{overflow:visible}
 .cat-edit-toggle.on::after{transform:translateX(17px)}
 .cat-add-row{display:flex;gap:8px;margin-top:14px}
 .cat-restore-btn{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;padding:12px 0 0;width:100%;text-align:center}
+.cat-history-panel{display:none;margin-top:6px}
+.cat-history-panel.open{display:block}
+.cat-history-title{font-size:12px;font-weight:700;color:var(--muted);margin:18px 0 4px;text-transform:uppercase;letter-spacing:.03em}
+.cat-history-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.cat-history-item:last-child{border-bottom:none}
+.cat-history-text{flex:1;min-width:0;font-size:13px;color:var(--muted)}
+.cat-history-text b{color:var(--text);font-weight:700}
+.cat-history-restore{flex-shrink:0;background:none;border:none;color:var(--accent);font-size:13px;font-weight:700}
 .cat-restore-btn:disabled{opacity:.4;text-decoration:none}
 .keyboard-action-bar{position:fixed;left:0;right:0;bottom:0;z-index:400;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:44px;align-items:stretch;gap:8px;width:min(100%,720px);margin:0 auto;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--card);box-shadow:0 -12px 30px rgba(23,11,51,.12);transform:translateY(120%);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.22,1,.36,1),opacity .16s ease}
 .keyboard-action-bar.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.keyboard-action-bar.no-comment{grid-template-columns:1fr}
+.keyboard-action-bar.no-comment .keyboard-action-comment-wrap{display:none}
 .keyboard-action-comment-wrap{box-sizing:border-box;display:flex;align-items:center;width:100%;height:44px;min-height:44px;max-height:44px;margin:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:var(--card)}
 .keyboard-action-comment{box-sizing:border-box;display:block;min-width:0;width:100%;height:42px;min-height:42px;max-height:42px;margin:0;border:0;border-radius:0;outline:0;background:transparent;color:var(--text);font-family:inherit;font-size:14px;font-weight:700;line-height:42px;padding:0 12px;text-align:center;-webkit-appearance:none;appearance:none}
 .keyboard-action-comment::placeholder{color:var(--muted);font-weight:700}
@@ -303,8 +345,8 @@ svg{overflow:visible}
 <div class="head">
   <h1>Мои финансы</h1>
   <div class="head-icons">
-    <button class="icon-btn" id="syncRefreshBtn" title="Обновить данные из облака" aria-label="Обновить данные из облака">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+    <button class="icon-btn" id="syncRefreshBtn" title="Индикатор синхронизации" aria-label="Индикатор синхронизации" tabindex="-1" style="pointer-events:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9" stroke="var(--track)"/><circle class="sync-arc" cx="12" cy="12" r="9" fill="none"/><path class="sync-arrow" d="M21 12a9 9 0 1 1-2.64-6.36" stroke="currentColor" stroke-linejoin="round"/></svg>
     </button>
     <button class="month-menu" id="monthMenuBtn" title="Меню периода" aria-label="Меню периода">
       <svg width="18" height="6" viewBox="0 0 18 6" aria-hidden="true"><circle cx="3" cy="3" r="1.6" fill="currentColor"/><circle cx="9" cy="3" r="1.6" fill="currentColor"/><circle cx="15" cy="3" r="1.6" fill="currentColor"/></svg>
@@ -416,7 +458,8 @@ svg{overflow:visible}
   <div class="sheet">
     <div class="sheet-head"><h2>Готовые категории</h2><button class="sheet-close" id="addCategoryClose">×</button></div>
     <div id="addCategoryList"></div>
-    <button class="cat-restore-btn" id="catRestorePresetsBtn">Восстановить убранные категории</button>
+    <button class="cat-restore-btn" type="button" id="catHistoryToggleBtn" aria-expanded="false">История изменений</button>
+    <div id="catHistorySection" class="cat-history-panel"></div>
   </div>
 </div>
 <div class="overlay" id="othersOverlay">
@@ -451,8 +494,8 @@ svg{overflow:visible}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9c-2.52 0-4.93-1-6.74-2.74L3 21"/><path d="M3 12a9 9 0 0 1 9-9c2.52 0 4.93 1 6.74 2.74L21 3"/><path d="M3 16v5h5"/><path d="M21 8V3h-5"/></svg>
       </div>
       <div class="backup-option-text">
-        <div class="backup-option-title" id="syncBtnTitle">Синхронизация между устройствами</div>
-        <div class="backup-option-desc" id="syncBtnDesc">Один код — одни данные на всех устройствах</div>
+        <div class="backup-option-title" id="syncBtnTitle">Код сохранности данных</div>
+        <div class="backup-option-desc" id="syncBtnDesc">Защитит данные от потери и объединит их на всех устройствах</div>
       </div>
     </button>
     <div class="sync-panel" id="syncPanel"></div>
@@ -462,7 +505,7 @@ svg{overflow:visible}
       </div>
       <div class="backup-option-text">
         <div class="backup-option-title">Восстановить из копии</div>
-        <div class="backup-option-desc">Заменит все текущие данные файлом.<br><strong>Действие необратимо!</strong></div>
+        <div class="backup-option-desc">Вы потеряете текущие расходы.<br><strong>Действие необратимо!</strong></div>
       </div>
     </button>
     <button class="backup-option danger" type="button" id="clearMonthExpensesBtn">
@@ -485,9 +528,9 @@ svg{overflow:visible}
       <div class="backup-option-icon icon-yellow">
         <svg id="themeIconSun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         <svg id="themeIconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
-        <svg id="themeIconAuto" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/></svg>
+        <svg id="themeIconSystem" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
       </div>
-      <div class="backup-option-text"><div class="backup-option-title">Выбрать тему</div><div class="backup-option-desc" id="themeMenuDesc">Светлая, тёмная или автоматически по времени суток</div></div>
+      <div class="backup-option-text"><div class="backup-option-title">Выбрать тему</div><div class="backup-option-desc" id="themeMenuDesc">Светлая, тёмная или по системе устройства</div></div>
     </button>
     <div class="theme-panel" id="themePanel"></div>
     <input type="file" id="backupFileInput" accept="application/json" style="display:none">
@@ -584,9 +627,9 @@ svg{overflow:visible}
 </div>
 <script src="logic.js"></script>
 <script>
-const {P, MONTH_NAMES, nextColor, monthKey, defaultCalendarLabel, defaultMonthData, fmt, strip, numVal, pol, arc, contrastTextColor, getWeekBounds, getRangeCats, getRangeBudget} = Logic;
+const {P, MONTH_NAMES, nextColor, monthKey, defaultCalendarLabel, defaultMonthData, fmt, strip, numVal, pol, arc, contrastTextColor, getWeekBounds, getRangeCats, getRangeBudget, categoryIconSvg} = Logic;
 const K="icity-budget-v2";
-const PRESET_CATEGORIES=["Путешествия","Спорт","Красота и уход","Образование","Подарки","Дети","Животные","Другое"];
+const PRESET_CATEGORIES=["Путешествия","Спорт","Красота и уход","Образование","Подарки","Дети","Животные","Хобби","Подушка","Другое"];
 
 function monthLabel(key){
   const month = STORE.months[key];
@@ -659,6 +702,116 @@ if(Object.keys(STORE.months).length===0){
   STORE.current = nowKey;
 }
 
+// The 19 built-in category names (defaults + presets) each own a fixed slot
+// in P[] that keeps getting retuned by hand (exact hex requests, one at a
+// time). A category's `col` is only ever copied from P[] once, at creation —
+// so without this, a slot retuned after a category already existed never
+// reaches it; contrast is fine either way, so the general safety-net below
+// never catches it. Forced sync by name, unconditionally, on every load —
+// this only touches the 19 known names, never a category the user named
+// themselves.
+const NAME_TO_P_INDEX = {
+  'дом':0, 'продукты и хозтовары':1, 'транспорт':2, 'связь и подписки':3, 'одежда':4,
+  'развлечения':5, 'кафе и рестораны':6, 'здоровье':7, 'кредиты':8,
+  'путешествия':9, 'спорт':10, 'красота и уход':11, 'образование':12, 'подарки':13,
+  'дети':14, 'животные':15, 'хобби':16, 'подушка':17, 'другое':18
+};
+function syncBuiltinCategoryColor(c){
+  const idx = NAME_TO_P_INDEX[c.n.trim().toLowerCase()];
+  if(idx!==undefined && P[idx]) c.col = P[idx];
+}
+
+// Icons went flat-white (2026-08-09), so any category color a real user's
+// history has accumulated — not just the ones in the shipped palette, since
+// `col` is copied once at creation time via nextColor() and can drift far
+// from P[] as categories get added/removed/reordered over months of use —
+// needs enough contrast for a white glyph to read. Checked and, if needed,
+// darkened (same hue, lower lightness) on every load, so this self-heals
+// regardless of how the color got there.
+function hexToRgb(hex){
+  const h = hex.replace('#','');
+  return { r: parseInt(h.substr(0,2),16), g: parseInt(h.substr(2,2),16), b: parseInt(h.substr(4,2),16) };
+}
+function rgbToHex(r,g,b){
+  const c = v => Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+  return '#'+c(r)+c(g)+c(b);
+}
+function rgbToHsl(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0,s=0; const l=(max+min)/2;
+  const d = max-min;
+  if(d!==0){
+    s = d/(1-Math.abs(2*l-1));
+    switch(max){
+      case r: h = ((g-b)/d) % 6; break;
+      case g: h = (b-r)/d + 2; break;
+      default: h = (r-g)/d + 4;
+    }
+    h *= 60; if(h<0) h+=360;
+  }
+  return {h,s,l};
+}
+function hslToRgb(h,s,l){
+  const c = (1-Math.abs(2*l-1))*s;
+  const x = c*(1-Math.abs((h/60)%2-1));
+  const m = l-c/2;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x;b=0;} else if(h<120){r=x;g=c;b=0;} else if(h<180){r=0;g=c;b=x;}
+  else if(h<240){r=0;g=x;b=c;} else if(h<300){r=x;g=0;b=c;} else {r=c;g=0;b=x;}
+  return { r:(r+m)*255, g:(g+m)*255, b:(b+m)*255 };
+}
+function contrastWithWhite(r,g,b){
+  const f = v => { v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); };
+  const L = 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);
+  return 1.05/(L+0.05);
+}
+function ensureWhiteIconContrast(hex, target){
+  target = target||3.2;
+  let rgb;
+  try{ rgb = hexToRgb(hex); }catch(e){ return hex; }
+  if(isNaN(rgb.r)||isNaN(rgb.g)||isNaN(rgb.b)) return hex;
+  if(contrastWithWhite(rgb.r,rgb.g,rgb.b) >= target) return hex;
+  const hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+  let l = hsl.l;
+  for(let i=0;i<50 && l>0.02;i++){
+    l -= 0.02;
+    const darker = hslToRgb(hsl.h,hsl.s,l);
+    if(contrastWithWhite(darker.r,darker.g,darker.b) >= target){
+      return rgbToHex(darker.r,darker.g,darker.b);
+    }
+  }
+  const floor = hslToRgb(hsl.h,hsl.s,0.02);
+  return rgbToHex(floor.r,floor.g,floor.b);
+}
+
+// "Еда вне дома" renamed to "Кафе и рестораны" (2026-08-09) — some users
+// had already created a "Кафе и рестораны" category by hand, which would
+// otherwise sit duplicated next to the newly-renamed default. Merges the
+// duplicate's amount/history into the renamed category instead of
+// discarding it, so no recorded spending is lost.
+function findCatEntry(month, nameLower){
+  let idx = (month.C||[]).findIndex(c=>c.n.trim().toLowerCase()===nameLower);
+  if(idx>=0) return {arr:month.C, idx};
+  idx = (month.hiddenC||[]).findIndex(c=>c.n.trim().toLowerCase()===nameLower);
+  if(idx>=0) return {arr:month.hiddenC, idx};
+  return null;
+}
+function mergeFoodOutIntoCafe(month){
+  const foodOutEntry = findCatEntry(month, 'еда вне дома');
+  const cafeEntry = findCatEntry(month, 'кафе и рестораны');
+  if(foodOutEntry && cafeEntry){
+    const foodOut = foodOutEntry.arr[foodOutEntry.idx];
+    const cafe = cafeEntry.arr[cafeEntry.idx];
+    foodOut.a = (foodOut.a||0) + (cafe.a||0);
+    foodOut.h = (foodOut.h||[]).concat(cafe.h||[]);
+    foodOut.n = 'Кафе и рестораны';
+    cafeEntry.arr.splice(cafeEntry.idx,1);
+  } else if(foodOutEntry){
+    foodOutEntry.arr[foodOutEntry.idx].n = 'Кафе и рестораны';
+  }
+}
+
 // repairs order/current + fills in fields older/foreign data might be missing.
 // Shared by the initial load, "Восстановить из копии", and cloud sync pulls,
 // so every entry point into STORE gets the same shape guarantees.
@@ -668,11 +821,16 @@ function normalizeStore(store){
   const missing = existing.filter(k=>!known.has(k)).sort();
   store.order = store.order.filter(k=>store.months[k]).concat(missing);
   Object.values(store.months).forEach(month=>{
+    if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
+    mergeFoodOutIntoCafe(month);
     (month.C||[]).forEach((c,i)=>{
       if(!c.col) c.col = nextColor(month.C.slice(0,i));
+      else{ syncBuiltinCategoryColor(c); c.col = ensureWhiteIconContrast(c.col); }
+    });
+    month.hiddenC.forEach(c=>{
+      if(c.col){ syncBuiltinCategoryColor(c); c.col = ensureWhiteIconContrast(c.col); }
     });
     if(!Array.isArray(month.IN)) month.IN = [];
-    if(!Array.isArray(month.hiddenC)) month.hiddenC = [];
     if(!Array.isArray(month.EV)) month.EV = [];
   });
   if(!Array.isArray(store.deletedMonths)) store.deletedMonths = [];
@@ -738,6 +896,7 @@ const undoToast=document.getElementById('undoToast');
 const undoToastMessage=document.getElementById('undoToastMessage');
 const undoToastBtn=document.getElementById('undoToastBtn');
 let activeExpenseIndex=null;
+let activeLimitIndex=null;
 let keyboardActionMode=null;
 let lastUndoAction=null;
 let undoToastTimer=null;
@@ -844,10 +1003,13 @@ function updateKeyboardActionBarPosition(){
 }
 function showKeyboardActionBar(mode,i){
   const nextMode = mode || 'expense';
-  if(keyboardActionMode!==nextMode || activeExpenseIndex!==i) keyboardActionComment.value='';
+  const nextIndex = nextMode==='limit' ? activeLimitIndex : activeExpenseIndex;
+  if(keyboardActionMode!==nextMode || nextIndex!==i) keyboardActionComment.value='';
   keyboardActionMode=nextMode;
   activeExpenseIndex=nextMode==='expense'?i:null;
-  keyboardActionSubmit.textContent=nextMode==='income'?'Добавить':'Добавить расход';
+  activeLimitIndex=nextMode==='limit'?i:null;
+  keyboardActionSubmit.textContent=nextMode==='income'?'Добавить':nextMode==='limit'?'Добавить лимит':'Добавить расход';
+  keyboardActionBar.classList.toggle('no-comment', nextMode==='limit');
   keyboardActionBar.classList.add('show');
   keyboardActionBar.setAttribute('aria-hidden','false');
   keyboardActionBar.inert=false;
@@ -855,6 +1017,7 @@ function showKeyboardActionBar(mode,i){
 }
 function hideKeyboardActionBar(){
   activeExpenseIndex=null;
+  activeLimitIndex=null;
   keyboardActionMode=null;
   keyboardActionBar.classList.remove('show');
   keyboardActionBar.setAttribute('aria-hidden','true');
@@ -866,6 +1029,7 @@ keyboardActionSubmit.addEventListener('pointerdown',e=>e.preventDefault());
 keyboardActionSubmit.addEventListener('click',()=>{
   if(keyboardActionMode==='income') submitIncome();
   if(keyboardActionMode==='expense' && activeExpenseIndex!==null) submitExpenseFor(activeExpenseIndex);
+  if(keyboardActionMode==='limit' && activeLimitIndex!==null) saveCategoryLimit(activeLimitIndex);
 });
 keyboardActionComment.addEventListener('keydown',e=>{
   if(e.key==='Enter'||e.key==='Go'||e.key==='Done'){
@@ -899,6 +1063,18 @@ function flashSaveIndicator(ok){
   btn.classList.remove('sync-success','save-err');
   btn.classList.add(ok?'sync-success':'save-err');
   saveFlashTimer = setTimeout(()=>{ btn.classList.remove('sync-success','save-err'); }, ok?900:1600);
+}
+let syncSweepTimer1=null, syncSweepTimer2=null;
+function flashSyncSpin(){
+  const btn = document.getElementById('syncRefreshBtn');
+  clearTimeout(saveFlashTimer);
+  clearTimeout(syncSweepTimer1);
+  clearTimeout(syncSweepTimer2);
+  btn.classList.remove('sync-success','save-err','sweep-run','sweep-flash');
+  void btn.offsetWidth; // restart the draw animation if a sync lands mid-flight
+  btn.classList.add('busy','sweep-run');
+  syncSweepTimer1 = setTimeout(()=>{ btn.classList.add('sweep-flash'); }, 600);
+  syncSweepTimer2 = setTimeout(()=>{ btn.classList.remove('busy','sweep-run','sweep-flash'); }, 600+900);
 }
 function save(silent){
   try{
@@ -1021,7 +1197,7 @@ function renderRows(){
     const row=document.createElement('div');row.className='row'+(isExpanded?' expanded':'');
     row.innerHTML=`
       <div class="row-top">
-        <div class="sw" style="background:${swGradient(c.col || P[i%P.length])}"></div>
+        <div class="sw" style="background:${c.col || P[i%P.length]};color:#fff">${categoryIconSvg(c.n)}</div>
         <div class="ninp" title="${(c.n||'').replace(/"/g,'&quot;')}">${(c.n||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
         <div class="amt-display${(c.limit>0 && c.a>c.limit)?' over-limit':''}" id="amt-${i}">${fmt(c.a)}</div>
         <button class="hist-icon-btn" type="button" data-i="${i}" data-histbtn="1" aria-label="История категории" title="История категории">
@@ -1363,22 +1539,81 @@ function animateSideNumbers(fromBudget, fromRemaining, fromCatAmounts){
 function animateChartTransition(fromRanges, fromLeft, fromTotal){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduceMotion) return;
-  const paths = Array.from(svg.querySelectorAll('path[data-seg]'));
-  if(!paths.length) return;
-  const jobs = paths.map(el=>{
-    const key = el.getAttribute('data-seg');
-    const toS = parseFloat(el.getAttribute('data-s')), toE = parseFloat(el.getAttribute('data-e'));
-    const fromRange = key==='__left__' ? fromLeft : fromRanges.find(r=>r.name===key);
-    let fromS, fromE;
-    if(fromRange){ fromS=fromRange.s; fromE=fromRange.e; }
-    else { const mid=(toS+toE)/2; fromS=mid; fromE=mid; }
-    return {el, fromS, fromE, toS, toE};
-  });
   const totalEl = svg.querySelector('[data-role="chart-total"]');
   const toTotal = totalEl ? parseFloat(totalEl.getAttribute('data-raw')) : null;
   const animateTotal = totalEl && typeof fromTotal==='number' && !isNaN(toTotal) && fromTotal!==toTotal;
   const dur=300, t0=performance.now();
   const ease = t => 1-Math.pow(1-t,3);
+  const paths = Array.from(svg.querySelectorAll('path[data-seg]'));
+  // "Empty" means no real spending category segments - a month with a budget
+  // but 0 spent still renders one grey __left__ segment covering the whole
+  // ring (it's not visually blank), so that path alone must NOT count as
+  // "has categories" here, or the sweep animation below never triggers for
+  // the single most common empty-month case.
+  const toCatPaths = paths.filter(el=>el.getAttribute('data-seg')!=='__left__');
+  const toLeftPath = paths.find(el=>el.getAttribute('data-seg')==='__left__');
+  const fromHasCats = fromRanges.length>0;
+  const toHasCats = toCatPaths.length>0;
+  let jobs=[], boundaryJob=null;
+  // The __left__ segment (if present on the "to" side) always just slides/
+  // grows in place like an ordinary matched category - it's never part of
+  // the sweep, since its color barely changes and it isn't what reads as
+  // "the categories appearing/disappearing" to begin with.
+  function addLeftJob(){
+    if(!toLeftPath) return;
+    const toS=parseFloat(toLeftPath.getAttribute('data-s')), toE=parseFloat(toLeftPath.getAttribute('data-e'));
+    let fromS, fromE;
+    if(fromLeft){ fromS=fromLeft.s; fromE=fromLeft.e; }
+    else { const mid=(toS+toE)/2; fromS=mid; fromE=mid; }
+    jobs.push({el:toLeftPath, fromS, fromE, toS, toE});
+  }
+  if(fromHasCats && toHasCats){
+    // Normal month-to-month move: categories that exist on both sides slide
+    // from their old arc to their new one; a category that only exists on
+    // one side grows/shrinks in place around its own midpoint. Pivoting
+    // every unmatched segment to a shared point here (like the sweep cases
+    // below) made ordinary month switches look like a reset, since several
+    // segments rarely line up between two months.
+    jobs = paths.map(el=>{
+      const key = el.getAttribute('data-seg');
+      const toS = parseFloat(el.getAttribute('data-s')), toE = parseFloat(el.getAttribute('data-e'));
+      const fromRange = key==='__left__' ? fromLeft : fromRanges.find(r=>r.name===key);
+      let fromS, fromE;
+      if(fromRange){ fromS=fromRange.s; fromE=fromRange.e; }
+      else { const mid=(toS+toE)/2; fromS=mid; fromE=mid; }
+      return {el, fromS, fromE, toS, toE};
+    });
+  } else if(toHasCats){
+    // Coming from an empty (no-spending) month: unwind exactly like the ring
+    // was originally drawn - one shared boundary sweeping clockwise from 12
+    // o'clock, revealing each category segment in turn.
+    boundaryJob = { from:-90, to:-90, mode:'reveal', segs: toCatPaths.map(el=>({
+      el, s:parseFloat(el.getAttribute('data-s')), e:parseFloat(el.getAttribute('data-e'))
+    })) };
+    boundaryJob.to = Math.max(...boundaryJob.segs.map(s=>s.e));
+    addLeftJob();
+  } else if(fromHasCats){
+    // Going to an empty (no-spending) month: erase with the *same* clockwise
+    // sweep as filling in, not a mirrored counter-clockwise rewind - the
+    // boundary starts at 12 o'clock and advances clockwise, consuming each
+    // old category segment from its own start forward (ghost copies, since
+    // the real elements are already gone from the freshly-rendered DOM), so
+    // the earliest-drawn segment is the first to vanish and the wipe always
+    // reads as 12 -> 3 -> 6 -> 9 -> 12.
+    boundaryJob = { from:-90, to: Math.max(...fromRanges.map(r=>r.e)), mode:'erase', ghost:true, segs: fromRanges.map(r=>{
+      const el=document.createElementNS(CHART_NS,"path");
+      el.setAttribute("fill", r.col||cssVar('--muted'));
+      el.setAttribute("stroke","none");
+      if(totalEl) svg.insertBefore(el, totalEl); else svg.appendChild(el);
+      return {el, s:r.s, e:r.e};
+    })};
+    addLeftJob();
+  } else {
+    // Neither side has real spending - only the __left__/track slide (or
+    // nothing at all) and possibly the center total number are in motion.
+    addLeftJob();
+    if(!jobs.length && !animateTotal) return;
+  }
   function frame(now){
     const t=Math.min(1,(now-t0)/dur), k=ease(t);
     jobs.forEach(j=>{
@@ -1386,8 +1621,18 @@ function animateChartTransition(fromRanges, fromLeft, fromTotal){
       const e=j.fromE+(j.toE-j.fromE)*k;
       j.el.setAttribute('d', roundedSegmentPath(CHART_CX,CHART_CY,CHART_RINGR+CHART_THICK/2,CHART_RINGR-CHART_THICK/2, s, e, SEGMENT_CORNER_PX));
     });
+    if(boundaryJob){
+      const boundary = boundaryJob.from+(boundaryJob.to-boundaryJob.from)*k;
+      boundaryJob.segs.forEach(seg=>{
+        const s = boundaryJob.mode==='erase' ? Math.max(seg.s, boundary) : seg.s;
+        const e = boundaryJob.mode==='erase' ? seg.e : Math.min(seg.e, boundary);
+        if(e<=s){ seg.el.setAttribute('d',''); return; }
+        seg.el.setAttribute('d', roundedSegmentPath(CHART_CX,CHART_CY,CHART_RINGR+CHART_THICK/2,CHART_RINGR-CHART_THICK/2, s, e, SEGMENT_CORNER_PX));
+      });
+    }
     if(animateTotal) totalEl.textContent = fmt(Math.round(fromTotal+(toTotal-fromTotal)*k));
     if(t<1) requestAnimationFrame(frame);
+    else if(boundaryJob && boundaryJob.ghost) boundaryJob.segs.forEach(seg=>seg.el.remove());
   }
   requestAnimationFrame(frame);
 }
@@ -1529,7 +1774,7 @@ function renderChartNow(){
     btn.classList.toggle('active', btn.dataset.period===chartPeriod);
   });
   chartCol.classList.toggle('expanded', chartExpanded);
-  lastCatRanges = catRanges.map(r=>({name:r.name, s:r.s, e:r.e}));
+  lastCatRanges = catRanges.map(r=>({name:r.name, s:r.s, e:r.e, col:r.col}));
   lastLeftRange = lastLeftRangeNext;
   lastPeriodTotal = periodTotal;
 }
@@ -1693,6 +1938,9 @@ function getAllExpenses(){
         all.push({kind:'add_cat', mk, mLabel, catName:ev.name, date:ev.date});
       } else if(ev.type==='rename_cat'){
         all.push({kind:'rename_cat', mk, mLabel, oldName:ev.oldName, newName:ev.newName, date:ev.date});
+      } else if(ev.type==='clear_month'){
+        const total = (ev.snapshot||[]).reduce((s,c)=>s+(parseFloat(c.a)||0),0);
+        all.push({kind:'clear_month', mk, mLabel, evIndex, total, date:ev.date, restored:!!ev.restored});
       }
     });
   });
@@ -1730,6 +1978,7 @@ function itemSearchText(item){
     case 'rename_cat': return ['переименование', item.oldName, item.newName, item.mLabel].filter(Boolean).join(' ');
     case 'del_cat': return ['удалена категория', item.catName, item.mLabel, fmt(item.amount)].filter(Boolean).join(' ');
     case 'del_month': return ['удалён месяц', item.monthLabel].filter(Boolean).join(' ');
+    case 'clear_month': return ['очищены расходы', item.mLabel, fmt(item.total)].filter(Boolean).join(' ');
     default: return '';
   }
 }
@@ -1829,6 +2078,19 @@ function renderGlobalHist(){
             <div class="gh-date">${historyTime(item.date)}</div>
           </div>
           ${item.restored ? `<div style="font-size:12px;color:var(--green);margin-top:6px;padding-left:24px">✓ восстановлен</div>` : `<div style="margin-top:8px;padding-left:24px"><button class="gh-restore" data-ghrestoremonth="${item.dmIndex}">Вернуть месяц</button></div>`}
+        </div>
+      `;
+    }
+    if(item.kind==='clear_month'){
+      return `
+        ${dayHeader}<div class="gh-item">
+          <div class="gh-row">
+            <div class="gh-event-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg></div>
+            <div class="gh-cat">расходы месяца очищены</div>
+            <div class="gh-date"><span class="gh-month-tag">${item.mLabel||''}</span> ${historyTime(item.date)}</div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;padding-left:24px">Сумма на момент очистки: <b style="color:var(--text)">${fmt(item.total)}</b></div>
+          ${item.restored ? `<div style="font-size:12px;color:var(--green);margin-top:6px;padding-left:24px">✓ восстановлены</div>` : `<div style="margin-top:8px;padding-left:24px"><button class="gh-restore" data-ghrestoreclear="${item.mk}:${item.evIndex}">Восстановить расходы</button></div>`}
         </div>
       `;
     }
@@ -1972,6 +2234,29 @@ function attachGlobalHist(){
       if(!ev || ev.type!=='del_cat' || ev.restored) return;
       if(!confirm(`Вернуть категорию «${ev.name}» с суммой ${fmt(ev.amount)} и историей трат?`)) return;
       m.C.push({n: ev.name, a: ev.amount, h: ev.h || [], col: nextColor(m.C)});
+      ev.restored = true;
+      renderRows();
+      renderChart();
+      renderGlobalHist();
+      save();
+    });
+  });
+  document.querySelectorAll('[data-ghrestoreclear]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      const [mk,evIndexStr] = e.target.dataset.ghrestoreclear.split(':');
+      const evIndex = +evIndexStr;
+      const m = STORE.months[mk];
+      if(!m) return;
+      const ev = m.EV[evIndex];
+      if(!ev || ev.type!=='clear_month' || ev.restored) return;
+      const total = (ev.snapshot||[]).reduce((s,c)=>s+(parseFloat(c.a)||0),0);
+      if(!confirm(`Восстановить расходы месяца на сумму ${fmt(total)}?`)) return;
+      ev.snapshot.forEach(snap=>{
+        let cat = m.C.find(c=>c.n===snap.n);
+        if(!cat){ cat = {n:snap.n, a:0, h:[], col:nextColor(m.C)}; m.C.push(cat); }
+        cat.a = (parseFloat(cat.a)||0) + (parseFloat(snap.a)||0);
+        cat.h = (snap.h||[]).concat(cat.h||[]).sort((a,b)=>new Date(a.d)-new Date(b.d));
+      });
       ev.restored = true;
       renderRows();
       renderChart();
@@ -2207,7 +2492,7 @@ function attach(){
       document.getElementById('hist-'+i).classList.toggle('open');
     });
   });
-  function saveCategoryLimit(i){
+  saveCategoryLimit = function(i){
     const inp=document.querySelector(`[data-limitinput="${i}"]`);
     const c=C[i];
     if(!inp || !c) return;
@@ -2216,6 +2501,7 @@ function attach(){
     const num=numVal(inp.value);
     if(num>0){ c.limit=num; } else { delete c.limit; }
     limitEditCategories.delete(c);
+    hideKeyboardActionBar();
     renderRows(); renderChart(); sched();
     const newLimit=num>0?num:null;
     const oldNormalized=hadLimit && Number(oldLimit)>0?Number(oldLimit):null;
@@ -2236,8 +2522,8 @@ function attach(){
         limitEditCategories.clear();
         limitEditCategories.add(c);
         cancelIncomeEntry();
-        hideKeyboardActionBar();
         renderRows();
+        showKeyboardActionBar('limit', i);
         const inp=document.querySelector(`[data-limitinput="${i}"]`);
         if(inp){
           inp.focus({preventScroll:true});
@@ -2330,8 +2616,6 @@ function attachCatSwipe(list){
 function renderCatEditor(){
   const m = cur();
   const list = document.getElementById('catEditorList');
-  const activeNames = new Set(m.C.map(c=>c.n.trim().toLowerCase()));
-  const hiddenNames = new Set((m.hiddenC||[]).map(c=>c.n.trim().toLowerCase()));
 
   let html = '';
   m.C.forEach((c,i)=>{
@@ -2340,22 +2624,9 @@ function renderCatEditor(){
         <button type="button" class="cat-drag-handle" aria-label="Изменить порядок категории">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg>
         </button>
-        <div class="cat-edit-sw" style="background:${swGradient(c.col)}"></div>
+        <div class="cat-edit-sw" style="background:${c.col};color:#fff">${categoryIconSvg(c.n)}</div>
         <div class="cat-edit-name">${c.n.replace(/</g,'&lt;')}</div>
         <button class="cat-edit-toggle on" type="button" data-cathide="${i}" aria-label="Отключить категорию"></button>
-      </div>`;
-  });
-  (m.hiddenC||[]).forEach((c,i)=>{
-    html += `
-      <div class="cat-swipe-wrap">
-        <button class="cat-swipe-delete" data-catdelhidden="${i}">Удалить</button>
-        <div class="cat-swipe-content" data-swipeitem="1">
-          <div class="cat-edit-item" style="border-bottom:none">
-            <div class="cat-edit-sw" style="background:${swGradient(c.col)}"></div>
-            <div class="cat-edit-name dim">${c.n.replace(/</g,'&lt;')}</div>
-            <button class="cat-edit-toggle" type="button" data-catshow="${i}" aria-label="Включить категорию"></button>
-          </div>
-        </div>
       </div>`;
   });
   list.innerHTML = html || '<div class="gh-empty">Нет доступных категорий</div>';
@@ -2398,32 +2669,6 @@ function renderCatEditor(){
         btn.classList.add('on');
         renderRows(); renderChart(); save();
       }
-    });
-  });
-  list.querySelectorAll('[data-catshow]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const i = +btn.dataset.catshow;
-      const m2 = cur();
-      const [cat] = m2.hiddenC.splice(i,1);
-      m2.C.push(cat);
-      // Same in-place treatment as отключение: flip the toggle right where
-      // it is so the transition actually plays, instead of rebuilding the
-      // list immediately (which would just paint the new state instantly).
-      btn.classList.add('on');
-      renderRows(); renderChart(); save();
-    });
-  });
-  list.querySelectorAll('[data-catdelhidden]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const i = +btn.dataset.catdelhidden;
-      const m2 = cur();
-      const cat = m2.hiddenC[i];
-      if(!cat) return;
-      if(!confirm(`Удалить категорию «${cat.n}» насовсем? Это действие нельзя отменить.`)) return;
-      expandedCategories.delete(cat);
-      limitEditCategories.delete(cat);
-      m2.hiddenC.splice(i,1);
-      renderCatEditor(); save();
     });
   });
   attachCatSwipe(list);
@@ -2487,6 +2732,58 @@ function attachCatReorder(list){
   });
 }
 
+// Presets you've dismissed ("Убрать") and categories you've permanently
+// deleted ("Удалить") both land here instead of just vanishing — each row
+// restores that one item right in place, no separate "restore everything"
+// step.
+function renderCatHistory(){
+  const m = cur();
+  const section = document.getElementById('catHistorySection');
+  const dismissed = STORE.dismissedPresets||[];
+  const deleted = m.deletedC||[];
+  if(!dismissed.length && !deleted.length){
+    section.innerHTML = '<div class="gh-empty">Пока нет изменений</div>';
+    return;
+  }
+
+  let html = '';
+  dismissed.forEach((key,i)=>{
+    const preset = PRESET_CATEGORIES.find(n=>n.trim().toLowerCase()===key);
+    html += `
+      <div class="cat-history-item">
+        <div class="cat-history-text">Категория «<b>${(preset||key).replace(/</g,'&lt;')}</b>» убрана из предложений</div>
+        <button class="cat-history-restore" type="button" data-histdismiss="${i}">Вернуть</button>
+      </div>`;
+  });
+  deleted.forEach((cat,i)=>{
+    html += `
+      <div class="cat-history-item">
+        <div class="cat-history-text">Категория «<b>${cat.n.replace(/</g,'&lt;')}</b>» удалена</div>
+        <button class="cat-history-restore" type="button" data-histdeleted="${i}">Восстановить</button>
+      </div>`;
+  });
+  section.innerHTML = html;
+
+  section.querySelectorAll('[data-histdismiss]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.histdismiss;
+      STORE.dismissedPresets.splice(i,1);
+      renderAddCategoryList(); save();
+    });
+  });
+  section.querySelectorAll('[data-histdeleted]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i = +btn.dataset.histdeleted;
+      const m2 = cur();
+      const [cat] = m2.deletedC.splice(i,1);
+      if(!cat) return;
+      if(!m2.hiddenC) m2.hiddenC=[];
+      m2.hiddenC.push(cat);
+      renderAddCategoryList(); save();
+    });
+  });
+}
+
 function renderAddCategoryList(){
   const m = cur();
   const list = document.getElementById('addCategoryList');
@@ -2494,6 +2791,22 @@ function renderAddCategoryList(){
   const hiddenNames = new Set((m.hiddenC||[]).map(c=>c.n.trim().toLowerCase()));
 
   let html = '';
+  // Categories you've turned off show up here (real color, already exist as
+  // objects) alongside preset suggestions you've never added (placeholder
+  // color, no object yet) — one merged "things you can turn on" list.
+  (m.hiddenC||[]).forEach((c,i)=>{
+    html += `
+      <div class="cat-swipe-wrap">
+        <button class="cat-swipe-delete" data-catdelhidden="${i}">Удалить</button>
+        <div class="cat-swipe-content" data-swipeitem="1">
+          <div class="cat-edit-item" style="border-bottom:none" data-cathidx="${i}">
+            <div class="cat-edit-sw" style="background:var(--line)">${categoryIconSvg(c.n)}</div>
+            <div class="cat-edit-name dim">${c.n.replace(/</g,'&lt;')}</div>
+            <button class="cat-edit-toggle" type="button" aria-label="Включить категорию"></button>
+          </div>
+        </div>
+      </div>`;
+  });
   PRESET_CATEGORIES.forEach(name=>{
     const key = name.trim().toLowerCase();
     if(activeNames.has(key) || hiddenNames.has(key)) return;
@@ -2502,20 +2815,16 @@ function renderAddCategoryList(){
       <div class="cat-swipe-wrap">
         <button class="cat-swipe-delete" data-catdismiss="${name.replace(/"/g,'&quot;')}">Убрать</button>
         <div class="cat-swipe-content" data-swipeitem="1">
-          <div class="cat-edit-item" style="border-bottom:none">
-            <div class="cat-edit-sw" style="background:var(--line)"></div>
+          <div class="cat-edit-item" style="border-bottom:none" data-catpreset="${name.replace(/"/g,'&quot;')}">
+            <div class="cat-edit-sw" style="background:var(--line)">${categoryIconSvg(name)}</div>
             <div class="cat-edit-name dim">${name}</div>
-            <button class="cat-edit-toggle" type="button" data-catadd="${name.replace(/"/g,'&quot;')}" aria-label="Добавить категорию"></button>
+            <button class="cat-edit-toggle" type="button" aria-label="Добавить категорию"></button>
           </div>
         </div>
       </div>`;
   });
-  list.innerHTML = html || '<div class="gh-empty">Все готовые категории уже добавлены</div>';
-
-  const restoreBtn = document.getElementById('catRestorePresetsBtn');
-  const dismissedCount = (STORE.dismissedPresets||[]).length;
-  restoreBtn.disabled = dismissedCount===0;
-  restoreBtn.textContent = dismissedCount>0 ? `Восстановить убранные категории (${dismissedCount})` : 'Нет убранных категорий';
+  list.innerHTML = html || '<div class="gh-empty">Всё уже добавлено</div>';
+  renderCatHistory();
 
   list.querySelectorAll('[data-catdismiss]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -2526,18 +2835,71 @@ function renderAddCategoryList(){
       renderAddCategoryList(); save();
     });
   });
-  attachCatSwipe(list);
-  list.querySelectorAll('[data-catadd]').forEach(btn=>{
+  list.querySelectorAll('[data-catdelhidden]').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      const name = btn.dataset.catadd;
+      const i = +btn.dataset.catdelhidden;
       const m2 = cur();
-      m2.C.push({n:name, a:0, h:[], col:nextColor(m2.C)});
-      if(!m2.EV) m2.EV=[];
-      m2.EV.push({type:'add_cat', name, date:new Date().toISOString()});
-      // Flip in place so the toggle animates, same as elsewhere — the row
-      // leaves this sheet's list next time it's (re)opened, not immediately.
-      btn.classList.add('on');
-      renderRows(); renderChart(); renderCatEditor(); sched();
+      const [cat] = m2.hiddenC.splice(i,1);
+      if(!cat) return;
+      expandedCategories.delete(cat);
+      limitEditCategories.delete(cat);
+      // Kept, not discarded — shows up below in the history so a delete
+      // isn't a dead end the way the old confirm()-then-gone version was.
+      if(!m2.deletedC) m2.deletedC=[];
+      m2.deletedC.push(cat);
+      renderAddCategoryList(); save();
+    });
+  });
+  attachCatSwipe(list);
+
+  // One bidirectional toggle for both rows. A preset has no backing
+  // category object until its first "on" click; from then on this row
+  // keeps toggling that same object, so quickly turning something on then
+  // off again in one sitting can't spawn duplicate categories — the bug
+  // was that the old add-handler unconditionally pushed a new object on
+  // every click with no memory of one already existing.
+  list.querySelectorAll('[data-cathidx], [data-catpreset]').forEach(row=>{
+    const btn = row.querySelector('.cat-edit-toggle');
+    const sw = row.querySelector('.cat-edit-sw');
+    const nameEl = row.querySelector('.cat-edit-name');
+    let cat = row.dataset.cathidx !== undefined ? (m.hiddenC||[])[+row.dataset.cathidx] : null;
+    const presetName = row.dataset.catpreset;
+    btn.addEventListener('click',()=>{
+      const m2 = cur();
+      if(btn.classList.contains('on')){
+        if(!cat) return;
+        const idx = m2.C.indexOf(cat);
+        if(idx<0) return;
+        m2.C.splice(idx,1);
+        expandedCategories.delete(cat);
+        limitEditCategories.delete(cat);
+        if(!m2.hiddenC) m2.hiddenC=[];
+        m2.hiddenC.push(cat);
+        btn.classList.remove('on');
+        nameEl.classList.add('dim');
+        if(sw){ sw.style.background = 'var(--line)'; sw.style.color = ''; }
+        renderRows(); renderChart(); save();
+      } else {
+        if(cat){
+          const hIdx = (m2.hiddenC||[]).indexOf(cat);
+          if(hIdx<0) return;
+          m2.hiddenC.splice(hIdx,1);
+          m2.C.push(cat);
+        } else {
+          // Guards against the exact duplicate-category bug this replaced:
+          // a stale render or a second sheet instance could otherwise still
+          // race to add the same preset name twice.
+          if(m2.C.some(c=>c.n.trim().toLowerCase()===presetName.trim().toLowerCase())) return;
+          cat = {n:presetName, a:0, h:[], col:nextColor(m2.C)};
+          m2.C.push(cat);
+          if(!m2.EV) m2.EV=[];
+          m2.EV.push({type:'add_cat', name:presetName, date:new Date().toISOString()});
+        }
+        btn.classList.add('on');
+        nameEl.classList.remove('dim');
+        if(sw){ sw.style.background = cat.col; sw.style.color = '#fff'; }
+        renderRows(); renderChart(); renderCatEditor(); sched();
+      }
     });
   });
 }
@@ -2556,6 +2918,13 @@ document.getElementById('openAddCategoryBtn').addEventListener('click',()=>{
 document.getElementById('addCategoryClose').addEventListener('click',()=>{
   document.getElementById('addCategoryOverlay').classList.remove('open');
 });
+document.getElementById('catHistoryToggleBtn').addEventListener('click',()=>{
+  const btn = document.getElementById('catHistoryToggleBtn');
+  const panel = document.getElementById('catHistorySection');
+  const open = !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+});
 document.getElementById('addCategoryOverlay').addEventListener('click',e=>{
   if(e.target.id==='addCategoryOverlay') document.getElementById('addCategoryOverlay').classList.remove('open');
 });
@@ -2567,16 +2936,16 @@ document.getElementById('catAddBtn').addEventListener('click',()=>{
   const name = inp.value.trim();
   if(!name) return;
   const m = cur();
+  const key = name.toLowerCase();
+  if(m.C.some(c=>c.n.trim().toLowerCase()===key) || (m.hiddenC||[]).some(c=>c.n.trim().toLowerCase()===key)){
+    alert(`Категория «${name}» уже есть`);
+    return;
+  }
   m.C.push({n:name, a:0, h:[], col:nextColor(m.C)});
   if(!m.EV) m.EV=[];
   m.EV.push({type:'add_cat', name, date:new Date().toISOString()});
   inp.value='';
   renderRows(); renderChart(); renderCatEditor(); sched();
-});
-document.getElementById('catRestorePresetsBtn').addEventListener('click',()=>{
-  STORE.dismissedPresets = [];
-  renderAddCategoryList();
-  save();
 });
 
 // Income field is read-only: it only changes via "Новый доход" or history editing.
@@ -2717,7 +3086,9 @@ document.getElementById('clearMonthExpensesBtn').addEventListener('click',()=>{
     alert('В этом месяце пока нет расходов.');
     return;
   }
-  const snapshot = m.C.map(c=>({a:c.a, h:(c.h||[]).slice()}));
+  if(!m.EV) m.EV=[];
+  const ev = {type:'clear_month', snapshot: m.C.map(c=>({n:c.n, a:c.a, h:(c.h||[]).slice()})), date:new Date().toISOString()};
+  m.EV.push(ev);
   m.C.forEach(c=>{ c.a=0; c.h=[]; });
   expandedCategories.clear();
   limitEditCategories.clear();
@@ -2727,8 +3098,12 @@ document.getElementById('clearMonthExpensesBtn').addEventListener('click',()=>{
   if(document.getElementById('ghOverlay').classList.contains('open')) renderGlobalHist();
   save();
   document.getElementById('backupOverlay').classList.remove('open');
+  // The undo toast is the fast path; ev stays in the month's event log either
+  // way so the clear can still be found and reversed from История after the
+  // toast is gone (mirrors how del_cat/del_month restores work).
   showUndoToast('Расходы месяца очищены',()=>{
-    m.C.forEach((c,i)=>{ c.a=snapshot[i].a; c.h=snapshot[i].h; });
+    m.C.forEach((c,i)=>{ c.a=ev.snapshot[i].a; c.h=ev.snapshot[i].h; });
+    ev.restored = true;
     refreshAfterUndo();
   });
 });
@@ -2950,38 +3325,10 @@ function applyRemoteStore(remoteStore, forceCurrentMonth){
 
 const syncRefreshBtn = document.getElementById('syncRefreshBtn');
 function updateSyncRefreshBtn(){
-  syncRefreshBtn.title = syncCode ? 'Обновить данные из облака' : 'Индикатор сохранения';
+  syncRefreshBtn.title = syncCode ? 'Индикатор синхронизации' : 'Индикатор сохранения';
   syncRefreshBtn.setAttribute('aria-label', syncRefreshBtn.title);
 }
 updateSyncRefreshBtn();
-syncRefreshBtn.addEventListener('click', async ()=>{
-  if(!syncCode || !window.CloudSync || syncRefreshBtn.classList.contains('busy')) return;
-  syncRefreshBtn.classList.add('busy');
-  syncRefreshBtn.querySelector('svg').classList.add('spinning');
-  const minSpin = new Promise(r=>setTimeout(r, 1000));
-  let ok = true;
-  try{
-    const data = await window.CloudSync.getBudgetDoc(syncCode, syncCollection);
-    if(data && data.store){
-      applyRemoteStore(data.store);
-      syncStatus = 'Синхронизировано только что';
-      syncStatusErr = false;
-    }
-  }catch(err){
-    ok = false;
-    syncStatus = 'Не удалось обновить: '+err.message;
-    syncStatusErr = true;
-  }
-  await minSpin;
-  if(syncPanelOpen) renderSyncPanel();
-  syncRefreshBtn.querySelector('svg').classList.remove('spinning');
-  if(ok){
-    syncRefreshBtn.classList.add('sync-success');
-    setTimeout(()=>{ syncRefreshBtn.classList.remove('sync-success'); syncRefreshBtn.classList.remove('busy'); }, 1000);
-  } else {
-    syncRefreshBtn.classList.remove('busy');
-  }
-});
 
 function startSync(code, collection){
   collection = collection || 'budgets';
@@ -3008,6 +3355,7 @@ function startSync(code, collection){
     firstSnapshot = false;
     syncStatus = 'Синхронизировано только что';
     syncStatusErr = false;
+    flashSyncSpin();
     if(syncPanelOpen) renderSyncPanel();
   }, collection);
 }
@@ -3057,7 +3405,7 @@ function renderSyncPanel(){
   let html = '';
   if(syncCode){
     html += `
-      <div class="backup-option-desc">Код синхронизации привязан именно к текущему хранилищу (Safari и иконка на экране «Домой» на iPhone — разные хранилища). Храните код как пароль и вводите его в поле «Подключить» в другом месте, чтобы свести данные вместе:</div>
+      <div class="backup-option-desc">Главное — этот код спасёт данные, если браузер сотрёт кэш. Храните его как пароль. А ещё можно ввести его на другом устройстве в поле «Подключить», чтобы синхронизировать данные.</div>
       <div class="sync-code-box">
         <span class="sync-code-text">${syncCode}</span>
         <button class="period-rename-save${syncJustCopied?' copied':''}" type="button" id="syncCopyBtn" style="flex-shrink:0;height:34px;padding:0 10px;font-size:12px">${syncJustCopied?'Скопировано ✓':'Копировать'}</button>
@@ -3213,24 +3561,19 @@ const THEME_KEY = "icity-budget-theme";
 const themeBtn = document.getElementById('themeToggle');
 const themeIconSun = document.getElementById('themeIconSun');
 const themeIconMoon = document.getElementById('themeIconMoon');
-const themeIconAuto = document.getElementById('themeIconAuto');
+const themeIconSystem = document.getElementById('themeIconSystem');
 const themeMenuDesc = document.getElementById('themeMenuDesc');
 const themePanel = document.getElementById('themePanel');
-// "Авто" follows a fixed daily window rather than the OS's light/dark
-// setting or geolocation-based sunrise/sunset — simple and works offline.
-const THEME_DAY_START_HOUR = 7;
-const THEME_DAY_END_HOUR = 20;
-function isDaytimeNow(){
-  const h = new Date().getHours();
-  return h>=THEME_DAY_START_HOUR && h<THEME_DAY_END_HOUR;
-}
+// "Системная" mirrors the device's actual light/dark setting live.
+const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 function effectiveTheme(mode){
-  return mode==='auto' ? (isDaytimeNow() ? 'light' : 'dark') : mode;
+  if(mode==='system') return systemDarkQuery.matches ? 'dark' : 'light';
+  return mode;
 }
 const THEME_OPTIONS = [
-  {mode:'light', title:'Светлая', desc:'Всегда светлое оформление'},
-  {mode:'dark', title:'Тёмная', desc:'Всегда тёмное оформление'},
-  {mode:'auto', title:'Автоматическая', desc:`Светлая с ${THEME_DAY_START_HOUR}:00 до ${THEME_DAY_END_HOUR}:00, тёмная в остальное время`}
+  {mode:'light', label:'Всегда светлая тема'},
+  {mode:'dark', label:'Всегда тёмная тема'},
+  {mode:'system', label:'Как в системе'}
 ];
 const CHECK_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg>';
 let themeMode = 'light';
@@ -3240,8 +3583,7 @@ function renderThemePanel(){
     <button type="button" class="theme-option${themeMode===opt.mode?' active':''}" data-thememode="${opt.mode}">
       <span class="theme-option-check">${CHECK_SVG}</span>
       <span class="theme-option-text">
-        <span class="theme-option-title">${opt.title}</span>
-        <span class="theme-option-desc">${opt.desc}</span>
+        <span class="theme-option-title">${opt.label}</span>
       </span>
     </button>
   `).join('');
@@ -3255,36 +3597,63 @@ function renderThemePanel(){
     });
   });
 }
-function applyTheme(mode){
+function applyThemeNow(mode){
   themeMode = mode;
   const effective = effectiveTheme(mode);
   if(effective==='light') document.documentElement.setAttribute('data-theme','light');
   else document.documentElement.removeAttribute('data-theme');
   themeIconSun.style.display = mode==='light' ? 'block' : 'none';
   themeIconMoon.style.display = mode==='dark' ? 'block' : 'none';
-  themeIconAuto.style.display = mode==='auto' ? 'block' : 'none';
-  const modeLabel = mode==='light' ? 'светлая' : mode==='dark' ? 'тёмная' : 'авто · сейчас '+(effective==='light'?'светлая':'тёмная');
-  themeMenuDesc.textContent = 'Сейчас: '+modeLabel;
+  themeIconSystem.style.display = mode==='system' ? 'block' : 'none';
+  const modeLabel = mode==='light' ? 'Светлая' : mode==='dark' ? 'Тёмная' : 'Системная';
+  themeMenuDesc.textContent = modeLabel;
   if(themePanelOpen) renderThemePanel();
   renderChart();
 }
+// Cross-fades the whole page between palettes instead of every themed element
+// snapping color at once - skipped on the very first (boot) call since there's
+// nothing on screen yet to transition from, and skipped whenever the switch
+// doesn't actually change the palette (e.g. picking "Системная" while the
+// device is already dark and the app was already showing dark) - comparing
+// against the attribute actually on screen right now, not against themeMode,
+// so a live OS theme change while already in "system" mode still animates.
+function applyTheme(mode, instant){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const currentEffective = document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
+  const paletteChanges = currentEffective !== effectiveTheme(mode);
+  if(!instant && paletteChanges && document.startViewTransition && !reduceMotion){
+    document.startViewTransition(()=>applyThemeNow(mode));
+  } else {
+    applyThemeNow(mode);
+  }
+}
 let savedTheme = 'light';
 try{ savedTheme = localStorage.getItem(THEME_KEY) || 'light'; }catch(e){}
+if(savedTheme==='auto') savedTheme = 'system'; // "Автоматическая" (time-of-day) was retired in favor of "Системная"
 
 renderMonthSelect();
 bi.value = fmt(cur().B);
 renderRows();
 renderChart();
-applyTheme(savedTheme);
-// Keeps an open session in sync with the fixed day/night window — e.g. the
-// app was opened at 19:55 in light mode and is still open past 20:00.
-setInterval(()=>{ if(themeMode==='auto') applyTheme('auto'); }, 60000);
+// Cold start has no previous ring to transition from, so animateChartTransition
+// never fires on its own here (every other caller - switchMonth, addExpense,
+// etc. - snapshots a real "from" state first). Feeding it an empty from-state
+// forces the same "sweep in from 12 o'clock" reveal the ring already plays
+// when switching in from an empty month.
+animateChartTransition([], null, 0);
+applyTheme(savedTheme, true);
+// Reacts immediately if the device's own light/dark setting changes while
+// the app is open in "system" mode (e.g. iOS switching at sunset).
+systemDarkQuery.addEventListener('change', ()=>{ if(themeMode==='system') applyTheme('system'); });
 
 themeBtn.addEventListener('click',()=>{
   themePanelOpen = !themePanelOpen;
   themePanel.classList.toggle('open', themePanelOpen);
   themeBtn.setAttribute('aria-expanded', themePanelOpen ? 'true' : 'false');
-  if(themePanelOpen) renderThemePanel();
+  if(themePanelOpen){
+    renderThemePanel();
+    themePanel.scrollIntoView({block:'nearest'});
+  }
 });
 
 function toggleChartExpanded(){
