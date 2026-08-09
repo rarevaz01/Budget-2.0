@@ -86,15 +86,15 @@ svg{overflow:visible}
 .binp{background:none;border:none;color:var(--text);font-weight:800;font-size:21px;line-height:1;padding:4px 0;width:100%;max-width:150px;cursor:default;letter-spacing:-.01em;font-family:inherit;font-variant-numeric:tabular-nums}
 .binp:focus{outline:none}
 .row{padding:13px 0;border-bottom:1px solid var(--line)}
-.row-top{display:grid;grid-template-columns:30px minmax(0,1fr) 88px 44px 44px;align-items:center;gap:8px;touch-action:pan-y}
-@media(max-width:430px){.row-top{grid-template-columns:30px minmax(0,1fr) 72px 44px 44px;gap:6px}}
+.row-top{display:grid;grid-template-columns:24px minmax(0,1fr) 88px 44px 44px;align-items:center;gap:8px;touch-action:pan-y}
+@media(max-width:430px){.row-top{grid-template-columns:24px minmax(0,1fr) 72px 44px 44px;gap:6px}}
 .row-dragging{opacity:.95;box-shadow:0 10px 24px rgba(0,0,0,.3);border-radius:14px;background:var(--card);pointer-events:none}
 .row-spacer{border:2px dashed var(--line);border-radius:12px;margin:2px 0;box-sizing:border-box}
-.sw{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
-.sw svg{width:16px;height:16px}
-.ninp{color:var(--text);font-weight:700;font-size:13px;line-height:1.2;letter-spacing:0;width:100%;min-width:0;padding:3px 2px;overflow:hidden;white-space:nowrap}
+.sw{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.sw svg{width:11px;height:11px}
+.ninp{color:var(--text);font-weight:700;font-size:14.5px;line-height:1.2;letter-spacing:0;width:100%;min-width:0;margin-left:-2px;padding:3px 2px;overflow:hidden;white-space:nowrap}
 .ninp.is-overflowing{-webkit-mask-image:linear-gradient(to right,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 72%,transparent 100%)}
-.amt-display{font-weight:700;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.amt-display{font-weight:700;font-size:14.5px;text-align:right;font-variant-numeric:tabular-nums}
 .row-expand-btn{width:44px;height:44px;border-radius:10px;border:1px solid var(--accent-action);background:var(--accent-action);color:#141414;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .12s ease}
 .row-expand-btn:active{transform:scale(.88)}
 .row-expand-btn span{display:flex;transition:transform .22s cubic-bezier(.22,1,.36,1)}
@@ -307,8 +307,8 @@ svg{overflow:visible}
 .cat-swipe-wrap{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
 .cat-swipe-content{position:relative;background:var(--card);touch-action:pan-y;will-change:transform}
 .cat-swipe-delete{position:absolute;top:0;right:0;bottom:0;width:80px;background:var(--red);color:#fff;font-weight:700;font-size:12px;border:none}
-.cat-edit-sw{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-.cat-edit-sw svg{width:15px;height:15px}
+.cat-edit-sw{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.cat-edit-sw svg{width:10px;height:10px}
 .cat-edit-name{flex:1;font-size:14px;font-weight:600;color:var(--text)}
 .cat-edit-name.dim{color:var(--muted);font-weight:500}
 .cat-edit-toggle{width:51px;height:23px;border-radius:11.5px;border:none;background:var(--line);position:relative;flex-shrink:0;transition:background .25s ease}
@@ -717,7 +717,7 @@ const NAME_TO_P_INDEX = {
   'дети':14, 'животные':15, 'хобби':16, 'подушка':17, 'другое':18
 };
 function syncBuiltinCategoryColor(c){
-  const idx = NAME_TO_P_INDEX[c.n.trim().toLowerCase()];
+  const idx = NAME_TO_P_INDEX[(c.n||'').trim().toLowerCase()];
   if(idx!==undefined && P[idx]) c.col = P[idx];
 }
 
@@ -791,9 +791,9 @@ function ensureWhiteIconContrast(hex, target){
 // duplicate's amount/history into the renamed category instead of
 // discarding it, so no recorded spending is lost.
 function findCatEntry(month, nameLower){
-  let idx = (month.C||[]).findIndex(c=>c.n.trim().toLowerCase()===nameLower);
+  let idx = (month.C||[]).findIndex(c=>(c.n||'').trim().toLowerCase()===nameLower);
   if(idx>=0) return {arr:month.C, idx};
-  idx = (month.hiddenC||[]).findIndex(c=>c.n.trim().toLowerCase()===nameLower);
+  idx = (month.hiddenC||[]).findIndex(c=>(c.n||'').trim().toLowerCase()===nameLower);
   if(idx>=0) return {arr:month.hiddenC, idx};
   return null;
 }
@@ -876,7 +876,7 @@ function ensureCurrentRealMonth(store){
   ensureRealMonthsUpTo(store, nowKey);
   if(store.months[nowKey]) store.current = nowKey;
 }
-normalizeStore(STORE);
+try{ normalizeStore(STORE); }catch(e){ console.error('normalizeStore failed, continuing with raw data', e); }
 ensureCurrentRealMonth(STORE);
 
 // active month's data, aliased for convenience
@@ -3241,7 +3241,7 @@ document.getElementById('backupFileInput').addEventListener('change',e=>{
         STORE.months[monthKey(new Date())] = defaultMonthData();
         STORE.order = [monthKey(new Date())];
       }
-      normalizeStore(STORE);
+      try{ normalizeStore(STORE); }catch(e){ console.error('normalizeStore failed, continuing with raw data', e); }
       ensureCurrentRealMonth(STORE);
       renderMonthSelect();
       bi.value = fmt(cur().B);
@@ -3305,7 +3305,7 @@ function applyRemoteStore(remoteStore, forceCurrentMonth){
       STORE.months[monthKey(new Date())] = defaultMonthData();
       STORE.order = [monthKey(new Date())];
     }
-    normalizeStore(STORE);
+    try{ normalizeStore(STORE); }catch(e){ console.error('normalizeStore failed, continuing with raw data', e); }
     ensureRealMonthsUpTo(STORE, monthKey(new Date()));
     if(forceCurrentMonth) ensureCurrentRealMonth(STORE);
     expandedCategories.clear();
